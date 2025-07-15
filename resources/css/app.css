@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ----------------------------- */
+/* 🎯 Custom Styles Start Here  */
+/* ----------------------------- */
+
+/* Orb Canvas Container (used in Orb.tsx) */
+.orb-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+}
