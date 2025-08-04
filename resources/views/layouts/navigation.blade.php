@@ -7,7 +7,7 @@
             <!-- Logo + Nav -->
             <div class="flex items-center">
                 <!-- Logo -->
-                <a href="{{ route('dashboard') }}" class="flex items-center space-x-2">
+                <a href="/" class="flex items-center space-x-2">
                     <img src="{{ asset('images/NAMELOGO_2.jpg') }}" alt="MEEPLE Logo" class="h-10 w-auto">
                 </a>
 

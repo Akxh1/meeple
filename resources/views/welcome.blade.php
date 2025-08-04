@@ -248,29 +248,113 @@
 
 
         <!-- What is MEEPLE -->
-        <section id="section-what" class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-                    <div class="space-y-4">
-                        <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100">What is MEEPLE?</h2>
-                        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
-                            MEEPLE is a university-grade platform combining playful design with academic power. It
-                            handles
-                            exams, assignments, quizzes, and automated grading through Excel uploads and AI-enhanced
-                            recommendations. Named after the game token “meeple”, it merges fun with serious learning.
-                        </p>
-                        <a href="#how-it-works"
-                            class="inline-block px-6 py-2 border border-yellow-500 text-yellow-700 dark:text-yellow-300 dark:border-yellow-300 font-medium rounded-md hover:bg-yellow-50 dark:hover:bg-yellow-300/10 transition">
-                            How MEEPLE Works
-                        </a>
-                    </div>
-                    <div class="aspect-w-20 aspect-h-20 rounded-xl overflow-hidden shadow-lg">
-                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                            title="Intro to MEEPLE" allowfullscreen></iframe>
+        <section id="section-what" class="bg-gray-50 dark:bg-gray-900 py-20 min-h-screen flex items-center">
+            <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col gap-12">
+                <!-- What is MEEPLE (Full Width Row) -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 mb-2">
+                    <h2 class="text-3xl font-extrabold text-gray-800 dark:text-white mb-4">
+                        What is <span class="text-yellow-600 dark:text-yellow-300">MEEPLE</span>?
+                    </h2>
+                    <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+                        MEEPLE is a university-grade platform that combines playful design with academic power.
+                        It supports exams, assignments, quizzes, and automated grading through Excel uploads and
+                        AI-enhanced support.
+                        Named after the game token “meeple,” it merges fun with serious learning.
+                    </p>
+                    <a href="#how-it-works"
+                        class="mt-6 inline-block px-6 py-2 border border-yellow-500 text-yellow-700 dark:text-yellow-300 dark:border-yellow-300 font-medium rounded-md hover:bg-yellow-50 dark:hover:bg-yellow-300/10 transition">
+                        How MEEPLE Works
+                    </a>
+                </div>
+
+                <!-- Carousel Row (Meaning, Features, Video) -->
+                <div class="flex flex-col items-center justify-center w-full">
+                    <div 
+                        x-data="{
+                            slides: [
+                                {
+                                    type: 'meaning',
+                                    html: `<div class='bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 border-l-4 border-yellow-400 group min-h-[340px] flex flex-col justify-center'>
+                        <h3 class='text-xl font-semibold text-gray-800 dark:text-white mb-6 flex items-center gap-2'>
+                            <span>🔤</span> MEEPLE Meaning
+                        </h3>
+                        <ul class='space-y-4 text-sm text-gray-700 dark:text-gray-200'>
+                            <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
+                                <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>M</span>
+                                <span><strong>Model-Assisted:</strong> Uses ML models like ChatGPT/Gemini for hints, explanations, and support.</span>
+                            </li>
+                            <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
+                                <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>E</span>
+                                <span><strong>Evaluation:</strong> Students are evaluated through adaptive quizzes and exams.</span>
+                            </li>
+                            <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
+                                <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>E</span>
+                                <span><strong>Engine:</strong> A robust backend engine handles logic, scoring, and feedback.</span>
+                            </li>
+                            <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
+                                <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>P</span>
+                                <span><strong>Personalized:</strong> Adapts content based on individual student performance.</span>
+                            </li>
+                            <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
+                                <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>L</span>
+                                <span><strong>Learning:</strong> Offers interactive study modules and revision tools.</span>
+                            </li>
+                            <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
+                                <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>E</span>
+                                <span><strong>Experience:</strong> Creates a seamless and engaging student experience.</span>
+                            </li>
+                        </ul>
+                    </div>`
+                                },
+                                {
+                                    type: 'features',
+                                    html: `<div class='bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 min-h-[340px] flex flex-col justify-center'>
+                        <h3 class='text-xl font-semibold text-gray-800 dark:text-white mb-4'>🎯 Core Features of MEEPLE</h3>
+                        <ul class='list-disc pl-5 space-y-2 text-sm text-gray-700 dark:text-gray-300'>
+                            <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Quiz/Exam Engine:</strong> MCQs, coding questions, fill-in-the-blanks, timed tests, progressive difficulty, and instant scoring.</li>
+                            <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Hint System Using AI:</strong> Integrates with <span class='font-medium'>ChatGPT</span> and <span class='font-medium'>Gemini</span> for tailored explanations, summaries, and hints.</li>
+                            <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Example:</strong> Student faces a Python question → clicks “Hint” → gets real-time AI explanation.</li>
+                            <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Custom ML Model:</strong> Student Performance Predictor using <code>scikit-learn</code> — detects “At risk” students based on score trends, time taken, and hint usage.</li>
+                            <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Laravel Integration:</strong> Laravel backend communicates with Python model (via Flask API or shell execution).</li>
+                        </ul>
+                    </div>`
+                                },
+                                {
+                                    type: 'video',
+                                    html: `<div class='w-full max-w-full rounded-xl overflow-hidden shadow-xl min-h-[340px] flex flex-col justify-center'>
+                                        <iframe class='w-full h-64 md:h-80 rounded-xl' src='https://www.youtube.com/embed/dQw4w9WgXcQ'
+                                            title='Intro to MEEPLE' allowfullscreen></iframe>
+                                    </div>`
+                                }
+                            ],
+                            current: 0,
+                            next() { this.current = (this.current + 1) % this.slides.length },
+                            prev() { this.current = (this.current - 1 + this.slides.length) % this.slides.length }
+                        }" class="w-full">
+                        <div class="relative w-full min-h-[340px]">
+                            <template x-for="(slide, idx) in slides" :key="slide.type">
+                                <div x-show="current === idx" x-html="slide.html" class="transition-all duration-500 absolute inset-0 z-0"></div>
+                            </template>
+                            <div class="flex justify-center mt-4 space-x-4 absolute left-0 right-0 bottom-0 z-10">
+                                <button type="button" @click="prev" class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-yellow-400 dark:hover:bg-yellow-500 transition">
+                                    <i class="fa fa-chevron-left"></i>
+                                </button>
+                                <template x-for="(slide, idx) in slides" :key="slide.type + '-dot'">
+                                    <span @click="current = idx"
+                                        :class="{'bg-yellow-500 dark:bg-yellow-400': current === idx, 'bg-gray-300 dark:bg-gray-600': current !== idx}"
+                                        class="inline-block w-3 h-3 rounded-full mx-1 cursor-pointer transition"></span>
+                                </template>
+                                <button type="button" @click="next" class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-yellow-400 dark:hover:bg-yellow-500 transition">
+                                    <i class="fa fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
+
+
 
         <!-- Interactive How It Works -->
         <section id="how-it-works"
@@ -293,15 +377,15 @@
                                 'desc' =>
                                     'MEEPLE learns from student performance and recommends tailored question sets with smart difficulty scaling.',
                                 'btn' => 'Simulate ML Assist',
-                                'href' => '#',
+                                'href' => route('test-exam.index'),
                                 'bg' => 'border-yellow-500 text-yellow-700 dark:text-yellow-300 dark:border-yellow-400',
                             ],
                             [
                                 'title' => 'Performance Engine',
                                 'desc' =>
-                                    'Colorful dashboards, leaderboard gamification, and performance insights per student/module.',
+                                    'Find out Student performance, prediction score determines if they are at risk of failing or not.',
                                 'btn' => 'View Sample Stats',
-                                'href' => '#',
+                                'href' => route('risk.predictor'),
                                 'bg' => 'border-blue-500 text-blue-700 dark:text-blue-300 dark:border-blue-400',
                             ],
                         ];
