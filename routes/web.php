@@ -7,6 +7,10 @@ use App\Http\Middleware\IsTeacher;
 use App\Http\Controllers\Teacher\QuestionController;
 use App\Http\Controllers\HintController;
 use App\Http\Controllers\RiskPredictorController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\StudentController;
+
+
 
 Route::post('/generate-hint', [HintController::class, 'generate']);
 
@@ -30,14 +34,22 @@ Route::post('/risk-predictor/upload', [RiskPredictorController::class, 'upload']
 
 Route::get('/Test-Exam', [TestExamController::class,'index'])->name('test-exam.index');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::get('/dashboard/student', [DashboardController::class, 'studentDashboard'])
+    ->middleware(['auth', 'verified'])
+    ->name('student.dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/student/warnings', [StudentController::class, 'getWarnings'])
+    ->middleware('auth');
+
 
 require __DIR__ . '/auth.php';

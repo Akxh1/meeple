@@ -15,14 +15,14 @@
         <!-- Hero content centered -->
         <div class="relative z-10 flex flex-col justify-center items-center h-full px-6 text-center max-w-4xl mx-auto">
             <h1 class="text-6xl font-extrabold text-gray-900 dark:text-white drop-shadow-md leading-tight sm:text-7xl">
-                MEEPLE
+                X-Scaffold
             </h1>
             <p class="mt-4 text-xl text-gray-800 dark:text-white/90 max-w-xl">
-                Gamify Exams. Recommend Smartly. Upload Easily.
+                Predict Performance. Explain Insights. Scaffold Learning.
             </p>
             <a href="#what-is-meeple"
                 class="mt-8 inline-block px-6 py-2 border border-gray-700 dark:border-white text-gray-800 dark:text-white font-medium rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-white/20">
-                Learn What MEEPLE Does
+                Discover the Predict-Explain-Act Framework
             </a>
 
 
@@ -72,27 +72,28 @@
             <div class="space-y-6 max-w-5xl mx-auto relative z-10">
                 <h1
                     class="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-6xl md:text-7xl">
-                    Your University Learning + Exam Engine
+                    The Predict-Explain-Act Learning Engine
                 </h1>
                 <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                    Machine Learning meets education. Playful. Powerful. Academic.
+                    Bridging the gap between Machine Learning prediction and pedagogical action with Explainable AI and
+                    LLM-driven scaffolding.
                 </p>
                 <div class="inline-flex space-x-4 justify-center">
                     <a href="#section-what"
                         class="inline-block px-6 py-2 border border-gray-800 dark:border-white text-gray-800 dark:text-white font-medium rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition duration-200 ease-in-out">
-                        What is MEEPLE?
+                        What is X-Scaffold?
                     </a>
                     <button id="openCanvasBtn"
                         class="relative inline-flex items-center px-6 py-2 font-medium rounded-md text-white
-           bg-transparent border border-transparent
-           bg-gradient-to-r from-teal-600 via-teal-400 to-teal-600
-           bg-[length:200%_100%] bg-left-bottom
-           hover:bg-right-bottom
-           transition-all duration-500 ease-in-out
-           shadow-sm
-           dark:text-gray-800
-           dark:from-gray-50 dark:via-gray-100 dark:to-gray-300
-           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+bg-transparent border border-transparent
+bg-gradient-to-r from-teal-600 via-teal-400 to-teal-600
+bg-[length:200%_100%] bg-left-bottom
+hover:bg-right-bottom
+transition-all duration-500 ease-in-out
+shadow-sm
+dark:text-gray-800
+dark:from-gray-50 dark:via-gray-100 dark:to-gray-300
+focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                         <span class="relative z-10">Show Developer's Canvas</span>
                         <span
                             class="absolute inset-0 rounded-md bg-white/10 dark:bg-black/20 blur-sm opacity-0 hover:opacity-100 transition-opacity duration-300"></span>
@@ -253,98 +254,96 @@
                 <!-- What is MEEPLE (Full Width Row) -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 mb-2">
                     <h2 class="text-3xl font-extrabold text-gray-800 dark:text-white mb-4">
-                        What is <span class="text-yellow-600 dark:text-yellow-300">MEEPLE</span>?
+                        What is <span class="text-yellow-600 dark:text-yellow-300">X-Scaffold</span>?
                     </h2>
                     <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-                        MEEPLE is a university-grade platform that combines playful design with academic power.
-                        It supports exams, assignments, quizzes, and automated grading through Excel uploads and
-                        AI-enhanced support.
-                        Named after the game token “meeple,” it merges fun with serious learning.
+                        X-Scaffold is an integrated "Predict-Explain-Act" framework that bridges the gap between
+                        analytics and intervention.
+                        It moves beyond static grading by combining Machine Learning for real-time performance
+                        prediction,
+                        Explainable AI (XAI) for transparent teacher insights, and LLM-driven adaptive scaffolding to
+                        support students during assessments.
                     </p>
                     <a href="#how-it-works"
                         class="mt-6 inline-block px-6 py-2 border border-yellow-500 text-yellow-700 dark:text-yellow-300 dark:border-yellow-300 font-medium rounded-md hover:bg-yellow-50 dark:hover:bg-yellow-300/10 transition">
-                        How MEEPLE Works
+                        How X-Scaffold Works
                     </a>
                 </div>
 
                 <!-- Carousel Row (Meaning, Features, Video) -->
                 <div class="flex flex-col items-center justify-center w-full">
-                    <div 
-                        x-data="{
-                            slides: [
-                                {
-                                    type: 'meaning',
-                                    html: `<div class='bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 border-l-4 border-yellow-400 group min-h-[340px] flex flex-col justify-center'>
-                        <h3 class='text-xl font-semibold text-gray-800 dark:text-white mb-6 flex items-center gap-2'>
-                            <span>🔤</span> MEEPLE Meaning
-                        </h3>
-                        <ul class='space-y-4 text-sm text-gray-700 dark:text-gray-200'>
-                            <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
-                                <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>M</span>
-                                <span><strong>Model-Assisted:</strong> Uses ML models like ChatGPT/Gemini for hints, explanations, and support.</span>
-                            </li>
-                            <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
-                                <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>E</span>
-                                <span><strong>Evaluation:</strong> Students are evaluated through adaptive quizzes and exams.</span>
-                            </li>
-                            <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
-                                <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>E</span>
-                                <span><strong>Engine:</strong> A robust backend engine handles logic, scoring, and feedback.</span>
-                            </li>
-                            <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
-                                <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>P</span>
-                                <span><strong>Personalized:</strong> Adapts content based on individual student performance.</span>
-                            </li>
-                            <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
-                                <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>L</span>
-                                <span><strong>Learning:</strong> Offers interactive study modules and revision tools.</span>
-                            </li>
-                            <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
-                                <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>E</span>
-                                <span><strong>Experience:</strong> Creates a seamless and engaging student experience.</span>
-                            </li>
-                        </ul>
-                    </div>`
-                                },
-                                {
-                                    type: 'features',
-                                    html: `<div class='bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 min-h-[340px] flex flex-col justify-center'>
-                        <h3 class='text-xl font-semibold text-gray-800 dark:text-white mb-4'>🎯 Core Features of MEEPLE</h3>
-                        <ul class='list-disc pl-5 space-y-2 text-sm text-gray-700 dark:text-gray-300'>
-                            <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Quiz/Exam Engine:</strong> MCQs, coding questions, fill-in-the-blanks, timed tests, progressive difficulty, and instant scoring.</li>
-                            <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Hint System Using AI:</strong> Integrates with <span class='font-medium'>ChatGPT</span> and <span class='font-medium'>Gemini</span> for tailored explanations, summaries, and hints.</li>
-                            <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Example:</strong> Student faces a Python question → clicks “Hint” → gets real-time AI explanation.</li>
-                            <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Custom ML Model:</strong> Student Performance Predictor using <code>scikit-learn</code> — detects “At risk” students based on score trends, time taken, and hint usage.</li>
-                            <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Laravel Integration:</strong> Laravel backend communicates with Python model (via Flask API or shell execution).</li>
-                        </ul>
-                    </div>`
-                                },
-                                {
-                                    type: 'video',
-                                    html: `<div class='w-full max-w-full rounded-xl overflow-hidden shadow-xl min-h-[340px] flex flex-col justify-center'>
-                                        <iframe class='w-full h-64 md:h-80 rounded-xl' src='https://www.youtube.com/embed/dQw4w9WgXcQ'
-                                            title='Intro to MEEPLE' allowfullscreen></iframe>
-                                    </div>`
-                                }
-                            ],
-                            current: 0,
-                            next() { this.current = (this.current + 1) % this.slides.length },
-                            prev() { this.current = (this.current - 1 + this.slides.length) % this.slides.length }
-                        }" class="w-full">
+                    <div x-data="{
+                        slides: [{
+                                type: 'meaning',
+                                html: `<div class='bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 border-l-4 border-yellow-400 group min-h-[340px] flex flex-col justify-center'>
+                                    <h3 class='text-xl font-semibold text-gray-800 dark:text-white mb-6 flex items-center gap-2'>
+                                        <span>🔄</span> The X-Scaffold Framework
+                                    </h3>
+                                    <ul class='space-y-4 text-sm text-gray-700 dark:text-gray-200'>
+                                        <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
+                                            <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>P</span>
+                                            <span><strong>Predict (ML):</strong> Real-time Random Forest models analyze behavior (time/hints) to predict student risk scores.</span>
+                                        </li>
+                                        <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
+                                            <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>E</span>
+                                            <span><strong>Explain (XAI):</strong> SHAP/LIME values generate 'reason codes' explaining <em>why</em> a student is at risk.</span>
+                                        </li>
+                                        <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
+                                            <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>A</span>
+                                            <span><strong>Act (LLM):</strong> AI uses the specific risk profile to generate adaptive scaffolding hints (Basic to Advanced).</span>
+                                        </li>
+                                    </ul>
+                                </div>`
+                            },
+                            {
+                                type: 'features',
+                                html: `<div class='bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 min-h-[340px] flex flex-col justify-center'>
+                                    <h3 class='text-xl font-semibold text-gray-800 dark:text-white mb-4'>🎯 Core Features of X-Scaffold</h3>
+                                    <ul class='list-disc pl-5 space-y-2 text-sm text-gray-700 dark:text-gray-300'>
+                                        <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Fine-Grained Tracking:</strong> Monitors <code>time_per_question</code>, hint clicks, and accuracy in real-time.</li>
+                                        <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Closed-Loop AI:</strong> Bridges the gap between static analytics and active student intervention.</li>
+                                        <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Generative Scaffolding:</strong> Hints aren't static; they are generated by an LLM based on the XAI risk explanation.</li>
+                                        <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Tech Stack:</strong> Powered by Laravel 11, React 18, and Python 3.10 (Scikit-learn/TensorFlow).</li>
+                                        <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Example:</strong> High Hint Usage + Low Time = 'Gaming the system' risk → System restricts answer visibility.</li>
+                                    </ul>
+                                </div>`
+                            },
+                            {
+                                type: 'video',
+                                html: `<div class='w-full max-w-full rounded-xl overflow-hidden shadow-xl min-h-[340px] flex flex-col justify-center'>
+                                    <iframe class='w-full h-64 md:h-80 rounded-xl' src='https://www.youtube.com/embed/dQw4w9WgXcQ' title='Intro to X-Scaffold' allowfullscreen></iframe>
+                                </div>`
+                            }
+                        ],
+                        current: 0,
+                        next() {
+                            this.current = (this.current + 1) % this.slides.length
+                        },
+                        prev() {
+                            this.current = (this.current - 1 + this.slides.length) % this.slides.length
+                        }
+                    }" class="w-full">
                         <div class="relative w-full min-h-[340px]">
                             <template x-for="(slide, idx) in slides" :key="slide.type">
-                                <div x-show="current === idx" x-html="slide.html" class="transition-all duration-500 absolute inset-0 z-0"></div>
+                                <div x-show="current === idx" x-html="slide.html"
+                                    class="transition-all duration-500 absolute inset-0 z-0"></div>
                             </template>
                             <div class="flex justify-center mt-4 space-x-4 absolute left-0 right-0 bottom-0 z-10">
-                                <button type="button" @click="prev" class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-yellow-400 dark:hover:bg-yellow-500 transition">
+                                <button type="button" @click="prev"
+                                    class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-yellow-400 dark:hover:bg-yellow-500 transition">
                                     <i class="fa fa-chevron-left"></i>
                                 </button>
                                 <template x-for="(slide, idx) in slides" :key="slide.type + '-dot'">
                                     <span @click="current = idx"
-                                        :class="{'bg-yellow-500 dark:bg-yellow-400': current === idx, 'bg-gray-300 dark:bg-gray-600': current !== idx}"
+                                        :class="{
+                                            'bg-yellow-500 dark:bg-yellow-400': current ===
+                                                idx,
+                                            'bg-gray-300 dark:bg-gray-600': current !== idx
+                                        }"
                                         class="inline-block w-3 h-3 rounded-full mx-1 cursor-pointer transition"></span>
                                 </template>
-                                <button type="button" @click="next" class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-yellow-400 dark:hover:bg-yellow-500 transition">
+                                <button type="button" @click="next"
+                                    class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-yellow-400 dark:hover:bg-yellow-500 transition">
                                     <i class="fa fa-chevron-right"></i>
                                 </button>
                             </div>
@@ -360,7 +359,7 @@
         <section id="how-it-works"
             class="min-h-screen bg-gradient-to-tr from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 flex items-center">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-12">
-                <h2 class="text-3xl font-bold text-gray-800 dark:text-white text-center">How MEEPLE Works</h2>
+                <h2 class="text-3xl font-bold text-gray-800 dark:text-white text-center">How X-Scaffold Works</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     @php
                         $cards = [
@@ -371,6 +370,7 @@
                                 'btn' => 'Upload Demo',
                                 'href' => route('teacher.questions.upload'),
                                 'bg' => 'border-red-500 text-red-600 dark:text-red-300 dark:border-red-400',
+                                'note' => 'Teacher Login Required',
                             ],
                             [
                                 'title' => 'ML Recommendations',
@@ -398,6 +398,14 @@
                             </h3>
                             <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">{{ $card['desc'] }}
                             </p>
+                            @if (isset($card['note']))
+                                <div class="mb-4">
+                                    <span
+                                        class="block text-xs font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900 px-2 py-1 rounded">
+                                        {{ $card['note'] }}
+                                    </span>
+                                </div>
+                            @endif
                             <a href="{{ $card['href'] }}"
                                 class="inline-block border {{ $card['bg'] }} px-4 py-2 text-sm font-medium rounded hover:bg-opacity-10 transition">
                                 {{ $card['btn'] }}
@@ -415,48 +423,61 @@
         </section>
 
         <!-- Testimonials + Call to Action -->
-        <section id="final-cta" class="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 flex items-center">
-            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+<section id="final-cta" class="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 flex items-center">
+    <div class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
-                <!-- Testimonials -->
-                <div class="space-y-6">
-                    <h2 class="text-3xl font-bold text-gray-800 dark:text-white text-center md:text-left">
-                        Trusted by Students & Professors
-                    </h2>
-                    <div class="space-y-6">
-                        <blockquote
-                            class="bg-white dark:bg-gray-800 border-l-4 border-meepleBlue pl-6 pr-4 py-4 rounded-md shadow-sm">
-                            <p class="text-lg text-gray-700 dark:text-gray-100 leading-relaxed italic">
-                                “MEEPLE helped automate grading and let me focus on actual teaching. It helped me learn
-                                which students are falling behind despite them being camaflauged or unnoticed in our
-                                large physical classrooms”
-                            </p>
-                            <footer class="mt-3 text-sm text-gray-500">– Prof. Indika, University of Kelaniya</footer>
-                        </blockquote>
-
-                        <blockquote
-                            class="bg-white dark:bg-gray-800 border-l-4 border-meepleYellow pl-6 pr-4 py-4 rounded-md shadow-sm">
-                            <p class="text-lg text-gray-700 dark:text-gray-100 leading-relaxed italic">
-                                “I love how it makes practice feel like a game!”
-                            </p>
-                            <footer class="mt-3 text-sm text-gray-500">– Harini P., 2nd Year IT Student</footer>
-                        </blockquote>
-                    </div>
-                </div>
-
-                <!-- Call to Action -->
-                <div class="text-center space-y-6">
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Ready to Experience MEEPLE?</h2>
-                    <p class="text-gray-600 dark:text-gray-300 max-w-md mx-auto">
-                        Upload. Grade. Recommend. All in one academic engine.
+        <div class="space-y-6">
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-white text-center md:text-left">
+                Trusted by Data-Driven Educators
+            </h2>
+            <div class="space-y-6">
+                <blockquote class="bg-white dark:bg-gray-800 border-l-4 border-indigo-600 pl-6 pr-4 py-4 rounded-md shadow-sm">
+                    <p class="text-lg text-gray-700 dark:text-gray-100 leading-relaxed italic">
+                        "X-Scaffold’s <strong>Risk Prediction</strong> saved my semester. The system flagged struggling students weeks before the exam, and the 'Explainable AI' showed me exactly why—low confidence and high hint usage."
                     </p>
+                    <footer class="mt-3 text-sm text-gray-500">– Dr. Aruna, Senior Lecturer</footer>
+                </blockquote>
+
+                <blockquote class="bg-white dark:bg-gray-800 border-l-4 border-yellow-500 pl-6 pr-4 py-4 rounded-md shadow-sm">
+                    <p class="text-lg text-gray-700 dark:text-gray-100 leading-relaxed italic">
+                        "The <strong>AI Scaffolding</strong> is brilliant. It doesn't just give me the answer; it gives me a hint based on my exact mistake. It feels like a personalized tutor is sitting right next to me."
+                    </p>
+                    <footer class="mt-3 text-sm text-gray-500">– Kasun D., 3rd Year CS Student</footer>
+                </blockquote>
+            </div>
+        </div>
+
+        <div class="text-center space-y-6">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Ready to Close the Learning Loop?</h2>
+            <p class="text-gray-600 dark:text-gray-300 max-w-md mx-auto">
+                Predict Risk. Explain Causes. Act with AI.<br>
+                Experience the next generation of LMS intervention.
+            </p>
+
+            @auth
+                @if(auth()->user()->role === 'student')
+                    {{-- Student Link --}}
+                    <a href="{{ route('student.dashboard') }}"
+                        class="inline-block px-6 py-3 border border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400 font-medium rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-400/10 transition">
+                        Go to Student Dashboard
+                    </a>
+                @else
+                    {{-- Teacher & Admin Link --}}
                     <a href="{{ route('dashboard') }}"
                         class="inline-block px-6 py-3 border border-red-600 text-red-600 dark:text-red-400 dark:border-red-400 font-medium rounded-md hover:bg-red-50 dark:hover:bg-red-400/10 transition">
-                        Go to Dashboard
+                        Go to Instructor Dashboard
                     </a>
-                </div>
-            </div>
-        </section>
+                @endif
+            @else
+                {{-- Guest Link --}}
+                <a href="{{ route('login') }}"
+                    class="inline-block px-6 py-3 border border-gray-600 text-gray-600 dark:text-gray-400 dark:border-gray-400 font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-400/10 transition">
+                    Log In to Get Started
+                </a>
+            @endauth
+        </div>
+    </div>
+</section>
 
     </div>
 
