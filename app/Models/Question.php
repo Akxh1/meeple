@@ -12,4 +12,9 @@ class Question extends Model
         return $this->hasMany(Answer::class);
     }
 
+    public function module()
+    {
+        return $this->belongsTo(Module::class);
+    }
+
 }

@@ -1,75 +1,165 @@
 <x-app-layout>
-    
-    <div class="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    {{-- Premium Student Dashboard --}}
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             
-            <div class="mb-8 flex justify-between items-center">
-                <div>
-                    <h2 class="text-3xl font-bold text-gray-800 dark:text-white">
-                        Student Dashboard
-                    </h2>
-                    <p class="text-gray-500 dark:text-gray-400 mt-1">
-                        Track your progress and risk analysis.
-                    </p>
+            {{-- Header Section --}}
+            <div class="mb-8">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div>
+                        <h1 class="text-3xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
+                            <span class="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/25">
+                                <i class="fas fa-graduation-cap text-xl text-white"></i>
+                            </span>
+                            My Learning Dashboard
+                        </h1>
+                        <p class="mt-2 text-slate-600 dark:text-slate-400">Track your progress across all modules and assessments</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        @if($student)
+                        <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                                {{ strtoupper(substr($student->name, 0, 1)) }}
+                            </div>
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-200">{{ $student->name }}</span>
+                        </div>
+                        @endif
+                    </div>
                 </div>
-                <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-md">
-                    View Analytics Report
-                </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                @foreach($modules as $module)
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden group">
-                    
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="{{ $module['image_color'] }} w-12 h-12 rounded-lg flex items-center justify-center text-2xl shadow-md text-white">
-                                {{ $module['icon'] }}
-                            </div>
-                            @php
-                                $riskColor = match($module['risk_score']) {
-                                    'High' => 'bg-red-100 text-red-700 border-red-200',
-                                    'Medium' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
-                                    'Low' => 'bg-green-100 text-green-700 border-green-200',
-                                    default => 'bg-gray-100 text-gray-700 border-gray-200'
-                                };
-                            @endphp
-                            <span class="px-2 py-1 rounded text-xs font-semibold border {{ $riskColor }}">
-                                {{ $module['risk_score'] }} Risk
-                            </span>
+            {{-- Stats Overview --}}
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                {{-- Total Modules --}}
+                <div class="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="p-2 bg-indigo-100 dark:bg-indigo-500/10 rounded-xl">
+                            <i class="fas fa-book-open text-indigo-600 dark:text-indigo-400"></i>
                         </div>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-800 dark:text-white">{{ $totalModules }}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Total Modules</p>
+                </div>
 
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-indigo-600 transition-colors">
+                {{-- Completed Assessments --}}
+                <div class="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="p-2 bg-green-100 dark:bg-green-500/10 rounded-xl">
+                            <i class="fas fa-check-circle text-green-600 dark:text-green-400"></i>
+                        </div>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-800 dark:text-white">{{ $completedModules }}/{{ $totalModules }}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Assessments Done</p>
+                </div>
+
+                {{-- Average LMS --}}
+                <div class="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="p-2 bg-purple-100 dark:bg-purple-500/10 rounded-xl">
+                            <i class="fas fa-brain text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-800 dark:text-white">{{ $avgLMS ?: '—' }}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Average LMS</p>
+                </div>
+
+                {{-- Average Score --}}
+                <div class="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="p-2 bg-amber-100 dark:bg-amber-500/10 rounded-xl">
+                            <i class="fas fa-chart-line text-amber-600 dark:text-amber-400"></i>
+                        </div>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-800 dark:text-white">{{ $avgScore ? $avgScore . '%' : '—' }}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Average Score</p>
+                </div>
+            </div>
+
+            {{-- Modules Section Header --}}
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <i class="fas fa-layer-group text-indigo-500"></i>
+                    Your Modules
+                </h2>
+                <span class="text-sm text-slate-500 dark:text-slate-400">{{ $modules->count() }} modules available</span>
+            </div>
+
+            {{-- Modules Grid --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($modules as $module)
+                <a href="{{ route('student.module.show', $module['id']) }}" 
+                   class="group bg-white dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700/50 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    
+                    {{-- Module Header with Gradient --}}
+                    <div class="h-24 bg-gradient-to-r {{ $module['gradient'] }} p-5 relative overflow-hidden">
+                        {{-- Icon --}}
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 text-white">
+                            <i class="fas {{ $module['icon'] }} text-6xl"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-white shadow-lg">
+                                <i class="fas {{ $module['icon'] }} text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {{-- Module Content --}}
+                    <div class="p-5">
+                        <h3 class="font-bold text-lg text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
                             {{ $module['title'] }}
                         </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                            {{ $module['category'] }}
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 min-h-[40px]">
+                            {{ $module['description'] ?: 'Explore this module to learn more.' }}
                         </p>
-
-                        <div class="mt-6">
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-gray-600 dark:text-gray-300 font-medium">{{ $module['progress'] }}% Complete</span>
-                                <span class="text-gray-400">{{ $module['completed_lessons'] }}/{{ $module['total_lessons'] }} Lessons</span>
-                            </div>
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-indigo-600 h-2 rounded-full transition-all duration-1000" style="width: {{ $module['progress'] }}%"></div>
-                            </div>
+                        
+                        {{-- Stats Row --}}
+                        <div class="flex items-center gap-3 mt-4 pt-4 border-t border-slate-100 dark:border-slate-700/50">
+                            <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                                <i class="fas fa-question-circle mr-1"></i>
+                                {{ $module['questions_count'] }} Questions
+                            </span>
+                            
+                            @if($module['has_performance'])
+                                @php
+                                    $levelColors = [
+                                        'advanced' => 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+                                        'proficient' => 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400',
+                                        'developing' => 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400',
+                                        'at_risk' => 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400',
+                                    ];
+                                    $levelClass = $levelColors[$module['mastery_level']] ?? 'bg-gray-100 text-gray-600';
+                                @endphp
+                                <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium {{ $levelClass }}">
+                                    <i class="fas fa-trophy mr-1"></i>
+                                    LMS: {{ $module['lms'] }}
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
+                                    <i class="fas fa-clock mr-1"></i>
+                                    Not Started
+                                </span>
+                            @endif
+                        </div>
+                        
+                        {{-- Action Arrow --}}
+                        <div class="flex justify-end mt-4">
+                            <span class="text-indigo-600 dark:text-indigo-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                                Enter Module <i class="fas fa-arrow-right"></i>
+                            </span>
                         </div>
                     </div>
-
-                    <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                        <span class="text-xs text-gray-500 dark:text-gray-400">
-                            <i class="far fa-clock mr-1"></i> {{ $module['last_accessed'] }}
-                        </span>
-                        <a href="#" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 text-sm font-semibold flex items-center gap-1">
-                            Continue <i class="fas fa-arrow-right text-xs"></i>
-                        </a>
-                    </div>
-                </div>
+                </a>
                 @endforeach
-
             </div>
+
+            {{-- Empty State --}}
+            @if($modules->count() === 0)
+            <div class="text-center py-16 bg-white dark:bg-slate-800/50 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700">
+                <i class="fas fa-folder-open text-5xl text-slate-300 dark:text-slate-600 mb-4"></i>
+                <h3 class="text-xl font-bold text-slate-700 dark:text-slate-300">No Modules Available</h3>
+                <p class="text-slate-500 dark:text-slate-400 mt-2">Check back later for new modules to explore.</p>
+            </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

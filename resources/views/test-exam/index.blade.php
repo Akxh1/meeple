@@ -129,12 +129,15 @@
                                         <div class="fixed inset-0 bg-black bg-opacity-40" @click="showHint = false">
                                         </div>
                                         <div
-                                            class="relative bg-white dark:bg-gray-900 w-full max-w-md ml-auto h-full shadow-2xl p-10 flex flex-col rounded-l-3xl">
-                                            <div class="flex items-center justify-between mb-6">
-                                                <h2 class="text-2xl font-bold text-indigo-700 dark:text-indigo-200">Hint
-                                                </h2>
-                                                <button @click="showHint = false"
-                                                    class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                                            class="relative bg-white dark:bg-gray-900 w-full max-w-lg ml-auto h-full shadow-2xl flex flex-col rounded-l-3xl overflow-hidden">
+                                            <!-- Header -->
+                                            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                                                <div class="flex items-center gap-3">
+                                                    <i class="fa fa-lightbulb text-yellow-400 text-2xl"></i>
+                                                    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Personalized Hint</h2>
+                                                </div>
+                                                <button type="button" @click="showHint = false"
+                                                    class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7"
                                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -142,9 +145,107 @@
                                                     </svg>
                                                 </button>
                                             </div>
-                                            <div class="flex-1 flex items-center justify-center">
-                                                <div class="space-y-5 text-gray-700 dark:text-gray-300 text-[17px] leading-relaxed text-left"
-                                                    x-html="hint || '<p>Loading hint...</p>'"></div>
+                                            
+                                            <!-- Content Area - Scrollable -->
+                                            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                                                
+                                                <!-- Loading State -->
+                                                <template x-if="hintLoading">
+                                                    <div class="flex flex-col items-center justify-center py-16 space-y-4">
+                                                        <!-- Animated Spinner -->
+                                                        <div class="relative">
+                                                            <div class="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full"></div>
+                                                            <div class="absolute top-0 left-0 w-16 h-16 border-4 border-transparent border-t-indigo-600 rounded-full animate-spin"></div>
+                                                        </div>
+                                                        <!-- Pulsing Message -->
+                                                        <p class="text-indigo-600 dark:text-indigo-400 font-medium animate-pulse text-center">
+                                                            Generating your personalized hint...
+                                                        </p>
+                                                        <p class="text-gray-400 dark:text-gray-500 text-sm text-center">
+                                                            Analyzing your learning profile
+                                                        </p>
+                                                    </div>
+                                                </template>
+                                                
+                                                <!-- Loaded Content -->
+                                                <template x-if="!hintLoading">
+                                                    <div class="space-y-6">
+                                                        
+                                                        <!-- Student Level Badge -->
+                                                        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl p-4">
+                                                            <div class="flex items-center justify-between">
+                                                                <div>
+                                                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Your Predicted Level</p>
+                                                                    <div class="flex items-center gap-2">
+                                                                        <span class="px-3 py-1 rounded-full text-sm font-bold"
+                                                                            :class="{
+                                                                                'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300': studentProfile.level === 'L1',
+                                                                                'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300': studentProfile.level === 'L2',
+                                                                                'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300': studentProfile.level === 'L3'
+                                                                            }"
+                                                                            x-text="studentProfile.level">
+                                                                        </span>
+                                                                        <span class="text-lg font-semibold text-gray-800 dark:text-gray-100" x-text="studentProfile.level_name"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="text-3xl" 
+                                                                    x-text="studentProfile.level === 'L1' ? '🌟' : (studentProfile.level === 'L2' ? '📈' : '🎯')">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- SHAP Explanations (Collapsible) -->
+                                                        <div class="bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden">
+                                                            <button type="button" @click="showShapDetails = !showShapDetails" 
+                                                                class="w-full flex items-center justify-between p-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                                                                <div class="flex items-center gap-2">
+                                                                    <i class="fa fa-chart-bar text-indigo-500"></i>
+                                                                    <span class="font-medium text-gray-700 dark:text-gray-200">Why this level?</span>
+                                                                    <span class="text-xs text-gray-400">(SHAP Analysis)</span>
+                                                                </div>
+                                                                <i class="fa fa-chevron-down text-gray-400 transition-transform duration-200"
+                                                                    :class="{ 'rotate-180': showShapDetails }"></i>
+                                                            </button>
+                                                            
+                                                            <div x-show="showShapDetails" x-collapse class="border-t border-gray-200 dark:border-gray-700">
+                                                                <div class="p-4 space-y-2 max-h-64 overflow-y-auto">
+                                                                    <template x-for="item in studentProfile.shap_explanation" :key="item.feature">
+                                                                        <div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-white dark:hover:bg-gray-700 transition">
+                                                                            <div class="flex-1">
+                                                                                <p class="text-sm font-medium text-gray-700 dark:text-gray-200" x-text="item.feature"></p>
+                                                                                <p class="text-xs text-gray-400" x-text="item.desc"></p>
+                                                                            </div>
+                                                                            <div class="flex items-center gap-3">
+                                                                                <span class="text-sm text-gray-600 dark:text-gray-300 font-mono" x-text="item.value"></span>
+                                                                                <span class="text-xs font-bold px-2 py-0.5 rounded"
+                                                                                    :class="{
+                                                                                        'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400': item.contribution > 0,
+                                                                                        'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400': item.contribution < 0,
+                                                                                        'bg-gray-100 text-gray-500 dark:bg-gray-600 dark:text-gray-400': item.contribution === 0
+                                                                                    }"
+                                                                                    x-text="item.contribution > 0 ? '+' + item.contribution.toFixed(2) : item.contribution.toFixed(2)">
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </template>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Personalized Hint -->
+                                                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
+                                                            <div class="flex items-center gap-2 mb-3">
+                                                                <i class="fa fa-magic text-purple-500"></i>
+                                                                <span class="font-medium text-gray-700 dark:text-gray-200">Your Personalized Hint</span>
+                                                            </div>
+                                                            <div class="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 leading-relaxed"
+                                                                x-html="hint || '<p class=\'text-gray-400\'>No hint available.</p>'">
+                                                            </div>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </template>
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -189,6 +290,8 @@
                 questions: @json($Questions),
                 current: 0,
                 showHint: false,
+                hintLoading: false,
+                showShapDetails: false,
                 hint: '',
                 userAnswers: {},
                 userDetails: {
@@ -199,6 +302,24 @@
                     deviceType: 'Could not find',
                     userAgent: 'Could not find',
                     timezone: 'Could not find'
+                },
+                // Static student profile (will be fetched from DB when ML pipeline is ready)
+                studentProfile: {
+                    level: "L1",
+                    level_name: "Developing",
+                    shap_explanation: [
+                        { feature: "Score %", value: "65%", contribution: 0.25, desc: "Percentage of correct answers" },
+                        { feature: "Avg. Time/Question", value: "45s", contribution: -0.10, desc: "Mean time spent per item" },
+                        { feature: "Confidence", value: "3.2/5", contribution: 0.05, desc: "Mean self-reported confidence" },
+                        { feature: "Focus Rate", value: "0.3", contribution: -0.15, desc: "Avg tab switches per question" },
+                        { feature: "Uncertainty Rate", value: "0.5", contribution: -0.08, desc: "Avg answer changes per question" },
+                        { feature: "Review %", value: "20%", contribution: 0.02, desc: "% of questions marked for review" },
+                        { feature: "Processing Speed", value: "2.1s", contribution: 0.03, desc: "Mean latency to first interaction" },
+                        { feature: "Interaction Intensity", value: "4.5", contribution: 0.00, desc: "Avg clicks per question" },
+                        { feature: "Endurance Trend", value: "-0.05", contribution: -0.12, desc: "Accuracy change (2nd half - 1st half)" },
+                        { feature: "Advanced Mastery", value: "55%", contribution: 0.08, desc: "% correct on difficulty > 1" },
+                        { feature: "Scaffolding Use", value: "25%", contribution: 0.10, desc: "% of questions where hint was used" }
+                    ]
                 },
                 nextQuestion() {
                     if (this.current < this.questions.length - 1) this.current++;
@@ -211,7 +332,8 @@
                 },
                 async fetchHint() {
                     this.showHint = true;
-                    this.hint = 'Loading hint...';
+                    this.hintLoading = true;
+                    this.hint = '';
                     const currentQuestion = this.questions[this.current];
                     try {
                         const response = await fetch('/generate-hint', {
@@ -221,13 +343,17 @@
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                             },
                             body: JSON.stringify({
-                                question_text: currentQuestion.question_text
+                                question_text: currentQuestion.question_text,
+                                hint_level: this.studentProfile.level === 'L1' ? 1 : (this.studentProfile.level === 'L2' ? 2 : 3),
+                                student_context: `Student is at ${this.studentProfile.level_name} level (${this.studentProfile.level}). Key factors: Score ${this.studentProfile.shap_explanation[0].value}, Confidence ${this.studentProfile.shap_explanation[2].value}.`
                             })
                         });
                         const data = await response.json();
                         this.hint = data.hint || "Hint couldn't be generated. Try again later.";
                     } catch {
                         this.hint = "Hint couldn't be generated. Try again later.";
+                    } finally {
+                        this.hintLoading = false;
                     }
                 },
                 async fetchDetails() {

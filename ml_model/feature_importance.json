@@ -1,0 +1,116 @@
+{
+  "gini_importance": {
+    "score_percentage": {
+      "mean": 0.4702612892329941,
+      "std": 0.06006424406727078,
+      "rank": 1
+    },
+    "hard_question_accuracy": {
+      "mean": 0.10125454310278938,
+      "std": 0.0493042293451486,
+      "rank": 4
+    },
+    "hint_usage_percentage": {
+      "mean": 0.09249604158283263,
+      "std": 0.04946482441040292,
+      "rank": 6
+    },
+    "avg_confidence": {
+      "mean": 0.10490826687401306,
+      "std": 0.0372953031503529,
+      "rank": 3
+    },
+    "answer_changes_rate": {
+      "mean": 0.09282675785254259,
+      "std": 0.0410931155869292,
+      "rank": 5
+    },
+    "tab_switches_rate": {
+      "mean": 0.11773870918091367,
+      "std": 0.06292621634788848,
+      "rank": 2
+    },
+    "avg_time_per_question": {
+      "mean": 0.0036915080643318216,
+      "std": 0.00396715046491829,
+      "rank": 8
+    },
+    "review_percentage": {
+      "mean": 0.0034693228078168485,
+      "std": 0.00470569839057021,
+      "rank": 9
+    },
+    "avg_first_action_latency": {
+      "mean": 0.002571665581070548,
+      "std": 0.003604261778119598,
+      "rank": 11
+    },
+    "clicks_per_question": {
+      "mean": 0.00781971752814808,
+      "std": 0.008648451492223078,
+      "rank": 7
+    },
+    "performance_trend": {
+      "mean": 0.002962178192547357,
+      "std": 0.003833830539664648,
+      "rank": 10
+    }
+  },
+  "permutation_importance": {
+    "score_percentage": {
+      "mean": 0.39275000000000004,
+      "std": 0.008325412902673369,
+      "rank": 1
+    },
+    "hard_question_accuracy": {
+      "mean": 0.06425000000000002,
+      "std": 0.014100088652203576,
+      "rank": 4
+    },
+    "hint_usage_percentage": {
+      "mean": 0.03650000000000002,
+      "std": 0.00463680924774783,
+      "rank": 5
+    },
+    "avg_confidence": {
+      "mean": 0.17500000000000002,
+      "std": 0.01036822067666386,
+      "rank": 2
+    },
+    "answer_changes_rate": {
+      "mean": 0.026000000000000044,
+      "std": 0.008077747210701754,
+      "rank": 6
+    },
+    "tab_switches_rate": {
+      "mean": 0.08675000000000004,
+      "std": 0.010127314550264534,
+      "rank": 3
+    },
+    "avg_time_per_question": {
+      "mean": 0.0042500000000000315,
+      "std": 0.0027499999999999946,
+      "rank": 7
+    },
+    "review_percentage": {
+      "mean": 0.002250000000000041,
+      "std": 0.0013462912017836344,
+      "rank": 8
+    },
+    "avg_first_action_latency": {
+      "mean": -0.0004999999999999894,
+      "std": 0.0009999999999999788,
+      "rank": 11
+    },
+    "clicks_per_question": {
+      "mean": 0.000250000000000028,
+      "std": 0.002358495283014168,
+      "rank": 9
+    },
+    "performance_trend": {
+      "mean": 0.0,
+      "std": 0.0,
+      "rank": 10
+    }
+  }
+}

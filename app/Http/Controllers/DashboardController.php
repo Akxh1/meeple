@@ -3,103 +3,316 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
+use App\Models\StudentModulePerformance;
+use App\Models\Module;
 
 class DashboardController extends Controller
 {
-    public function index()
+    /**
+     * Instructor Dashboard - shows all students with their multi-module performance
+     */
+    public function index(Request $request)
     {
-        // Raw students collection for normal Blade usage
-        $students = Student::with('progress')->get();
-
-        // Map to plain array for JSON / Chart.js
-        $studentsArray = $students->map(function ($student) {
+        // Get all modules for the filter
+        $modules = Module::withCount(['studentPerformances', 'questions'])->get();
+        
+        // Get selected module filter (default: show all)
+        $selectedModuleId = $request->get('module', 'all');
+        
+        // Get all students with their module performance data
+        $students = Student::with(['modulePerformances.module', 'user'])->get();
+        
+        // Calculate overall statistics
+        $totalStudents = $students->count();
+        
+        // All performance records
+        $allPerformances = StudentModulePerformance::with(['student', 'module'])->get();
+        
+        // Students who have taken at least one exam
+        $studentsWithAnyPerformance = $students->filter(fn($s) => $s->modulePerformances->isNotEmpty());
+        $studentsWithoutAnyPerformance = $students->filter(fn($s) => $s->modulePerformances->isEmpty());
+        
+        // Calculate metrics
+        $examTakenCount = $studentsWithAnyPerformance->count();
+        $examPendingCount = $studentsWithoutAnyPerformance->count();
+        $totalPerformanceRecords = $allPerformances->count();
+        
+        // LMS Statistics
+        $averageLMS = $allPerformances->count() > 0 ? $allPerformances->avg('learning_mastery_score') : 0;
+        
+        // Mastery level distribution across all modules
+        $masteryDistribution = [
+            'advanced' => $allPerformances->where('mastery_level', 'advanced')->count(),
+            'proficient' => $allPerformances->where('mastery_level', 'proficient')->count(),
+            'developing' => $allPerformances->where('mastery_level', 'developing')->count(),
+            'at_risk' => $allPerformances->where('mastery_level', 'at_risk')->count(),
+        ];
+        
+        // Per-module statistics
+        $moduleStats = $modules->map(function ($module) use ($allPerformances) {
+            $modulePerfs = $allPerformances->where('module_id', $module->id);
             return [
-                'name' => $student->name,
-                'exam_1' => $student->progress->exam_1 ?? 0,
-                'exam_2' => $student->progress->exam_2 ?? 0,
-                'exam_3' => $student->progress->exam_3 ?? 0,
-                'attendance_rate' => $student->progress->attendance_rate ?? 0,
-                'engagement_score' => $student->progress->engagement_score ?? 0,
-                'quiz_score' => $student->progress->quiz_score ?? 0,
-                'group_work_score' => $student->progress->group_work_score ?? 0,
-                'revision_hours' => $student->progress->revision_hours ?? 0,
+                'id' => $module->id,
+                'name' => $module->name,
+                'student_count' => $modulePerfs->count(),
+                'questions_count' => $module->questions_count,
+                'avg_lms' => $modulePerfs->count() > 0 ? round($modulePerfs->avg('learning_mastery_score'), 1) : 0,
+                'avg_score' => $modulePerfs->count() > 0 ? round($modulePerfs->avg('score_percentage'), 1) : 0,
             ];
         });
+        
+        // Average feature values for insights
+        $featureAverages = [];
+        if ($allPerformances->count() > 0) {
+            $featureAverages = [
+                'score_percentage' => round($allPerformances->avg('score_percentage'), 1),
+                'hard_question_accuracy' => round($allPerformances->avg('hard_question_accuracy'), 1),
+                'hint_usage_percentage' => round($allPerformances->avg('hint_usage_percentage'), 1),
+                'avg_confidence' => round($allPerformances->avg('avg_confidence'), 2),
+                'avg_time_per_question' => round($allPerformances->avg('avg_time_per_question'), 1),
+                'review_percentage' => round($allPerformances->avg('review_percentage'), 1),
+            ];
+        }
 
-        return view('dashboard', [
-            'students' => $students,           // raw collection for tables
-            'studentsArray' => $studentsArray  // plain array for JSON/Chart.js
-        ]);
+        return view('dashboard', compact(
+            'students',
+            'modules',
+            'selectedModuleId',
+            'studentsWithAnyPerformance',
+            'studentsWithoutAnyPerformance',
+            'totalStudents',
+            'examTakenCount',
+            'examPendingCount',
+            'totalPerformanceRecords',
+            'averageLMS',
+            'masteryDistribution',
+            'moduleStats',
+            'featureAverages',
+            'allPerformances'
+        ));
     }
 
+    /**
+     * Student Dashboard - shows modules available to the student with their performance
+     */
     public function studentDashboard()
     {
-        // Static modules for the prototype
-        // In the future, these will come from: Module::where('student_id', $user->id)->get();
-        $modules = [
-            [
-                'id' => 1,
-                'title' => 'Cyber Security Essentials', // Requested module
-                'category' => 'Network Security',
-                'progress' => 75,
-                'total_lessons' => 20,
-                'completed_lessons' => 15,
-                'last_accessed' => '2 hours ago',
-                'risk_score' => 'Low', // X-Scaffold Context: Safe
-                'image_color' => 'bg-red-500', // Just for visual variety
-                'icon' => '🛡️'
-            ],
-            [
-                'id' => 2,
-                'title' => 'Advanced Python for ML',
-                'category' => 'Data Science',
-                'progress' => 45,
-                'total_lessons' => 40,
-                'completed_lessons' => 18,
-                'last_accessed' => '1 day ago',
-                'risk_score' => 'High', // X-Scaffold Context: Student needs intervention here
-                'image_color' => 'bg-blue-500',
-                'icon' => '🐍'
-            ],
-            [
-                'id' => 3,
-                'title' => 'Data Structures & Algorithms',
-                'category' => 'Computer Science',
-                'progress' => 10,
-                'total_lessons' => 50,
-                'completed_lessons' => 5,
-                'last_accessed' => '3 days ago',
-                'risk_score' => 'Medium', 
-                'image_color' => 'bg-purple-500',
-                'icon' => '🧮'
-            ],
-            [
-                'id' => 4,
-                'title' => 'Web Development with Laravel',
-                'category' => 'Full Stack',
-                'progress' => 90,
-                'total_lessons' => 30,
-                'completed_lessons' => 27,
-                'last_accessed' => '5 mins ago',
-                'risk_score' => 'Low',
-                'image_color' => 'bg-indigo-500',
-                'icon' => '🌐'
-            ],
-            [
-                'id' => 5,
-                'title' => 'Introduction to Cloud Computing',
-                'category' => 'DevOps',
-                'progress' => 0,
-                'total_lessons' => 15,
-                'completed_lessons' => 0,
-                'last_accessed' => 'Never',
-                'risk_score' => 'None',
-                'image_color' => 'bg-gray-500',
-                'icon' => '☁️'
-            ],
+        $user = Auth::user();
+        $student = Student::where('user_id', $user->id)->first();
+        
+        // Fetch all modules with question counts
+        $modules = Module::withCount('questions')->get();
+        
+        // Get student's performance data
+        $studentPerformances = collect();
+        if ($student) {
+            $studentPerformances = StudentModulePerformance::where('student_id', $student->id)
+                ->get()
+                ->keyBy('module_id');
+        }
+        
+        // Module styling maps
+        $colorMap = [
+            1 => 'from-red-500 to-rose-600',
+            2 => 'from-blue-500 to-cyan-600', 
+            3 => 'from-green-500 to-emerald-600',
+            4 => 'from-purple-500 to-violet-600',
+            5 => 'from-amber-500 to-orange-600',
+            6 => 'from-indigo-500 to-blue-600',
         ];
+        
+        $iconMap = [
+            1 => 'fa-shield-halved',
+            2 => 'fa-cloud',
+            3 => 'fa-chart-line',
+            4 => 'fa-network-wired',
+            5 => 'fa-tasks',
+            6 => 'fa-code',
+        ];
+        
+        // Enrich modules with student performance data
+        $modules = $modules->map(function ($module) use ($studentPerformances, $colorMap, $iconMap) {
+            $performance = $studentPerformances->get($module->id);
+            $hasPerformance = !is_null($performance);
+            
+            return [
+                'id' => $module->id,
+                'title' => $module->name,
+                'description' => $module->description,
+                'questions_count' => $module->questions_count,
+                'gradient' => $colorMap[$module->id] ?? 'from-gray-500 to-slate-600',
+                'icon' => $iconMap[$module->id] ?? 'fa-book',
+                // Performance data
+                'has_performance' => $hasPerformance,
+                'lms' => $hasPerformance ? round($performance->learning_mastery_score, 1) : null,
+                'mastery_level' => $hasPerformance ? $performance->mastery_level : null,
+                'score' => $hasPerformance ? round($performance->score_percentage, 1) : null,
+                'level_indicator_completed' => $hasPerformance,
+            ];
+        });
+        
+        // Calculate overall stats
+        $totalModules = $modules->count();
+        $completedModules = $studentPerformances->count();
+        $avgLMS = $studentPerformances->count() > 0 ? round($studentPerformances->avg('learning_mastery_score'), 1) : 0;
+        $avgScore = $studentPerformances->count() > 0 ? round($studentPerformances->avg('score_percentage'), 1) : 0;
 
-        return view('dashboard.student', compact('modules'));
+        return view('dashboard.student', compact(
+            'modules',
+            'student',
+            'totalModules',
+            'completedModules',
+            'avgLMS',
+            'avgScore'
+        ));
+    }
+
+    /**
+     * Show individual student detail page with all module performances (for instructors)
+     */
+    public function showStudent(Student $student)
+    {
+        // Load all performance data for this student
+        $student->load(['modulePerformances.module', 'user']);
+        
+        // Get all modules for reference
+        $allModules = Module::all();
+        
+        // Group performances by module
+        $modulePerformances = $student->modulePerformances->keyBy('module_id');
+        
+        // Calculate overall stats
+        $hasPerformance = $student->modulePerformances->isNotEmpty();
+        $overallStats = [];
+        
+        if ($hasPerformance) {
+            $performances = $student->modulePerformances;
+            $overallStats = [
+                'modules_completed' => $performances->count(),
+                'total_modules' => $allModules->count(),
+                'best_lms' => $performances->max('learning_mastery_score'),
+                'avg_lms' => round($performances->avg('learning_mastery_score'), 1),
+                'avg_score' => round($performances->avg('score_percentage'), 1),
+                'avg_confidence' => round($performances->avg('avg_confidence'), 2),
+                'avg_hint_usage' => round($performances->avg('hint_usage_percentage'), 1),
+                'avg_time_per_question' => round($performances->avg('avg_time_per_question'), 1),
+                'total_answer_changes' => round($performances->avg('answer_changes_rate'), 4),
+                'avg_review_percentage' => round($performances->avg('review_percentage'), 1),
+            ];
+            
+            // Determine overall mastery level based on best LMS
+            $bestLMS = $overallStats['best_lms'];
+            $overallStats['mastery_level'] = $bestLMS >= 76 ? 'advanced' : 
+                ($bestLMS >= 56 ? 'proficient' : ($bestLMS >= 36 ? 'developing' : 'at_risk'));
+        }
+        
+        // Get warning history
+        $warnings = \App\Models\StudentNotification::where('student_id', $student->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+        
+        return view('dashboard.instructor.student-detail', compact(
+            'student',
+            'allModules',
+            'modulePerformances',
+            'hasPerformance',
+            'overallStats',
+            'warnings'
+        ));
+    }
+
+    /**
+     * Show module detail page for students
+     */
+    public function showModule(Module $module)
+    {
+        $user = Auth::user();
+        $student = Student::where('user_id', $user->id)->first();
+        
+        // Get performance for this module if exists
+        $performance = null;
+        if ($student) {
+            $performance = StudentModulePerformance::where('student_id', $student->id)
+                ->where('module_id', $module->id)
+                ->first();
+        }
+        
+        // Module styling
+        $colorMap = [
+            1 => 'from-red-500 to-rose-600',
+            2 => 'from-blue-500 to-cyan-600', 
+            3 => 'from-green-500 to-emerald-600',
+            4 => 'from-purple-500 to-violet-600',
+            5 => 'from-amber-500 to-orange-600',
+            6 => 'from-indigo-500 to-blue-600',
+        ];
+        
+        $iconMap = [
+            1 => 'fa-shield-halved',
+            2 => 'fa-cloud',
+            3 => 'fa-chart-line',
+            4 => 'fa-network-wired',
+            5 => 'fa-tasks',
+            6 => 'fa-code',
+        ];
+        
+        $moduleData = [
+            'id' => $module->id,
+            'title' => $module->name,
+            'description' => $module->description,
+            'questions_count' => $module->questions()->count(),
+            'gradient' => $colorMap[$module->id] ?? 'from-gray-500 to-slate-600',
+            'icon' => $iconMap[$module->id] ?? 'fa-book',
+        ];
+        
+        return view('dashboard.module-detail', compact('module', 'moduleData', 'performance', 'student'));
+    }
+
+    /**
+     * Send a warning notification to a student
+     */
+    public function sendWarning(Request $request, Student $student)
+    {
+        $request->validate([
+            'warning_type' => 'required|in:performance,attendance,engagement',
+            'message' => 'required|string|max:1000',
+        ]);
+        
+        $student->load('user');
+        
+        // Get the student's email
+        $email = $student->user->email ?? null;
+        
+        if (!$email) {
+            return back()->with('error', 'Student email not found.');
+        }
+        
+        // Create notification in database
+        \App\Models\StudentNotification::create([
+            'student_id' => $student->id,
+            'sender_id' => Auth::id(),
+            'type' => $request->warning_type === 'performance' ? 'warning' : 'info',
+            'title' => 'Academic Warning: ' . ucfirst($request->warning_type),
+            'message' => $request->message,
+        ]);
+        
+        // Send the warning email (using Laravel's Mail facade)
+        try {
+            \Illuminate\Support\Facades\Mail::raw(
+                $request->message,
+                function ($mail) use ($email, $student, $request) {
+                    $mail->to($email)
+                         ->subject("Academic Warning: {$request->warning_type}")
+                         ->from(config('mail.from.address', 'noreply@meeple.test'), 'Meeple Learning System');
+                }
+            );
+            
+            return back()->with('success', "Warning notification sent to {$student->name} ({$email})");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to send email: ' . $e->getMessage());
+        }
     }
 }

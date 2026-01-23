@@ -35,4 +35,18 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | X-Scaffold ML API
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the Python Flask API that serves ML predictions
+    | and SHAP explanations. Run `python ml_model/api.py` to start the server.
+    |
+    */
+    'ml_api' => [
+        'url' => env('ML_API_URL', 'http://localhost:5000'),
+        'timeout' => env('ML_API_TIMEOUT', 10),
+    ],
+
 ];

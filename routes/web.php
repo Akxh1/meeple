@@ -42,6 +42,21 @@ Route::get('/dashboard/student', [DashboardController::class, 'studentDashboard'
     ->middleware(['auth', 'verified'])
     ->name('student.dashboard');
 
+// Module Detail Page (for students)
+Route::get('/module/{module}', [DashboardController::class, 'showModule'])
+    ->middleware(['auth', 'verified'])
+    ->name('student.module.show');
+
+// Student Detail Page (for instructors)
+Route::get('/dashboard/student/{student}', [DashboardController::class, 'showStudent'])
+    ->middleware(['auth', 'verified'])
+    ->name('instructor.student.show');
+
+// Send Warning Notification
+Route::post('/dashboard/student/{student}/warn', [DashboardController::class, 'sendWarning'])
+    ->middleware(['auth', 'verified'])
+    ->name('instructor.student.warn');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -50,6 +65,18 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/student/warnings', [StudentController::class, 'getWarnings'])
     ->middleware('auth');
+
+// Notification API Routes
+use App\Http\Controllers\NotificationController;
+
+Route::middleware('auth')->group(function () {
+    Route::get('/api/notifications', [NotificationController::class, 'getMyNotifications']);
+    Route::get('/api/notifications/unread-count', [NotificationController::class, 'getUnreadCount']);
+    Route::post('/api/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/api/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+    Route::post('/api/notifications/send-warning', [NotificationController::class, 'sendWarning']);
+    Route::get('/api/students/dropdown', [NotificationController::class, 'getStudentsForDropdown']);
+});
 
 
 require __DIR__ . '/auth.php';

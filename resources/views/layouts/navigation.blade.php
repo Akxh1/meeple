@@ -13,21 +13,28 @@
                 <!-- Navigation Links -->
                 <div class="hidden sm:flex sm:ml-10 space-x-6">
 
-                    {{-- 1. Main Dashboard (Visible to Teachers and Admins) --}}
-                    @if (auth()->user()->role === 'admin' || auth()->user()->role === 'teacher')
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')"
-                            class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-yellow-400 font-medium transition">
-                            {{ __('Instructor Dashboard') }}
-                        </x-nav-link>
-                    @endif
+                    @auth
+                        {{-- 1. Main Dashboard (Visible to Teachers and Admins) --}}
+                        @if (auth()->user()->role === 'admin' || auth()->user()->role === 'teacher')
+                            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')"
+                                class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-yellow-400 font-medium transition">
+                                {{ __('Instructor Dashboard') }}
+                            </x-nav-link>
+                        @endif
 
-                    {{-- 2. Student Dashboard (Visible to Students and Admins) --}}
-                    @if (auth()->user()->role === 'admin' || auth()->user()->role === 'student')
-                        <x-nav-link :href="route('student.dashboard')" :active="request()->routeIs('student.dashboard')"
+                        {{-- 2. Student Dashboard (Visible to Students and Admins) --}}
+                        @if (auth()->user()->role === 'admin' || auth()->user()->role === 'student')
+                            <x-nav-link :href="route('student.dashboard')" :active="request()->routeIs('student.dashboard')"
+                                class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-yellow-400 font-medium transition">
+                                {{ __('Student Dashboard') }}
+                            </x-nav-link>
+                        @endif
+                    @else
+                        <x-nav-link :href="url('/')" :active="request()->is('/')"
                             class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-yellow-400 font-medium transition">
-                            {{ __('Student Dashboard') }}
+                            {{ __('Home') }}
                         </x-nav-link>
-                    @endif
+                    @endauth
 
                 </div>
             </div>
@@ -205,105 +212,305 @@
         </div>
     </div>
 
-    <!-- Messages Drawer -->
+    <!-- Dynamic Notifications Drawer -->
     <div id="messagesDrawer"
-        class="fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-900 shadow-lg border-l border-gray-200 dark:border-gray-700 z-50 transform translate-x-full transition-transform duration-300"
+        x-data="notificationsPanel()"
+        x-init="init()"
+        class="fixed top-0 right-0 h-full w-96 bg-white dark:bg-gray-900 shadow-lg border-l border-gray-200 dark:border-gray-700 z-50 transform translate-x-full transition-transform duration-300"
         style="max-width: 100vw;">
+        
+        <!-- Header -->
         <div class="flex items-center justify-between px-4 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200">Messages</h3>
-            <button @click="document.getElementById('messagesDrawer').classList.add('translate-x-full')"
-                class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-                <i class="fa fa-times text-xl"></i>
+            <div class="flex items-center gap-2">
+                <i class="fa fa-bell text-indigo-500"></i>
+                <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200">Notifications</h3>
+                <span x-show="unreadCount > 0" x-text="unreadCount" class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full"></span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button @click="markAllRead()" x-show="unreadCount > 0"
+                    class="text-xs text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">
+                    Mark all read
+                </button>
+                <button @click="document.getElementById('messagesDrawer').classList.add('translate-x-full')"
+                    class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs for Student/Instructor views -->
+        @if(Auth::check() && (Auth::user()->role === 'admin' || Auth::user()->role === 'teacher'))
+        <div class="flex border-b border-gray-200 dark:border-gray-700">
+            <button @click="activeTab = 'notifications'" 
+                :class="activeTab === 'notifications' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500'"
+                class="flex-1 py-3 text-sm font-medium border-b-2 hover:text-indigo-600 transition">
+                <i class="fa fa-inbox mr-1"></i> View
+            </button>
+            <button @click="activeTab = 'send'" 
+                :class="activeTab === 'send' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500'"
+                class="flex-1 py-3 text-sm font-medium border-b-2 hover:text-indigo-600 transition">
+                <i class="fa fa-paper-plane mr-1"></i> Send Warning
             </button>
         </div>
-        <div id="messagesContainer" class="p-4 space-y-4 overflow-y-auto h-[calc(100vh-64px)]">
-            <!-- Example messages, replace with dynamic content -->
-            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-                <div class="font-semibold text-indigo-600 dark:text-indigo-300">Admin</div>
-                <div class="text-gray-700 dark:text-gray-300 text-sm mt-1">Welcome to X-Scaffold! Let us know if you need
-                    help.
+        @endif
+
+        <!-- Notifications List -->
+        <div x-show="activeTab === 'notifications'" class="p-4 space-y-3 overflow-y-auto h-[calc(100vh-140px)]">
+            <template x-if="loading">
+                <div class="flex items-center justify-center py-8">
+                    <i class="fa fa-spinner fa-spin text-2xl text-gray-400"></i>
                 </div>
-                <div class="text-xs text-gray-400 mt-2">2 hours ago</div>
-            </div>
-            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-                <div class="font-semibold text-indigo-600 dark:text-indigo-300">Support</div>
-                <div class="text-gray-700 dark:text-gray-300 text-sm mt-1">Your dashboard has been updated.</div>
-                <div class="text-xs text-gray-400 mt-2">1 day ago</div>
-            </div>
-            <!-- Add more messages here -->
-        </div>
-    </div>
-    {{-- <script>
-        const messagesContainer = document.getElementById('messagesContainer');
-        const messageCountEl = document.getElementById('messageCount');
-
-        let messages = []; // store messages
-
-        // Function to fetch messages from server
-        async function fetchMessages() {
-            try {
-                const res = await fetch('/api/messages'); // Laravel API endpoint
-                const data = await res.json(); // expect an array of messages
-                if (JSON.stringify(data) !== JSON.stringify(messages)) {
-                    messages = data;
-                    renderMessages();
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        // Render messages in the drawer
-        function renderMessages() {
-            messagesContainer.innerHTML = messages.map(msg => `
-        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-            <div class="font-semibold text-indigo-600 dark:text-indigo-300">${msg.sender}</div>
-            <div class="text-gray-700 dark:text-gray-300 text-sm mt-1">${msg.text}</div>
-            <div class="text-xs text-gray-400 mt-2">${msg.time}</div>
-        </div>
-    `).join('');
-
-            messageCountEl.textContent = messages.length;
-        }
-
-        // Poll every 5 seconds
-        setInterval(fetchMessages, 5000);
-        fetchMessages(); // initial fetch
-    </script> --}}
-
-    {{-- <script>
-        const messagesContainer = document.getElementById('messagesContainer');
-
-        async function loadStudentWarnings() {
-            try {
-                const res = await fetch('/student/warnings');
-                const messages = await res.json();
-
-                if (messages.length === 0) {
-                    messagesContainer.innerHTML =
-                        `<div class="text-gray-500 dark:text-gray-400 text-sm">No new messages.</div>`;
-                    return;
-                }
-
-                messagesContainer.innerHTML = messages.map(msg => `
-            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-                <div class="font-semibold text-indigo-600 dark:text-indigo-300">${msg.sender}</div>
-                <div class="text-gray-700 dark:text-gray-300 text-sm mt-1">${msg.text}</div>
-                <div class="text-xs text-gray-400 mt-2">${msg.time}</div>
-            </div>
-        `).join('');
+            </template>
             
-                document.getElementById('messageCount').textContent = messages.length;
-            } catch (err) {
-                console.error(err);
-            }
-        }
+            <template x-if="!loading && notifications.length === 0">
+                <div class="text-center py-8">
+                    <i class="fa fa-bell-slash text-4xl text-gray-300 dark:text-gray-600 mb-3"></i>
+                    <p class="text-gray-500 dark:text-gray-400">No notifications yet</p>
+                </div>
+            </template>
+            
+            <template x-for="n in notifications" :key="n.id">
+                <div @click="markAsRead(n.id)" 
+                    :class="n.is_read ? 'bg-gray-50 dark:bg-gray-800' : 'bg-indigo-50 dark:bg-indigo-900/30 border-l-4 border-indigo-500'"
+                    class="rounded-lg p-3 cursor-pointer hover:shadow-md transition">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-2">
+                            <span x-text="n.icon" class="text-lg"></span>
+                            <span :class="n.color" class="font-semibold text-sm" x-text="n.title"></span>
+                        </div>
+                        <span class="text-xs text-gray-400" x-text="n.time"></span>
+                    </div>
+                    <p class="text-gray-700 dark:text-gray-300 text-sm mt-2 line-clamp-3" x-text="n.message"></p>
+                    <div class="text-xs text-gray-400 mt-2">From: <span x-text="n.sender"></span></div>
+                </div>
+            </template>
+        </div>
 
-        // Load on page load
-        document.addEventListener('DOMContentLoaded', loadStudentWarnings);
-        // Poll every 5 seconds
-        setInterval(loadStudentWarnings, 5000);
-        loadStudentWarnings(); // initial fetch
-    </script> --}}
+        <!-- Send Warning Form (Instructors Only) -->
+        @if(Auth::check() && (Auth::user()->role === 'admin' || Auth::user()->role === 'teacher'))
+        <div x-show="activeTab === 'send'" class="p-4 overflow-y-auto h-[calc(100vh-140px)]">
+            <div class="space-y-4">
+                <!-- Student Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Student</label>
+                    <select x-model="sendForm.student_id" @change="updateSelectedStudentEmail()"
+                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-sm">
+                        <option value="">Choose a student...</option>
+                        <template x-for="s in students" :key="s.id">
+                            <option :value="s.id" x-text="`${s.name} (${s.student_id})`"></option>
+                        </template>
+                    </select>
+                </div>
+
+                <!-- Warning Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Warning Type</label>
+                    <select x-model="sendForm.type"
+                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-sm">
+                        <option value="warning">⚠️ Performance Warning</option>
+                        <option value="at_risk">🚨 At-Risk Alert</option>
+                        <option value="info">ℹ️ Information</option>
+                        <option value="success">✅ Positive Feedback</option>
+                    </select>
+                </div>
+
+                <!-- Title -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Title</label>
+                    <input type="text" x-model="sendForm.title" placeholder="e.g., Academic Performance Alert"
+                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-sm">
+                </div>
+
+                <!-- Message -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Message</label>
+                    <textarea x-model="sendForm.message" rows="5" placeholder="Enter your message..."
+                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-sm"></textarea>
+                </div>
+
+                <!-- Send Email Toggle -->
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" x-model="sendForm.send_email" id="sendEmailToggle"
+                        class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    <label for="sendEmailToggle" class="text-sm text-gray-700 dark:text-gray-300">
+                        Also send email to: <span x-text="selectedStudentEmail || 'N/A'" class="font-semibold"></span>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button @click="sendWarning()" :disabled="sending"
+                    class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white rounded-lg font-medium transition flex items-center justify-center gap-2">
+                    <i class="fa" :class="sending ? 'fa-spinner fa-spin' : 'fa-paper-plane'"></i>
+                    <span x-text="sending ? 'Sending...' : 'Send Warning'"></span>
+                </button>
+
+                <!-- Success/Error Messages -->
+                <div x-show="sendSuccess" class="p-3 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-sm">
+                    <i class="fa fa-check-circle mr-1"></i> Warning sent successfully!
+                </div>
+                <div x-show="sendError" class="p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-sm">
+                    <i class="fa fa-exclamation-circle mr-1"></i> <span x-text="sendError"></span>
+                </div>
+            </div>
+        </div>
+        @endif
+    </div>
+
+    <script>
+        function notificationsPanel() {
+            return {
+                activeTab: 'notifications',
+                notifications: [],
+                unreadCount: 0,
+                loading: true,
+                students: [],
+                selectedStudentEmail: '',
+                sendForm: {
+                    student_id: '',
+                    type: 'warning',
+                    title: 'Academic Performance Warning',
+                    message: '',
+                    send_email: true,
+                },
+                sending: false,
+                sendSuccess: false,
+                sendError: '',
+
+                async init() {
+                    await this.fetchNotifications();
+                    await this.fetchStudents();
+                    // Poll for new notifications every 30 seconds
+                    setInterval(() => this.fetchNotifications(), 30000);
+                },
+
+                async fetchNotifications() {
+                    try {
+                        const res = await fetch('/api/notifications', {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                            }
+                        });
+                        if (!res.ok) {
+                            // User not logged in or no permission - just show empty
+                            this.notifications = [];
+                            this.unreadCount = 0;
+                            this.updateBadge();
+                            return;
+                        }
+                        this.notifications = await res.json();
+                        this.unreadCount = this.notifications.filter(n => !n.is_read).length;
+                        this.updateBadge();
+                    } catch (err) {
+                        console.error('Failed to fetch notifications:', err);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async fetchStudents() {
+                    try {
+                        const res = await fetch('/api/students/dropdown', {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                            }
+                        });
+                        if (!res.ok) return; // Silently fail if not authorized
+                        this.students = await res.json();
+                    } catch (err) {
+                        console.error('Failed to fetch students:', err);
+                    }
+                },
+
+                updateSelectedStudentEmail() {
+                    const student = this.students.find(s => s.id == this.sendForm.student_id);
+                    this.selectedStudentEmail = student?.email || 'No email';
+                },
+
+                async markAsRead(id) {
+                    try {
+                        await fetch(`/api/notifications/${id}/read`, {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+                        });
+                        const n = this.notifications.find(n => n.id === id);
+                        if (n) n.is_read = true;
+                        this.unreadCount = this.notifications.filter(n => !n.is_read).length;
+                        this.updateBadge();
+                    } catch (err) {
+                        console.error(err);
+                    }
+                },
+
+                async markAllRead() {
+                    try {
+                        await fetch('/api/notifications/mark-all-read', {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+                        });
+                        this.notifications.forEach(n => n.is_read = true);
+                        this.unreadCount = 0;
+                        this.updateBadge();
+                    } catch (err) {
+                        console.error(err);
+                    }
+                },
+
+                updateBadge() {
+                    const badge = document.getElementById('messageCount');
+                    if (badge) {
+                        badge.textContent = this.unreadCount;
+                        badge.style.display = this.unreadCount > 0 ? 'flex' : 'none';
+                    }
+                },
+
+                async sendWarning() {
+                    if (!this.sendForm.student_id || !this.sendForm.title || !this.sendForm.message) {
+                        this.sendError = 'Please fill in all fields';
+                        return;
+                    }
+
+                    this.sending = true;
+                    this.sendSuccess = false;
+                    this.sendError = '';
+
+                    try {
+                        const res = await fetch('/api/notifications/send-warning', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify(this.sendForm)
+                        });
+
+                        const data = await res.json();
+
+                        if (data.success) {
+                            this.sendSuccess = true;
+                            this.sendForm = {
+                                student_id: '',
+                                type: 'warning',
+                                title: 'Academic Performance Warning',
+                                message: '',
+                                send_email: true,
+                            };
+                            this.selectedStudentEmail = '';
+                            setTimeout(() => this.sendSuccess = false, 3000);
+                        } else {
+                            this.sendError = data.message || 'Failed to send warning';
+                        }
+                    } catch (err) {
+                        this.sendError = 'Network error. Please try again.';
+                    } finally {
+                        this.sending = false;
+                    }
+                }
+            };
+        }
+    </script>
 
 </nav>
+

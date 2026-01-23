@@ -18,4 +18,8 @@ class Student extends Model
     public function progress() {
         return $this->hasOne(StudentProgress::class);
     }
+
+    public function modulePerformances() {
+        return $this->hasMany(StudentModulePerformance::class);
+    }
 }

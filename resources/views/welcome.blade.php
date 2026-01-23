@@ -1,484 +1,516 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-gray-900 dark:text-white tracking-tight">Welcome to MEEPLE</h2>
+        <h2 class="font-bold text-2xl text-gray-900 dark:text-white tracking-tight">Welcome to X-Scaffold</h2>
     </x-slot>
 
     <!-- ORB Background Hero Section -->
-    <section class="relative h-[600px] w-full overflow-hidden rounded-xl shadow-xl mb-14 mt-8">
-        <!-- Orb Canvas container, absolutely positioned -->
+    <section class="relative h-[650px] w-full overflow-hidden rounded-2xl shadow-2xl mb-16 mt-8">
+        <!-- Orb Canvas container -->
         <div id="orb-root" class="absolute inset-0 -z-10"></div>
 
-        <!-- Optional subtle light overlay for light mode, and dark overlay for dark mode -->
-        <div class="absolute inset-0 rounded-xl -z-5
-            bg-white/40 dark:bg-black/60"></div>
+        <!-- Gradient overlay for better text visibility -->
+        <div class="absolute inset-0 rounded-2xl -z-5
+            bg-gradient-to-br from-white/60 via-white/30 to-transparent 
+            dark:from-gray-900/80 dark:via-gray-900/50 dark:to-transparent"></div>
 
-        <!-- Hero content centered -->
-        <div class="relative z-10 flex flex-col justify-center items-center h-full px-6 text-center max-w-4xl mx-auto">
-            <h1 class="text-6xl font-extrabold text-gray-900 dark:text-white drop-shadow-md leading-tight sm:text-7xl">
+        <!-- Hero content -->
+        <div class="relative z-10 flex flex-col justify-center items-center h-full px-6 text-center max-w-5xl mx-auto">
+            <!-- Logo Badge -->
+            <div class="mb-6 px-4 py-2 bg-white/20 dark:bg-white/10 backdrop-blur-sm rounded-full border border-white/30 dark:border-white/20">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-200">🔬 Research Prototype • Final Year Project</span>
+            </div>
+            
+            <h1 class="text-6xl md:text-7xl lg:text-8xl font-black text-gray-900 dark:text-white drop-shadow-lg leading-none tracking-tight">
                 X-Scaffold
             </h1>
-            <p class="mt-4 text-xl text-gray-800 dark:text-white/90 max-w-xl">
-                Predict Performance. Explain Insights. Scaffold Learning.
+            
+            <p class="mt-6 text-xl md:text-2xl text-gray-700 dark:text-gray-200 max-w-2xl font-light">
+                <span class="font-semibold text-indigo-600 dark:text-indigo-400">Predict</span> Performance. 
+                <span class="font-semibold text-emerald-600 dark:text-emerald-400">Explain</span> Insights. 
+                <span class="font-semibold text-amber-600 dark:text-amber-400">Scaffold</span> Learning.
             </p>
-            <a href="#what-is-meeple"
-                class="mt-8 inline-block px-6 py-2 border border-gray-700 dark:border-white text-gray-800 dark:text-white font-medium rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-white/20">
-                Discover the Predict-Explain-Act Framework
-            </a>
+            
+            <p class="mt-4 text-base text-gray-600 dark:text-gray-400 max-w-xl">
+                An intelligent framework synthesizing ML prediction, XAI diagnostics, and LLM-driven adaptive intervention for next-generation Learning Management Systems.
+            </p>
 
-
+            <div class="mt-10 flex flex-col sm:flex-row gap-4">
+                <a href="#framework"
+                    class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                    Explore the Framework
+                </a>
+                <a href="#architecture"
+                    class="px-8 py-3 border-2 border-gray-800 dark:border-white text-gray-800 dark:text-white font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-300">
+                    View Architecture
+                </a>
+            </div>
         </div>
-
     </section>
 
     <div class="space-y-0">
-        <!-- Hero Section -->
-        <section id="what-is-meeple"
-            class="min-h-screen flex flex-col justify-center text-center px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            <!-- Carousel container -->
-            <div class="absolute inset-0 -z-10">
-                <div class="relative w-full h-full max-w-5xl mx-auto rounded-lg overflow-hidden">
-                    @php
-                        $images = [
-                            '/images/COMPONENTS RANGE.png',
-                            '/images/DATABASE DESIGN.png',
-                            '/images/FLOW.png',
-                            '/images/MEEPLE LEARNING PROCESS.png',
-                        ];
-                    @endphp
-
-                    <div id="carousel" class="relative w-full h-full">
-                        @foreach ($images as $index => $img)
-                            <img src="{{ $img }}" alt="MEEPLE Work Image {{ $index + 1 }}"
-                                class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-1000 ease-in-out"
-                                data-carousel-item="{{ $index }}"
-                                style="pointer-events:none; user-select:none;" />
-                        @endforeach
-                    </div>
-
-                    <!-- Navigation dots -->
-                    <div id="carousel-dots"
-                        class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-3">
-                        @foreach ($images as $index => $img)
-                            <button type="button" aria-label="Go to slide {{ $index + 1 }}"
-                                data-carousel-dot="{{ $index }}"
-                                class="w-3 h-3 rounded-full bg-white bg-opacity-40 hover:bg-opacity-70 transition"
-                                style="opacity:0.6"></button>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-
-            <!-- Text Content -->
-            <div class="space-y-6 max-w-5xl mx-auto relative z-10">
-                <h1
-                    class="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-6xl md:text-7xl">
-                    The Predict-Explain-Act Learning Engine
-                </h1>
-                <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                    Bridging the gap between Machine Learning prediction and pedagogical action with Explainable AI and
-                    LLM-driven scaffolding.
-                </p>
-                <div class="inline-flex space-x-4 justify-center">
-                    <a href="#section-what"
-                        class="inline-block px-6 py-2 border border-gray-800 dark:border-white text-gray-800 dark:text-white font-medium rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition duration-200 ease-in-out">
-                        What is X-Scaffold?
-                    </a>
-                    <button id="openCanvasBtn"
-                        class="relative inline-flex items-center px-6 py-2 font-medium rounded-md text-white
-bg-transparent border border-transparent
-bg-gradient-to-r from-teal-600 via-teal-400 to-teal-600
-bg-[length:200%_100%] bg-left-bottom
-hover:bg-right-bottom
-transition-all duration-500 ease-in-out
-shadow-sm
-dark:text-gray-800
-dark:from-gray-50 dark:via-gray-100 dark:to-gray-300
-focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                        <span class="relative z-10">Show Developer's Canvas</span>
-                        <span
-                            class="absolute inset-0 rounded-md bg-white/10 dark:bg-black/20 blur-sm opacity-0 hover:opacity-100 transition-opacity duration-300"></span>
-                    </button>
-
-                </div>
-            </div>
-
-            <!-- Canvas Modal Overlay -->
-            <div id="canvasModal"
-                class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm hidden z-50 flex flex-col items-center justify-center p-4">
-                <button id="closeCanvasBtn"
-                    class="self-end mb-4 text-white text-3xl font-bold hover:text-red-500 transition">&times;</button>
-                <canvas id="imageCanvas" width="800" height="600"
-                    class="rounded-lg shadow-lg border border-white"></canvas>
-                <div class="mt-4 flex space-x-4">
-                    <button id="prevImageBtn"
-                        class="px-4 py-2 bg-white bg-opacity-20 text-white rounded-md hover:bg-opacity-40 transition">Previous</button>
-                    <button id="nextImageBtn"
-                        class="px-4 py-2 bg-white bg-opacity-20 text-white rounded-md hover:bg-opacity-40 transition">Next</button>
-                </div>
-            </div>
-
-            <script>
-                (() => {
-                    // Carousel code (unchanged)
-                    const images = document.querySelectorAll('[data-carousel-item]');
-                    const dots = document.querySelectorAll('[data-carousel-dot]');
-                    let current = 0;
-                    const slideInterval = 5000;
-                    let timer;
-
-                    function showSlide(index) {
-                        images.forEach((img, i) => {
-                            if (i === index) {
-                                img.style.opacity = '0.15';
-                                img.style.zIndex = '0';
-                            } else {
-                                img.style.opacity = '0';
-                                img.style.zIndex = '-1';
-                            }
-                        });
-                        dots.forEach((dot, i) => {
-                            dot.style.opacity = i === index ? '1' : '0.4';
-                            dot.classList.toggle('bg-opacity-100', i === index);
-                        });
-                        current = index;
-                    }
-
-                    function nextSlide() {
-                        let next = (current + 1) % images.length;
-                        showSlide(next);
-                    }
-                    dots.forEach((dot, i) => {
-                        dot.addEventListener('click', () => {
-                            clearInterval(timer);
-                            showSlide(i);
-                            timer = setInterval(nextSlide, slideInterval);
-                        });
-                    });
-                    showSlide(0);
-                    timer = setInterval(nextSlide, slideInterval);
-
-                    // Canvas Modal Logic
-                    const modal = document.getElementById('canvasModal');
-                    const openBtn = document.getElementById('openCanvasBtn');
-                    const closeBtn = document.getElementById('closeCanvasBtn');
-                    const canvas = document.getElementById('imageCanvas');
-                    const ctx = canvas.getContext('2d');
-                    const prevBtn = document.getElementById('prevImageBtn');
-                    const nextBtn = document.getElementById('nextImageBtn');
-
-                    const imagePaths = [
-                        '/images/COMPONENTS RANGE.png',
-                        '/images/DATABASE DESIGN.png',
-                        '/images/FLOW.png',
-                        '/images/MEEPLE LEARNING PROCESS.png',
-                    ];
-
-                    let loadedImages = [];
-                    let currentImageIndex = 0;
-
-                    // Preload images
-                    function preloadImages(paths) {
-                        return Promise.all(
-                            paths.map(src => new Promise((resolve) => {
-                                const img = new Image();
-                                img.src = src;
-                                img.onload = () => resolve(img);
-                            }))
-                        );
-                    }
-
-                    function drawImageScaled(img) {
-                        // Clear canvas
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        // Calculate scale to fit inside canvas (keeping aspect ratio)
-                        let hRatio = canvas.width / img.width;
-                        let vRatio = canvas.height / img.height;
-                        let ratio = Math.min(hRatio, vRatio);
-                        let centerX = (canvas.width - img.width * ratio) / 2;
-                        let centerY = (canvas.height - img.height * ratio) / 2;
-                        ctx.drawImage(img, 0, 0, img.width, img.height,
-                            centerX, centerY, img.width * ratio, img.height * ratio);
-                    }
-
-                    function showCurrentImage() {
-                        const img = loadedImages[currentImageIndex];
-                        drawImageScaled(img);
-                    }
-
-                    function nextImage() {
-                        currentImageIndex = (currentImageIndex + 1) % loadedImages.length;
-                        showCurrentImage();
-                    }
-
-                    function prevImage() {
-                        currentImageIndex = (currentImageIndex - 1 + loadedImages.length) % loadedImages.length;
-                        showCurrentImage();
-                    }
-
-                    openBtn.addEventListener('click', () => {
-                        modal.classList.remove('hidden');
-                        // Load images if not already loaded
-                        if (loadedImages.length === 0) {
-                            preloadImages(imagePaths).then(images => {
-                                loadedImages = images;
-                                currentImageIndex = 0;
-                                showCurrentImage();
-                            });
-                        } else {
-                            showCurrentImage();
-                        }
-                    });
-
-                    closeBtn.addEventListener('click', () => {
-                        modal.classList.add('hidden');
-                    });
-
-                    nextBtn.addEventListener('click', nextImage);
-                    prevBtn.addEventListener('click', prevImage);
-
-                    // Optional: Close modal on ESC key
-                    window.addEventListener('keydown', (e) => {
-                        if (e.key === "Escape" && !modal.classList.contains('hidden')) {
-                            modal.classList.add('hidden');
-                        }
-                    });
-                })();
-            </script>
-        </section>
-
-
-
-        <!-- What is MEEPLE -->
-        <section id="section-what" class="bg-gray-50 dark:bg-gray-900 py-20 min-h-screen flex items-center">
-            <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col gap-12">
-                <!-- What is MEEPLE (Full Width Row) -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 mb-2">
-                    <h2 class="text-3xl font-extrabold text-gray-800 dark:text-white mb-4">
-                        What is <span class="text-yellow-600 dark:text-yellow-300">X-Scaffold</span>?
+        
+        <!-- Predict-Explain-Act Framework Section -->
+        <section id="framework" class="min-h-screen flex flex-col justify-center py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+            <div class="max-w-7xl mx-auto w-full">
+                <div class="text-center mb-16">
+                    <span class="inline-block px-4 py-1 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-semibold mb-4">
+                        The Core Framework
+                    </span>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                        Predict → Explain → Act
                     </h2>
-                    <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-                        X-Scaffold is an integrated "Predict-Explain-Act" framework that bridges the gap between
-                        analytics and intervention.
-                        It moves beyond static grading by combining Machine Learning for real-time performance
-                        prediction,
-                        Explainable AI (XAI) for transparent teacher insights, and LLM-driven adaptive scaffolding to
-                        support students during assessments.
+                    <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                        A unified pipeline that closes the loop between identifying at-risk students and providing timely, personalized interventions.
                     </p>
-                    <a href="#how-it-works"
-                        class="mt-6 inline-block px-6 py-2 border border-yellow-500 text-yellow-700 dark:text-yellow-300 dark:border-yellow-300 font-medium rounded-md hover:bg-yellow-50 dark:hover:bg-yellow-300/10 transition">
-                        How X-Scaffold Works
-                    </a>
                 </div>
 
-                <!-- Carousel Row (Meaning, Features, Video) -->
-                <div class="flex flex-col items-center justify-center w-full">
-                    <div x-data="{
-                        slides: [{
-                                type: 'meaning',
-                                html: `<div class='bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 border-l-4 border-yellow-400 group min-h-[340px] flex flex-col justify-center'>
-                                    <h3 class='text-xl font-semibold text-gray-800 dark:text-white mb-6 flex items-center gap-2'>
-                                        <span>🔄</span> The X-Scaffold Framework
-                                    </h3>
-                                    <ul class='space-y-4 text-sm text-gray-700 dark:text-gray-200'>
-                                        <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
-                                            <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>P</span>
-                                            <span><strong>Predict (ML):</strong> Real-time Random Forest models analyze behavior (time/hints) to predict student risk scores.</span>
-                                        </li>
-                                        <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
-                                            <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>E</span>
-                                            <span><strong>Explain (XAI):</strong> SHAP/LIME values generate 'reason codes' explaining <em>why</em> a student is at risk.</span>
-                                        </li>
-                                        <li class='flex items-start gap-3 transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'>
-                                            <span class='text-yellow-500 dark:text-yellow-300 font-bold text-base'>A</span>
-                                            <span><strong>Act (LLM):</strong> AI uses the specific risk profile to generate adaptive scaffolding hints (Basic to Advanced).</span>
-                                        </li>
-                                    </ul>
-                                </div>`
-                            },
-                            {
-                                type: 'features',
-                                html: `<div class='bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 min-h-[340px] flex flex-col justify-center'>
-                                    <h3 class='text-xl font-semibold text-gray-800 dark:text-white mb-4'>🎯 Core Features of X-Scaffold</h3>
-                                    <ul class='list-disc pl-5 space-y-2 text-sm text-gray-700 dark:text-gray-300'>
-                                        <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Fine-Grained Tracking:</strong> Monitors <code>time_per_question</code>, hint clicks, and accuracy in real-time.</li>
-                                        <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Closed-Loop AI:</strong> Bridges the gap between static analytics and active student intervention.</li>
-                                        <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Generative Scaffolding:</strong> Hints aren't static; they are generated by an LLM based on the XAI risk explanation.</li>
-                                        <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Tech Stack:</strong> Powered by Laravel 11, React 18, and Python 3.10 (Scikit-learn/TensorFlow).</li>
-                                        <li class='transition-all duration-200 hover:pl-2 hover:text-yellow-600 dark:hover:text-yellow-300'><strong>Example:</strong> High Hint Usage + Low Time = 'Gaming the system' risk → System restricts answer visibility.</li>
-                                    </ul>
-                                </div>`
-                            },
-                            {
-                                type: 'video',
-                                html: `<div class='w-full max-w-full rounded-xl overflow-hidden shadow-xl min-h-[340px] flex flex-col justify-center'>
-                                    <iframe class='w-full h-64 md:h-80 rounded-xl' src='https://www.youtube.com/embed/dQw4w9WgXcQ' title='Intro to X-Scaffold' allowfullscreen></iframe>
-                                </div>`
-                            }
-                        ],
-                        current: 0,
-                        next() {
-                            this.current = (this.current + 1) % this.slides.length
-                        },
-                        prev() {
-                            this.current = (this.current - 1 + this.slides.length) % this.slides.length
-                        }
-                    }" class="w-full">
-                        <div class="relative w-full min-h-[340px]">
-                            <template x-for="(slide, idx) in slides" :key="slide.type">
-                                <div x-show="current === idx" x-html="slide.html"
-                                    class="transition-all duration-500 absolute inset-0 z-0"></div>
-                            </template>
-                            <div class="flex justify-center mt-4 space-x-4 absolute left-0 right-0 bottom-0 z-10">
-                                <button type="button" @click="prev"
-                                    class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-yellow-400 dark:hover:bg-yellow-500 transition">
-                                    <i class="fa fa-chevron-left"></i>
-                                </button>
-                                <template x-for="(slide, idx) in slides" :key="slide.type + '-dot'">
-                                    <span @click="current = idx"
-                                        :class="{
-                                            'bg-yellow-500 dark:bg-yellow-400': current ===
-                                                idx,
-                                            'bg-gray-300 dark:bg-gray-600': current !== idx
-                                        }"
-                                        class="inline-block w-3 h-3 rounded-full mx-1 cursor-pointer transition"></span>
-                                </template>
-                                <button type="button" @click="next"
-                                    class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-yellow-400 dark:hover:bg-yellow-500 transition">
-                                    <i class="fa fa-chevron-right"></i>
-                                </button>
+                <!-- Three Pillars -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                    <!-- PREDICT -->
+                    <div class="group relative bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700 overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-500"></div>
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-brain text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">PREDICT</h3>
+                        <p class="text-sm font-semibold text-blue-600 dark:text-blue-400 mb-4">Machine Learning Layer</p>
+                        <ul class="space-y-3 text-gray-600 dark:text-gray-300">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-blue-500 mt-1"></i>
+                                <span>Random Forest models trained on 11 behavioral features</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-blue-500 mt-1"></i>
+                                <span>Learning Mastery Score (LMS) calculation</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-blue-500 mt-1"></i>
+                                <span>4-level risk classification (At-Risk → Advanced)</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- EXPLAIN -->
+                    <div class="group relative bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700 overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+                        <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-lightbulb text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">EXPLAIN</h3>
+                        <p class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 mb-4">Explainable AI Layer</p>
+                        <ul class="space-y-3 text-gray-600 dark:text-gray-300">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                                <span>SHAP/LIME interpretability for predictions</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                                <span>Human-readable "reason codes" for teachers</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                                <span>Feature contribution visualizations</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- ACT -->
+                    <div class="group relative bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700 overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-orange-500"></div>
+                        <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-magic text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">ACT</h3>
+                        <p class="text-sm font-semibold text-amber-600 dark:text-amber-400 mb-4">LLM Intervention Layer</p>
+                        <ul class="space-y-3 text-gray-600 dark:text-gray-300">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-amber-500 mt-1"></i>
+                                <span>Generative AI-powered adaptive hints</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-amber-500 mt-1"></i>
+                                <span>Progressive scaffolding (Basic → Advanced)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-amber-500 mt-1"></i>
+                                <span>Risk-profile-aware intervention strategies</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Problem Statement -->
+                <div class="bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20 rounded-2xl p-8 border border-rose-200 dark:border-rose-800">
+                    <div class="flex flex-col lg:flex-row gap-8 items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-20 h-20 bg-gradient-to-br from-rose-500 to-pink-500 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-exclamation-triangle text-3xl text-white"></i>
                             </div>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">The Problem We're Solving</h3>
+                            <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                                Modern LMS platforms collect vast amounts of data but fail to <strong>close the loop</strong> between identifying a struggling student and helping them effectively. 
+                                X-Scaffold bridges this <strong>"Prediction-Intervention Gap"</strong> by synthesizing ML predictions, XAI explanations, and LLM-generated scaffolding into a unified, actionable framework.
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- Architecture & Diagrams Section -->
+        <section id="architecture" class="min-h-screen py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
+            <div class="max-w-7xl mx-auto w-full">
+                <div class="text-center mb-16">
+                    <span class="inline-block px-4 py-1 bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300 rounded-full text-sm font-semibold mb-4">
+                        System Design
+                    </span>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                        Architecture & Design
+                    </h2>
+                    <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                        Explore the technical blueprints and design artifacts powering X-Scaffold.
+                    </p>
+                </div>
 
+                <!-- Developer's Canvas Button -->
+                <div class="text-center mb-12">
+                    <button id="openCanvasBtn"
+                        class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                        <i class="fas fa-images text-xl"></i>
+                        <span>Open Developer's Canvas</span>
+                        <span class="px-2 py-1 bg-white/20 rounded-lg text-sm">6 Diagrams</span>
+                    </button>
+                </div>
 
-        <!-- Interactive How It Works -->
-        <section id="how-it-works"
-            class="min-h-screen bg-gradient-to-tr from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 flex items-center">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-12">
-                <h2 class="text-3xl font-bold text-gray-800 dark:text-white text-center">How X-Scaffold Works</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Image Grid Preview -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
                     @php
-                        $cards = [
-                            [
-                                'title' => 'Excel Upload',
-                                'desc' =>
-                                    'Teachers upload questions directly via Excel — supporting MCQs, True/False, and Short Answer formats.',
-                                'btn' => 'Upload Demo',
-                                'href' => route('teacher.questions.upload'),
-                                'bg' => 'border-red-500 text-red-600 dark:text-red-300 dark:border-red-400',
-                                'note' => 'Teacher Login Required',
-                            ],
-                            [
-                                'title' => 'ML Recommendations',
-                                'desc' =>
-                                    'MEEPLE learns from student performance and recommends tailored question sets with smart difficulty scaling.',
-                                'btn' => 'Simulate ML Assist',
-                                'href' => route('test-exam.index'),
-                                'bg' => 'border-yellow-500 text-yellow-700 dark:text-yellow-300 dark:border-yellow-400',
-                            ],
-                            [
-                                'title' => 'Performance Engine',
-                                'desc' =>
-                                    'Find out Student performance, prediction score determines if they are at risk of failing or not.',
-                                'btn' => 'View Sample Stats',
-                                'href' => route('risk.predictor'),
-                                'bg' => 'border-blue-500 text-blue-700 dark:text-blue-300 dark:border-blue-400',
-                            ],
+                        $diagrams = [
+                            ['path' => '/images/FYP IMAGES/High_Level_Architecture_Diagram.png', 'title' => 'High-Level Architecture', 'desc' => 'System components & data flow'],
+                            ['path' => '/images/FYP IMAGES/System_workflow_diagram.png', 'title' => 'System Workflow', 'desc' => 'End-to-end process flow'],
+                            ['path' => '/images/FYP IMAGES/Use Case Diagram.png', 'title' => 'Use Case Diagram', 'desc' => 'Actor interactions'],
+                            ['path' => '/images/FYP IMAGES/Context Diagram.png', 'title' => 'Context Diagram', 'desc' => 'System boundaries'],
+                            ['path' => '/images/FYP IMAGES/Rich Picture Diagram.png', 'title' => 'Rich Picture', 'desc' => 'Stakeholder ecosystem'],
+                            ['path' => '/images/FYP IMAGES/onion_test.drawio.png', 'title' => 'Onion Architecture', 'desc' => 'Layered design pattern'],
                         ];
                     @endphp
 
-                    @foreach ($cards as $card)
-                        <div
-                            class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 transition-transform transform hover:-translate-y-1 hover:shadow-lg">
-                            <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">{{ $card['title'] }}
-                            </h3>
-                            <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">{{ $card['desc'] }}
-                            </p>
-                            @if (isset($card['note']))
-                                <div class="mb-4">
-                                    <span
-                                        class="block text-xs font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900 px-2 py-1 rounded">
-                                        {{ $card['note'] }}
-                                    </span>
+                    @foreach ($diagrams as $index => $diagram)
+                        <div class="group relative bg-gray-100 dark:bg-gray-700 rounded-xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300"
+                             data-diagram-index="{{ $index }}">
+                            <div class="aspect-video overflow-hidden bg-gray-200 dark:bg-gray-600">
+                                <img src="{{ $diagram['path'] }}" alt="{{ $diagram['title'] }}"
+                                    loading="lazy"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            </div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <div class="absolute bottom-0 left-0 right-0 p-4">
+                                    <h4 class="text-white font-semibold">{{ $diagram['title'] }}</h4>
+                                    <p class="text-gray-300 text-sm">{{ $diagram['desc'] }}</p>
                                 </div>
-                            @endif
-                            <a href="{{ $card['href'] }}"
-                                class="inline-block border {{ $card['bg'] }} px-4 py-2 text-sm font-medium rounded hover:bg-opacity-10 transition">
-                                {{ $card['btn'] }}
-                            </a>
+                            </div>
                         </div>
                     @endforeach
                 </div>
-                <div class="text-center">
-                    <a href="#final-cta"
-                        class="inline-block px-6 py-2 border border-gray-800 dark:border-white text-gray-900 dark:text-white font-medium rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition duration-200">
-                        I'm Ready for MEEPLE
-                    </a>
+
+                <!-- Canvas Modal -->
+                <div id="canvasModal"
+                    class="fixed inset-0 bg-black/90 backdrop-blur-md hidden z-50 flex flex-col items-center justify-center p-4">
+                    <div class="w-full max-w-6xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 id="canvasTitle" class="text-xl font-semibold text-white">Developer's Canvas</h3>
+                            <button id="closeCanvasBtn"
+                                class="text-white text-3xl font-bold hover:text-red-500 transition">&times;</button>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-2 shadow-2xl">
+                            <img id="canvasImage" src="" alt="Diagram" class="w-full h-auto max-h-[70vh] object-contain rounded-lg">
+                        </div>
+                        <div class="mt-6 flex justify-center items-center gap-4">
+                            <button id="prevImageBtn"
+                                class="px-6 py-3 bg-white/20 text-white rounded-xl hover:bg-white/30 transition flex items-center gap-2">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <div class="flex gap-2" id="modalDots"></div>
+                            <button id="nextImageBtn"
+                                class="px-6 py-3 bg-white/20 text-white rounded-xl hover:bg-white/30 transition flex items-center gap-2">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Testimonials + Call to Action -->
-<section id="final-cta" class="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 flex items-center">
-    <div class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-
-        <div class="space-y-6">
-            <h2 class="text-3xl font-bold text-gray-800 dark:text-white text-center md:text-left">
-                Trusted by Data-Driven Educators
-            </h2>
-            <div class="space-y-6">
-                <blockquote class="bg-white dark:bg-gray-800 border-l-4 border-indigo-600 pl-6 pr-4 py-4 rounded-md shadow-sm">
-                    <p class="text-lg text-gray-700 dark:text-gray-100 leading-relaxed italic">
-                        "X-Scaffold’s <strong>Risk Prediction</strong> saved my semester. The system flagged struggling students weeks before the exam, and the 'Explainable AI' showed me exactly why—low confidence and high hint usage."
+        <!-- Features & How It Works -->
+        <section id="features" class="min-h-screen py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+            <div class="max-w-7xl mx-auto w-full">
+                <div class="text-center mb-16">
+                    <span class="inline-block px-4 py-1 bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-300 rounded-full text-sm font-semibold mb-4">
+                        Capabilities
+                    </span>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                        How X-Scaffold Works
+                    </h2>
+                    <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                        From question upload to adaptive intervention — experience the complete learning enhancement pipeline.
                     </p>
-                    <footer class="mt-3 text-sm text-gray-500">– Dr. Aruna, Senior Lecturer</footer>
-                </blockquote>
+                </div>
 
-                <blockquote class="bg-white dark:bg-gray-800 border-l-4 border-yellow-500 pl-6 pr-4 py-4 rounded-md shadow-sm">
-                    <p class="text-lg text-gray-700 dark:text-gray-100 leading-relaxed italic">
-                        "The <strong>AI Scaffolding</strong> is brilliant. It doesn't just give me the answer; it gives me a hint based on my exact mistake. It feels like a personalized tutor is sitting right next to me."
-                    </p>
-                    <footer class="mt-3 text-sm text-gray-500">– Kasun D., 3rd Year CS Student</footer>
-                </blockquote>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    @php
+                        $features = [
+                            [
+                                'icon' => 'fa-file-excel',
+                                'title' => 'Excel Upload',
+                                'desc' => 'Teachers upload questions directly via Excel — supporting MCQs, True/False, and Short Answer formats with difficulty tagging.',
+                                'btn' => 'Upload Demo',
+                                'href' => route('teacher.questions.upload'),
+                                'gradient' => 'from-red-500 to-rose-600',
+                                'note' => 'Teacher Login Required',
+                            ],
+                            [
+                                'icon' => 'fa-robot',
+                                'title' => 'Adaptive Scaffolding',
+                                'desc' => 'AI analyzes student behavior in real-time and generates personalized hints based on their specific struggle patterns.',
+                                'btn' => 'Try Mock Exam',
+                                'href' => route('test-exam.index'),
+                                'gradient' => 'from-amber-500 to-orange-600',
+                                'note' => null,
+                            ],
+                            [
+                                'icon' => 'fa-chart-line',
+                                'title' => 'Risk Prediction',
+                                'desc' => 'ML models analyze 11 behavioral features to compute a Learning Mastery Score and classify students into risk levels.',
+                                'btn' => 'View Predictor',
+                                'href' => route('risk.predictor'),
+                                'gradient' => 'from-blue-500 to-cyan-600',
+                                'note' => null,
+                            ],
+                        ];
+                    @endphp
+
+                    @foreach ($features as $feature)
+                        <div class="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden">
+                            <div class="h-2 bg-gradient-to-r {{ $feature['gradient'] }}"></div>
+                            <div class="p-8">
+                                <div class="w-14 h-14 bg-gradient-to-br {{ $feature['gradient'] }} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                                    <i class="fas {{ $feature['icon'] }} text-xl text-white"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ $feature['title'] }}</h3>
+                                <p class="text-gray-600 dark:text-gray-300 text-sm mb-6 leading-relaxed">{{ $feature['desc'] }}</p>
+                                
+                                @if ($feature['note'])
+                                    <div class="mb-4">
+                                        <span class="inline-block text-xs font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-3 py-1 rounded-full">
+                                            {{ $feature['note'] }}
+                                        </span>
+                                    </div>
+                                @endif
+                                
+                                <a href="{{ $feature['href'] }}"
+                                    class="inline-flex items-center gap-2 text-sm font-semibold bg-gradient-to-r {{ $feature['gradient'] }} bg-clip-text text-transparent hover:underline">
+                                    {{ $feature['btn'] }} <i class="fas fa-arrow-right text-xs"></i>
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Tech Stack -->
+                <div class="mt-16 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Technology Stack</h3>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        @php
+                            $techStack = [
+                                ['name' => 'Laravel 11', 'icon' => 'fab fa-laravel', 'color' => 'text-red-500'],
+                                ['name' => 'PHP 8.3', 'icon' => 'fab fa-php', 'color' => 'text-indigo-500'],
+                                ['name' => 'JavaScript', 'icon' => 'fab fa-js', 'color' => 'text-yellow-500'],
+                                ['name' => 'TailwindCSS', 'icon' => 'fab fa-css3', 'color' => 'text-cyan-500'],
+                                ['name' => 'Python', 'icon' => 'fab fa-python', 'color' => 'text-blue-500'],
+                                ['name' => 'Scikit-learn', 'icon' => 'fas fa-brain', 'color' => 'text-orange-500'],
+                                ['name' => 'Gemini AI', 'icon' => 'fas fa-magic', 'color' => 'text-purple-500'],
+                                ['name' => 'MySQL', 'icon' => 'fas fa-database', 'color' => 'text-blue-600'],
+                            ];
+                        @endphp
+                        @foreach ($techStack as $tech)
+                            <div class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-full">
+                                <i class="{{ $tech['icon'] }} {{ $tech['color'] }}"></i>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $tech['name'] }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <div class="text-center space-y-6">
-            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Ready to Close the Learning Loop?</h2>
-            <p class="text-gray-600 dark:text-gray-300 max-w-md mx-auto">
-                Predict Risk. Explain Causes. Act with AI.<br>
-                Experience the next generation of LMS intervention.
-            </p>
+        <!-- Call to Action -->
+        <section id="cta" class="min-h-screen py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-900 via-purple-900 to-violet-900 flex items-center">
+            <div class="max-w-7xl mx-auto w-full">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <!-- Testimonials -->
+                    <div class="space-y-8">
+                        <h2 class="text-3xl font-bold text-white">
+                            Designed for Educators & Learners
+                        </h2>
+                        
+                        <blockquote class="bg-white/10 backdrop-blur-sm border-l-4 border-cyan-400 rounded-r-xl pl-6 pr-6 py-6">
+                            <p class="text-lg text-white/90 leading-relaxed italic">
+                                "X-Scaffold's <strong>risk prediction</strong> identified struggling students weeks before the exam. The explainable AI showed me exactly why—low confidence paired with high hint usage."
+                            </p>
+                            <footer class="mt-4 text-cyan-300 text-sm font-medium">— Dr. Aruna, Senior Lecturer</footer>
+                        </blockquote>
 
-            @auth
-                @if(auth()->user()->role === 'student')
-                    {{-- Student Link --}}
-                    <a href="{{ route('student.dashboard') }}"
-                        class="inline-block px-6 py-3 border border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400 font-medium rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-400/10 transition">
-                        Go to Student Dashboard
-                    </a>
-                @else
-                    {{-- Teacher & Admin Link --}}
-                    <a href="{{ route('dashboard') }}"
-                        class="inline-block px-6 py-3 border border-red-600 text-red-600 dark:text-red-400 dark:border-red-400 font-medium rounded-md hover:bg-red-50 dark:hover:bg-red-400/10 transition">
-                        Go to Instructor Dashboard
-                    </a>
-                @endif
-            @else
-                {{-- Guest Link --}}
-                <a href="{{ route('login') }}"
-                    class="inline-block px-6 py-3 border border-gray-600 text-gray-600 dark:text-gray-400 dark:border-gray-400 font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-400/10 transition">
-                    Log In to Get Started
-                </a>
-            @endauth
-        </div>
+                        <blockquote class="bg-white/10 backdrop-blur-sm border-l-4 border-amber-400 rounded-r-xl pl-6 pr-6 py-6">
+                            <p class="text-lg text-white/90 leading-relaxed italic">
+                                "The <strong>adaptive scaffolding</strong> doesn't just give answers—it generates hints based on my exact mistakes. Like having a personalized tutor."
+                            </p>
+                            <footer class="mt-4 text-amber-300 text-sm font-medium">— Kasun D., 3rd Year CS Student</footer>
+                        </blockquote>
+                    </div>
+
+                    <!-- CTA -->
+                    <div class="text-center lg:text-left space-y-8">
+                        <div>
+                            <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                                Ready to Close the Learning Loop?
+                            </h2>
+                            <p class="text-xl text-white/70">
+                                Predict Risk. Explain Causes. Act with AI.<br>
+                                Experience the next generation of LMS intervention.
+                            </p>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                            @auth
+                                @if(auth()->user()->role === 'student')
+                                    <a href="{{ route('student.dashboard') }}"
+                                        class="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 text-center">
+                                        <i class="fas fa-graduation-cap mr-2"></i> Go to Student Dashboard
+                                    </a>
+                                @else
+                                    <a href="{{ route('dashboard') }}"
+                                        class="px-8 py-4 bg-gradient-to-r from-rose-500 to-red-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 text-center">
+                                        <i class="fas fa-chalkboard-teacher mr-2"></i> Go to Instructor Dashboard
+                                    </a>
+                                @endif
+                            @else
+                                <a href="{{ route('login') }}"
+                                    class="px-8 py-4 bg-white text-indigo-900 font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 text-center">
+                                    <i class="fas fa-sign-in-alt mr-2"></i> Log In to Get Started
+                                </a>
+                                <a href="{{ route('register') }}"
+                                    class="px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-white/10 transition-all duration-300 text-center">
+                                    Create Account
+                                </a>
+                            @endauth
+                        </div>
+
+                        <!-- Research Badge -->
+                        <div class="pt-8 border-t border-white/20">
+                            <p class="text-white/50 text-sm">
+                                <i class="fas fa-flask mr-2"></i>
+                                Final Year Research Project • Computing Mathematics Education
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
-</section>
 
-    </div>
+    <!-- Canvas Modal JavaScript -->
+    <script>
+        (() => {
+            const modal = document.getElementById('canvasModal');
+            const openBtn = document.getElementById('openCanvasBtn');
+            const closeBtn = document.getElementById('closeCanvasBtn');
+            const canvasImage = document.getElementById('canvasImage');
+            const canvasTitle = document.getElementById('canvasTitle');
+            const prevBtn = document.getElementById('prevImageBtn');
+            const nextBtn = document.getElementById('nextImageBtn');
+            const dotsContainer = document.getElementById('modalDots');
 
+            const diagrams = [
+                { path: '/images/FYP IMAGES/High_Level_Architecture_Diagram.png', title: 'High-Level Architecture' },
+                { path: '/images/FYP IMAGES/System_workflow_diagram.png', title: 'System Workflow' },
+                { path: '/images/FYP IMAGES/Use Case Diagram.png', title: 'Use Case Diagram' },
+                { path: '/images/FYP IMAGES/Context Diagram.png', title: 'Context Diagram' },
+                { path: '/images/FYP IMAGES/Rich Picture Diagram.png', title: 'Rich Picture' },
+                { path: '/images/FYP IMAGES/onion_test.drawio.png', title: 'Onion Architecture' },
+            ];
+
+            let currentIndex = 0;
+
+            function updateDots() {
+                dotsContainer.innerHTML = diagrams.map((_, i) => 
+                    `<button class="w-3 h-3 rounded-full transition-all ${i === currentIndex ? 'bg-white scale-125' : 'bg-white/40 hover:bg-white/60'}" data-index="${i}"></button>`
+                ).join('');
+                
+                dotsContainer.querySelectorAll('button').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        currentIndex = parseInt(btn.dataset.index);
+                        showImage();
+                    });
+                });
+            }
+
+            function showImage() {
+                canvasImage.src = diagrams[currentIndex].path;
+                canvasTitle.textContent = diagrams[currentIndex].title;
+                updateDots();
+            }
+
+            function openModal(index = 0) {
+                currentIndex = index;
+                showImage();
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            openBtn.addEventListener('click', () => openModal(0));
+            closeBtn.addEventListener('click', closeModal);
+            
+            prevBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + diagrams.length) % diagrams.length;
+                showImage();
+            });
+            
+            nextBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % diagrams.length;
+                showImage();
+            });
+
+            // Click on diagram cards to open modal
+            document.querySelectorAll('[data-diagram-index]').forEach(card => {
+                card.addEventListener('click', () => {
+                    openModal(parseInt(card.dataset.diagramIndex));
+                });
+            });
+
+            // Close on ESC
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    closeModal();
+                }
+                if (e.key === 'ArrowLeft' && !modal.classList.contains('hidden')) {
+                    prevBtn.click();
+                }
+                if (e.key === 'ArrowRight' && !modal.classList.contains('hidden')) {
+                    nextBtn.click();
+                }
+            });
+
+            // Close on backdrop click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        })();
+    </script>
 </x-app-layout>

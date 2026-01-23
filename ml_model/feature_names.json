@@ -1,0 +1,22 @@
+{
+  "features": [
+    "score_percentage",
+    "hard_question_accuracy",
+    "hint_usage_percentage",
+    "avg_confidence",
+    "answer_changes_rate",
+    "tab_switches_rate",
+    "avg_time_per_question",
+    "review_percentage",
+    "avg_first_action_latency",
+    "clicks_per_question",
+    "performance_trend"
+  ],
+  "target": "mastery_level",
+  "class_names": [
+    "at_risk",
+    "developing",
+    "proficient",
+    "advanced"
+  ]
+}
