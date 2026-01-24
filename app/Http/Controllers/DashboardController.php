@@ -186,6 +186,7 @@ class DashboardController extends Controller
         // Calculate overall stats
         $hasPerformance = $student->modulePerformances->isNotEmpty();
         $overallStats = [];
+        $aggregatedXAI = [];
         
         if ($hasPerformance) {
             $performances = $student->modulePerformances;
@@ -206,6 +207,16 @@ class DashboardController extends Controller
             $bestLMS = $overallStats['best_lms'];
             $overallStats['mastery_level'] = $bestLMS >= 76 ? 'advanced' : 
                 ($bestLMS >= 56 ? 'proficient' : ($bestLMS >= 36 ? 'developing' : 'at_risk'));
+            
+            // Aggregate XAI data across all modules
+            $aggregatedXAI = [
+                'avg_lms' => $overallStats['avg_lms'],
+                'avg_confidence' => round($performances->avg('ml_prediction_confidence') * 100, 1),
+                'modules_count' => $performances->count(),
+                'positive_factors' => $this->aggregateFactors($performances->pluck('top_positive_factors')),
+                'negative_factors' => $this->aggregateFactors($performances->pluck('top_negative_factors')),
+                'level_distribution' => $performances->groupBy('mastery_level')->map->count()->toArray(),
+            ];
         }
         
         // Get warning history
@@ -220,8 +231,27 @@ class DashboardController extends Controller
             'modulePerformances',
             'hasPerformance',
             'overallStats',
+            'aggregatedXAI',
             'warnings'
         ));
+    }
+
+    /**
+     * Aggregate XAI factors across multiple modules, counting occurrences
+     */
+    private function aggregateFactors($factorStrings): array
+    {
+        $counts = [];
+        foreach ($factorStrings as $str) {
+            foreach (explode(', ', $str ?? '') as $factor) {
+                $factor = trim($factor);
+                if ($factor) {
+                    $counts[$factor] = ($counts[$factor] ?? 0) + 1;
+                }
+            }
+        }
+        arsort($counts);
+        return array_slice($counts, 0, 5, true);
     }
 
     /**

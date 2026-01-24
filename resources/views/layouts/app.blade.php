@@ -36,7 +36,7 @@
         @include('layouts.navigation')
 
         <!-- Main Content -->
-        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <main class="flex-grow w-full">
             {{ $slot }}
         </main>
 
