@@ -345,4 +345,23 @@ class DashboardController extends Controller
             return back()->with('error', 'Failed to send email: ' . $e->getMessage());
         }
     }
+    /**
+     * Generate comprehensive AI insights for a student
+     */
+    public function generateAIInsights(\Illuminate\Http\Request $request, Student $student, \App\Services\GeminiInsightsService $geminiService)
+    {
+        try {
+            $insight = $geminiService->generateStudentInsights($student);
+            
+            return response()->json([
+                'success' => true,
+                'insight' => \Illuminate\Support\Str::markdown($insight)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate insights: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

@@ -57,6 +57,11 @@ Route::post('/dashboard/student/{student}/warn', [DashboardController::class, 's
     ->middleware(['auth', 'verified'])
     ->name('instructor.student.warn');
 
+// Generate AI Insights
+Route::post('/dashboard/student/{student}/generate-insights', [DashboardController::class, 'generateAIInsights'])
+    ->middleware(['auth', 'verified'])
+    ->name('instructor.student.insights');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

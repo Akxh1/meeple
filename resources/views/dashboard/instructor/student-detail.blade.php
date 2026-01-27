@@ -1,6 +1,49 @@
 <x-app-layout>
     {{-- Student Detail Page - HCI Optimized Layout --}}
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900">
+    <div x-data="{ 
+        showModal: false, 
+        isLoading: false, 
+        insightContent: '',
+        async fetchInsights() {
+            this.showModal = true;
+            if (this.insightContent) return; // Cache if already loaded
+            this.isLoading = true;
+            try {
+                const response = await fetch('{{ route('instructor.student.insights', $student) }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    this.insightContent = data.insight;
+                } else {
+                    this.insightContent = '<p class=\'text-red-500\'>Failed to load insights.</p>';
+                }
+            } catch (error) {
+                this.insightContent = '<p class=\'text-red-500\'>Error connecting to server.</p>';
+            } finally {
+                this.isLoading = false;
+            }
+        }
+    }" class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900">
+        <style>
+            .ai-insight-content h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: #4338ca; }
+            .dark .ai-insight-content h1 { color: #818cf8; }
+            .ai-insight-content h2 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #1e293b; }
+            .dark .ai-insight-content h2 { color: #e2e8f0; }
+            .ai-insight-content h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #334155; }
+            .dark .ai-insight-content h3 { color: #cbd5e1; }
+            .ai-insight-content p { margin-bottom: 1rem; line-height: 1.6; color: #475569; }
+            .dark .ai-insight-content p { color: #94a3b8; }
+            .ai-insight-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #475569; }
+            .dark .ai-insight-content ul { color: #94a3b8; }
+            .ai-insight-content li { margin-bottom: 0.25rem; }
+            .ai-insight-content strong { font-weight: 600; color: #0f172a; }
+            .dark .ai-insight-content strong { color: #f8fafc; }
+        </style>
         <div class="w-full px-10 lg:px-16 xl:px-24 py-8">
             
             {{-- Flash Messages --}}
@@ -160,7 +203,7 @@
                     @if(!empty($aggregatedXAI))
                     <div class="bg-gradient-to-br from-violet-500 via-purple-500 to-indigo-600 rounded-2xl shadow-xl shadow-purple-500/20 overflow-hidden h-full">
                         {{-- Header --}}
-                        <div class="px-5 py-4 border-b border-white/10">
+                        <div class="px-5 py-4 border-b border-white/10 flex justify-between items-start">
                             <div class="flex items-center gap-3">
                                 <div class="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
                                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,10 +211,14 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-white">AI Learning Insights</h3>
-                                    <p class="text-xs text-white/70">Based on {{ $aggregatedXAI['modules_count'] }} modules</p>
+                                    <h3 class="font-bold text-white">AI Insights</h3>
+                                    <p class="text-xs text-white/70">{{ $aggregatedXAI['modules_count'] }} modules</p>
                                 </div>
                             </div>
+                            <button @click="fetchInsights()" class="text-xs font-medium text-white/90 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors border border-white/20 backdrop-blur-sm shadow-sm flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                View Analysis
+                            </button>
                         </div>
 
                         {{-- Stats Row --}}
@@ -395,6 +442,47 @@
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+        
+        {{-- Insights Modal --}}
+        <div x-show="showModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div x-show="showModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="showModal = false"></div>
+
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                <div x-show="showModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white dark:bg-slate-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-slate-200 dark:border-slate-700">
+                    
+                    <div class="px-6 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 border-b border-white/10 flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            AI Performance Review
+                        </h3>
+                        <button @click="showModal = false" class="text-white/70 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="p-6 max-h-[70vh] overflow-y-auto">
+                        {{-- Loading State --}}
+                        <div x-show="isLoading" class="flex flex-col items-center justify-center py-12">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                            <p class="mt-4 text-slate-500 dark:text-slate-400">Analyzing module performance...</p>
+                        </div>
+
+                        {{-- Content State --}}
+                        <div x-show="!isLoading" class="ai-insight-content">
+                            <div x-html="insightContent"></div>
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-4 bg-slate-50 dark:bg-slate-700/30 flex justify-end">
+                        <button type="button" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors" @click="showModal = false">
+                            Close
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
