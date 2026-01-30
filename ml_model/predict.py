@@ -7,8 +7,7 @@ Usage:
     python predict.py --features '{"score_percentage": 72.5, ...}'
     python predict.py --csv students.csv --output predictions.csv
 
-Author: X-Scaffold Research Team
-Date: January 2026
+
 """
 
 import os
