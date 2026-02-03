@@ -31,7 +31,12 @@
             {{-- Overview Stats Cards --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
                 {{-- Total Students --}}
-                <div class="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 hover:border-blue-300 dark:hover:border-indigo-500/50 transition-all duration-300 shadow-sm">
+                <div class="group bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 hover:border-blue-300 dark:hover:border-indigo-500/50 transition-all duration-300 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                    </div>
                     <div class="flex items-center justify-between mb-3">
                         <div class="p-2 bg-blue-100 dark:bg-blue-500/10 rounded-xl">
                             <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,11 +45,17 @@
                         </div>
                     </div>
                     <p class="text-2xl font-bold text-slate-800 dark:text-white">{{ $totalStudents }}</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Total Students</p>
+                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Total Enrolled</p>
+                    <p class="text-[10px] leading-tight text-slate-400 dark:text-slate-500 mt-2">Total number of unique students registered in the system across all modules.</p>
                 </div>
 
                 {{-- Exam Taken --}}
-                <div class="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 hover:border-green-300 dark:hover:border-green-500/50 transition-all duration-300 shadow-sm">
+                <div class="group bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 hover:border-green-300 dark:hover:border-green-500/50 transition-all duration-300 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
                     <div class="flex items-center justify-between mb-3">
                         <div class="p-2 bg-green-100 dark:bg-green-500/10 rounded-xl">
                             <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,11 +64,17 @@
                         </div>
                     </div>
                     <p class="text-2xl font-bold text-slate-800 dark:text-white">{{ $examTakenCount }}</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Students Assessed</p>
+                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Assessed Students</p>
+                    <p class="text-[10px] leading-tight text-slate-400 dark:text-slate-500 mt-2">Students who have completed at least one "Level Indicator Exam" in any module.</p>
                 </div>
 
                 {{-- Pending Exam --}}
-                <div class="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 hover:border-amber-300 dark:hover:border-amber-500/50 transition-all duration-300 shadow-sm">
+                <div class="group bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 hover:border-amber-300 dark:hover:border-amber-500/50 transition-all duration-300 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-8 h-8 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
                     <div class="flex items-center justify-between mb-3">
                         <div class="p-2 bg-amber-100 dark:bg-amber-500/10 rounded-xl">
                             <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,11 +83,17 @@
                         </div>
                     </div>
                     <p class="text-2xl font-bold text-slate-800 dark:text-white">{{ $examPendingCount }}</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Awaiting Assessment</p>
+                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Awaiting Assessment</p>
+                    <p class="text-[10px] leading-tight text-slate-400 dark:text-slate-500 mt-2">Students who are enrolled but haven't taken any diagnostic exams yet.</p>
                 </div>
 
                 {{-- Total Performance Records --}}
-                <div class="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-all duration-300 shadow-sm">
+                <div class="group bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-all duration-300 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-8 h-8 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
                     <div class="flex items-center justify-between mb-3">
                         <div class="p-2 bg-indigo-100 dark:bg-indigo-500/10 rounded-xl">
                             <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,11 +102,17 @@
                         </div>
                     </div>
                     <p class="text-2xl font-bold text-slate-800 dark:text-white">{{ $totalPerformanceRecords }}</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Exam Records</p>
+                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Total Exam Attempt Data</p>
+                    <p class="text-[10px] leading-tight text-slate-400 dark:text-slate-500 mt-2">Aggregate count of all module exams completed. Students can have multiple records.</p>
                 </div>
 
                 {{-- Average LMS --}}
-                <div class="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 hover:border-purple-300 dark:hover:border-purple-500/50 transition-all duration-300 shadow-sm">
+                <div class="group bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 hover:border-purple-300 dark:hover:border-purple-500/50 transition-all duration-300 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
                     <div class="flex items-center justify-between mb-3">
                         <div class="p-2 bg-purple-100 dark:bg-purple-500/10 rounded-xl">
                             <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,7 +121,8 @@
                         </div>
                     </div>
                     <p class="text-2xl font-bold text-slate-800 dark:text-white">{{ number_format($averageLMS, 1) }}</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Average LMS</p>
+                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Class Mastery Index</p>
+                    <p class="text-[10px] leading-tight text-slate-400 dark:text-slate-500 mt-2">Average Learning Mastery Score calculated from performance, behavior, and metacognition.</p>
                 </div>
             </div>
 
