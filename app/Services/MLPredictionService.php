@@ -273,6 +273,7 @@ class MLPredictionService
      * Predict and update with automatic fallback to local calculation.
      * 
      * Tries Flask API first, falls back to local LMS formula if unavailable.
+     * Sets prediction_source to 'flask_api' or 'local_fallback'.
      * 
      * @param StudentModulePerformance $performance
      * @return StudentModulePerformance Updated record
@@ -282,7 +283,10 @@ class MLPredictionService
         // Try Flask API first
         if ($this->isAvailable()) {
             Log::info('Using Flask ML API for prediction');
-            return $this->predictAndUpdate($performance);
+            $performance = $this->predictAndUpdate($performance);
+            $performance->prediction_source = 'flask_api';
+            $performance->save();
+            return $performance;
         }
         
         Log::info('Flask ML API unavailable, using local fallback');
@@ -316,13 +320,15 @@ class MLPredictionService
         $performance->top_positive_factors = $shap['positive'];
         $performance->top_negative_factors = $shap['negative'];
         $performance->shap_values = $shap['values'];
+        $performance->prediction_source = 'local_fallback';
         $performance->save();
         
         Log::info('Local ML prediction saved', [
             'student_id' => $performance->student_id,
             'module_id' => $performance->module_id,
             'lms' => $lms,
-            'level' => $level
+            'level' => $level,
+            'prediction_source' => 'local_fallback'
         ]);
         
         return $performance;

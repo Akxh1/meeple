@@ -32,7 +32,7 @@
             </div>
 
             {{-- Result Summary Cards --}}
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
                 <div class="bg-white dark:bg-slate-800/50 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700/50">
                     <div class="flex items-center gap-3 mb-2">
                         <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -71,6 +71,33 @@
                         <span class="text-sm text-slate-500 dark:text-slate-400">Hard Q Acc</span>
                     </div>
                     <div class="text-3xl font-bold text-slate-800 dark:text-white">{{ round($attempt->hard_question_accuracy, 1) }}%</div>
+                </div>
+                
+                {{-- ML Prediction Source --}}
+                <div class="bg-white dark:bg-slate-800/50 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700/50">
+                    <div class="flex items-center gap-3 mb-2">
+                        @if($attempt->prediction_source === 'flask_api')
+                        <div class="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                            <i class="fas fa-server text-green-600 dark:text-green-400"></i>
+                        </div>
+                        @else
+                        <div class="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+                            <i class="fas fa-calculator text-cyan-600 dark:text-cyan-400"></i>
+                        </div>
+                        @endif
+                        <span class="text-sm text-slate-500 dark:text-slate-400">ML Source</span>
+                    </div>
+                    @if($attempt->prediction_source === 'flask_api')
+                    <div class="text-sm font-bold text-green-600 dark:text-green-400">
+                        <i class="fas fa-check-circle mr-1"></i>Flask API
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Full ML model + PKL</p>
+                    @else
+                    <div class="text-sm font-bold text-cyan-600 dark:text-cyan-400">
+                        <i class="fas fa-laptop-code mr-1"></i>Local Fallback
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">LMS Formula</p>
+                    @endif
                 </div>
             </div>
 

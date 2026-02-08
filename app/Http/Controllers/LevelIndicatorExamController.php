@@ -302,6 +302,7 @@ class LevelIndicatorExamController extends Controller
             'xai_explanation' => $performance->xai_explanation,
             'top_positive_factors' => $performance->top_positive_factors,
             'top_negative_factors' => $performance->top_negative_factors,
+            'prediction_source' => $performance->prediction_source ?? 'local_fallback',
         ]);
         
         Log::info('Level Indicator Exam completed', [
