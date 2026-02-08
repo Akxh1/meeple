@@ -126,39 +126,90 @@
                 </div>
             </div>
 
-            {{-- Module Overview Cards --}}
+            {{-- MODULES Section --}}
             <div class="mb-8">
-                <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                    </svg>
-                    Module Performance Overview
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-3">
+                    <span class="p-2 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl shadow-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                    </span>
+                    MODULES
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($moduleStats as $module)
-                    <div class="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-xl p-4 border border-slate-200 dark:border-slate-700/50 hover:shadow-md transition-all duration-300">
-                        <div class="flex items-start justify-between mb-3">
-                            <div class="flex-1">
-                                <h4 class="font-semibold text-slate-800 dark:text-white text-sm truncate" title="{{ $module['name'] }}">{{ $module['name'] }}</h4>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">{{ $module['questions_count'] }} questions</p>
+                    @php
+                        $gradientMap = [
+                            1 => 'from-red-500 to-rose-600',
+                            2 => 'from-blue-500 to-cyan-600',
+                            3 => 'from-green-500 to-emerald-600',
+                            4 => 'from-purple-500 to-violet-600',
+                            5 => 'from-amber-500 to-orange-600',
+                            6 => 'from-indigo-500 to-blue-600',
+                        ];
+                        $gradient = $gradientMap[$module['id']] ?? 'from-gray-500 to-slate-600';
+                    @endphp
+                    <div class="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-slate-700/50 hover:shadow-xl hover:border-blue-300 dark:hover:border-blue-500/50 transition-all duration-300 overflow-hidden">
+                        {{-- Module Header with Gradient --}}
+                        <div class="bg-gradient-to-r {{ $gradient }} p-5">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-white text-lg">{{ $module['name'] }}</h4>
+                                        <p class="text-white/80 text-sm">{{ $module['questions_count'] }} questions</p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1.5 text-sm font-bold rounded-full bg-white/20 backdrop-blur-sm text-white">
+                                    {{ $module['avg_lms'] }} LMS
+                                </span>
                             </div>
-                            <span class="px-2 py-1 text-xs font-medium rounded-full 
-                                @if($module['avg_lms'] >= 76) bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400
-                                @elseif($module['avg_lms'] >= 56) bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400
-                                @elseif($module['avg_lms'] >= 36) bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400
-                                @else bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400
-                                @endif
-                            ">{{ $module['avg_lms'] }} LMS</span>
                         </div>
-                        <div class="flex items-center gap-4 text-xs">
-                            <div>
-                                <span class="text-slate-500 dark:text-slate-400">Students:</span>
-                                <span class="font-semibold text-slate-700 dark:text-slate-200 ml-1">{{ $module['student_count'] }}</span>
+                        
+                        {{-- Module Stats --}}
+                        <div class="p-5">
+                            <div class="grid grid-cols-2 gap-4 mb-5">
+                                <div class="text-center p-3 bg-slate-50 dark:bg-slate-700/30 rounded-xl">
+                                    <p class="text-2xl font-bold text-slate-800 dark:text-white">{{ $module['student_count'] }}</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">Students</p>
+                                </div>
+                                <div class="text-center p-3 bg-slate-50 dark:bg-slate-700/30 rounded-xl">
+                                    <p class="text-2xl font-bold text-slate-800 dark:text-white">{{ $module['avg_score'] }}%</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">Avg Score</p>
+                                </div>
                             </div>
-                            <div>
-                                <span class="text-slate-500 dark:text-slate-400">Avg Score:</span>
-                                <span class="font-semibold text-slate-700 dark:text-slate-200 ml-1">{{ $module['avg_score'] }}%</span>
+                            
+                            {{-- LMS Progress Bar --}}
+                            <div class="mb-4">
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-slate-500 dark:text-slate-400">Class Mastery</span>
+                                    <span class="font-medium 
+                                        @if($module['avg_lms'] >= 76) text-emerald-600 dark:text-emerald-400
+                                        @elseif($module['avg_lms'] >= 56) text-blue-600 dark:text-blue-400
+                                        @elseif($module['avg_lms'] >= 36) text-amber-600 dark:text-amber-400
+                                        @else text-red-600 dark:text-red-400
+                                        @endif
+                                    ">{{ $module['avg_lms'] }}/100</span>
+                                </div>
+                                <div class="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <div class="h-full rounded-full transition-all duration-500 bg-gradient-to-r {{ $gradient }}" 
+                                         style="width: {{ $module['avg_lms'] }}%"></div>
+                                </div>
                             </div>
+                            
+                            {{-- Settings Button --}}
+                            <a href="{{ route('instructor.module.settings', ['module' => $module['id']]) }}" 
+                               class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 dark:bg-slate-700/50 hover:bg-blue-500 text-slate-600 dark:text-slate-300 hover:text-white rounded-xl font-medium transition-all duration-200 group">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                Configure Module
+                            </a>
                         </div>
                     </div>
                     @endforeach
