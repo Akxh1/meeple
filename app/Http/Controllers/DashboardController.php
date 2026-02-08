@@ -364,4 +364,57 @@ class DashboardController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Show module settings page for instructors
+     */
+    public function showModuleSettings(Module $module)
+    {
+        // Get module statistics
+        $stats = [
+            'questions_count' => $module->questions()->count(),
+            'students_completed' => StudentModulePerformance::where('module_id', $module->id)->count(),
+            'avg_lms' => round(StudentModulePerformance::where('module_id', $module->id)->avg('learning_mastery_score') ?? 0, 1),
+            'total_attempts' => \App\Models\LevelIndicatorAttempt::where('module_id', $module->id)->count(),
+        ];
+        
+        // Module styling
+        $colorMap = [
+            1 => 'from-red-500 to-rose-600',
+            2 => 'from-blue-500 to-cyan-600', 
+            3 => 'from-green-500 to-emerald-600',
+            4 => 'from-purple-500 to-violet-600',
+            5 => 'from-amber-500 to-orange-600',
+            6 => 'from-indigo-500 to-blue-600',
+        ];
+        
+        $moduleData = [
+            'id' => $module->id,
+            'title' => $module->name,
+            'gradient' => $colorMap[$module->id] ?? 'from-gray-500 to-slate-600',
+        ];
+        
+        return view('dashboard.instructor.module-settings', compact('module', 'moduleData', 'stats'));
+    }
+
+    /**
+     * Update module settings (max attempts, etc.)
+     */
+    public function updateModuleSettings(Request $request, Module $module)
+    {
+        $validated = $request->validate([
+            'max_level_indicator_attempts' => 'required|integer|min:1|max:10',
+            'description' => 'nullable|string|max:500',
+        ]);
+        
+        $module->max_level_indicator_attempts = $validated['max_level_indicator_attempts'];
+        
+        if (isset($validated['description'])) {
+            $module->description = $validated['description'];
+        }
+        
+        $module->save();
+        
+        return back()->with('success', 'Module settings updated successfully!');
+    }
 }

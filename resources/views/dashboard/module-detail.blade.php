@@ -117,16 +117,33 @@
                         </div>
 
                         @if($performance)
+                            @php
+                                $latestAttempt = \App\Models\LevelIndicatorAttempt::getLatestAttempt($student->id, $module->id);
+                                $attemptCount = \App\Models\LevelIndicatorAttempt::getAttemptCount($student->id, $module->id);
+                                $canAttempt = \App\Models\LevelIndicatorAttempt::canAttempt($student->id, $module->id);
+                                $maxAttempts = $module->max_level_indicator_attempts ?? 3;
+                            @endphp
                             <div class="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-xl mb-4">
                                 <i class="fas fa-check-circle text-green-600 dark:text-green-400"></i>
-                                <span class="text-sm text-green-700 dark:text-green-400 font-medium">Completed</span>
-                                <span class="text-sm text-green-600 dark:text-green-300 ml-auto">Score: {{ round($performance->score_percentage, 1) }}%</span>
+                                <span class="text-sm text-green-700 dark:text-green-400 font-medium">
+                                    Completed ({{ $attemptCount }}/{{ $maxAttempts }} attempts)
+                                </span>
+                                <span class="text-sm text-green-600 dark:text-green-300 ml-auto">LMS: {{ round($performance->learning_mastery_score, 1) }}</span>
                             </div>
-                            <button disabled class="w-full py-3 bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-xl font-medium cursor-not-allowed">
-                                <i class="fas fa-redo mr-2"></i>Retake Coming Soon
-                            </button>
+                            <div class="flex gap-3">
+                                <a href="{{ route('level-indicator.show', $module) }}" 
+                                   class="flex-1 py-3 bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 rounded-xl font-medium text-center hover:bg-blue-200 dark:hover:bg-blue-500/30 transition">
+                                    <i class="fas fa-chart-bar mr-2"></i>View Results
+                                </a>
+                                @if($canAttempt)
+                                <a href="{{ route('level-indicator.start', $module) }}" 
+                                   class="flex-1 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white rounded-xl font-medium text-center shadow-lg shadow-blue-500/25 transition-all">
+                                    <i class="fas fa-redo mr-2"></i>Retake
+                                </a>
+                                @endif
+                            </div>
                         @else
-                            <a href="#" class="block w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white rounded-xl font-medium text-center shadow-lg shadow-blue-500/25 transition-all hover:shadow-blue-500/40">
+                            <a href="{{ route('level-indicator.start', $module) }}" class="block w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white rounded-xl font-medium text-center shadow-lg shadow-blue-500/25 transition-all hover:shadow-blue-500/40">
                                 <i class="fas fa-play mr-2"></i>Start Level Indicator
                             </a>
                         @endif

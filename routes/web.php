@@ -9,6 +9,7 @@ use App\Http\Controllers\HintController;
 use App\Http\Controllers\RiskPredictorController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\LevelIndicatorExamController;
 
 
 
@@ -47,6 +48,20 @@ Route::get('/module/{module}', [DashboardController::class, 'showModule'])
     ->middleware(['auth', 'verified'])
     ->name('student.module.show');
 
+// ================================================================
+// Level Indicator Exam Routes
+// ================================================================
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/module/{module}/level-indicator', [LevelIndicatorExamController::class, 'show'])
+        ->name('level-indicator.show');
+    Route::get('/module/{module}/level-indicator/start', [LevelIndicatorExamController::class, 'start'])
+        ->name('level-indicator.start');
+    Route::post('/module/{module}/level-indicator/submit', [LevelIndicatorExamController::class, 'submit'])
+        ->name('level-indicator.submit');
+    Route::get('/module/{module}/level-indicator/results/{attempt}', [LevelIndicatorExamController::class, 'results'])
+        ->name('level-indicator.results');
+});
+
 // Student Detail Page (for instructors)
 Route::get('/dashboard/student/{student}', [DashboardController::class, 'showStudent'])
     ->middleware(['auth', 'verified'])
@@ -61,6 +76,15 @@ Route::post('/dashboard/student/{student}/warn', [DashboardController::class, 's
 Route::post('/dashboard/student/{student}/generate-insights', [DashboardController::class, 'generateAIInsights'])
     ->middleware(['auth', 'verified'])
     ->name('instructor.student.insights');
+
+// Module Settings (for instructors)
+Route::get('/dashboard/module/{module}/settings', [DashboardController::class, 'showModuleSettings'])
+    ->middleware(['auth', 'verified'])
+    ->name('instructor.module.settings');
+
+Route::post('/dashboard/module/{module}/settings', [DashboardController::class, 'updateModuleSettings'])
+    ->middleware(['auth', 'verified'])
+    ->name('instructor.module.settings.update');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

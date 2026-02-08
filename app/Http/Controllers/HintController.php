@@ -32,6 +32,7 @@ class HintController extends Controller
         // --- 1. Get Inputs ---
         $question = $request->input('question_text');
         $moduleId = $request->input('module_id');
+        $isDiagnostic = $request->input('is_diagnostic', false);
 
         // --- 2. Validate Input ---
         if (empty($question)) {
@@ -39,10 +40,18 @@ class HintController extends Controller
         }
 
         // --- 3. Get XAI Context (Real or Fallback) ---
-        $xaiData = $this->getXAIContext($moduleId);
-        $hint_level = $xaiData['hint_level'];
-        $xai_analysis = $xaiData['xai_analysis'];
-        $student_level = $xaiData['student_level'];
+        // For DIAGNOSTIC exams (Level Indicator), use simple L2 hints
+        // since we're COLLECTING data, not using prior performance data
+        if ($isDiagnostic) {
+            $hint_level = 2; // Fixed moderate level
+            $student_level = 'Student (Diagnostic Mode)';
+            $xai_analysis = "This is a diagnostic assessment. Provide a balanced hint that helps without giving away the answer.";
+        } else {
+            $xaiData = $this->getXAIContext($moduleId);
+            $hint_level = $xaiData['hint_level'];
+            $xai_analysis = $xaiData['xai_analysis'];
+            $student_level = $xaiData['student_level'];
+        }
 
         // --- 4. Build the Adaptive Prompt ---
         $promptText = $this->buildPrompt($question, $student_level, $xai_analysis);

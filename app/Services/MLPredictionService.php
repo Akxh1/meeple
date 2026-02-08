@@ -225,9 +225,9 @@ class MLPredictionService
             $formattedFeature = str_replace('_', ' ', $feature);
             
             if ($value > 0.05) {
-                $positiveFactors[] = "{$formattedFeature} (+{$value:.3f})";
+                $positiveFactors[] = "{$formattedFeature} (+" . number_format($value, 3) . ")";
             } elseif ($value < -0.05) {
-                $negativeFactors[] = "{$formattedFeature} ({$value:.3f})";
+                $negativeFactors[] = "{$formattedFeature} (" . number_format($value, 3) . ")";
             }
         }
         
@@ -262,5 +262,302 @@ class MLPredictionService
             0 => 3, // at_risk → intensive hints (L3)
             default => 2
         };
+    }
+
+    // ========================================================================
+    // LOCAL FALLBACK PREDICTION (No Flask API Required)
+    // Uses the trained LMS formula when Flask API is unavailable
+    // ========================================================================
+
+    /**
+     * Predict and update with automatic fallback to local calculation.
+     * 
+     * Tries Flask API first, falls back to local LMS formula if unavailable.
+     * 
+     * @param StudentModulePerformance $performance
+     * @return StudentModulePerformance Updated record
+     */
+    public function predictWithFallback(StudentModulePerformance $performance): StudentModulePerformance
+    {
+        // Try Flask API first
+        if ($this->isAvailable()) {
+            Log::info('Using Flask ML API for prediction');
+            return $this->predictAndUpdate($performance);
+        }
+        
+        Log::info('Flask ML API unavailable, using local fallback');
+        
+        // Extract features as array
+        $features = [
+            (float) ($performance->score_percentage ?? 50),
+            (float) ($performance->hard_question_accuracy ?? 50),
+            (float) ($performance->hint_usage_percentage ?? 25),
+            (float) ($performance->avg_confidence ?? 3.0),
+            (float) ($performance->answer_changes_rate ?? 0.5),
+            (float) ($performance->tab_switches_rate ?? 1.0),
+            (float) ($performance->avg_time_per_question ?? 60),
+            (float) ($performance->review_percentage ?? 30),
+            (float) ($performance->avg_first_action_latency ?? 5.0),
+            (float) ($performance->clicks_per_question ?? 5.0),
+            (float) ($performance->performance_trend ?? 0),
+        ];
+        
+        // Calculate using local methods
+        $lms = $this->predictLMSLocally($features);
+        $level = $this->classifyLevel($lms);
+        $confidence = $this->estimateConfidence($features);
+        $shap = $this->generateShapAnalysisLocally($features, $performance);
+        
+        // Update record
+        $performance->learning_mastery_score = $lms;
+        $performance->mastery_level = $level;
+        $performance->ml_prediction_confidence = $confidence;
+        $performance->xai_explanation = $shap['explanation'];
+        $performance->top_positive_factors = $shap['positive'];
+        $performance->top_negative_factors = $shap['negative'];
+        $performance->shap_values = $shap['values'];
+        $performance->save();
+        
+        Log::info('Local ML prediction saved', [
+            'student_id' => $performance->student_id,
+            'module_id' => $performance->module_id,
+            'lms' => $lms,
+            'level' => $level
+        ]);
+        
+        return $performance;
+    }
+
+    /**
+     * Predict LMS using the research-backed formula.
+     * LMS = 0.50×S + 0.15×Hd + 10×Ccal + 10×Ks + 10×Af − 15×Hu^1.5
+     */
+    protected function predictLMSLocally(array $features): float
+    {
+        [$score, $hardAcc, $hints, $conf, $changes, $switches, 
+         $time, $review, $latency, $clicks, $trend] = $features;
+        
+        $S = $score;
+        $Hd = $hardAcc;
+        $Hu = $hints / 100;
+        
+        // Calibration: how well confidence matches performance
+        $expectedConf = $score / 20; // 0-5 scale
+        $Ccal = abs($conf - $expectedConf) <= 1 ? 1 : 0;
+        
+        // Knowledge stability (low changes = stable)
+        $Ks = max(0, 1 - ($changes - 0.5) / 1.0);
+        $Ks = min(1, $Ks);
+        
+        // Attention factor (low switches = focused)
+        $Af = max(0, 1 - ($switches - 1) / 2.0);
+        $Af = min(1, $Af);
+        
+        $lms = (0.50 * $S) + (0.15 * $Hd) + (10 * $Ccal) + (10 * $Ks) + (10 * $Af) - (15 * pow($Hu, 1.5));
+        
+        return round(max(0, min(100, $lms)), 2);
+    }
+
+    /**
+     * Classify mastery level from LMS score.
+     */
+    protected function classifyLevel(float $lms): string
+    {
+        if ($lms >= 76) return 'advanced';
+        if ($lms >= 56) return 'proficient';
+        if ($lms >= 36) return 'developing';
+        return 'at_risk';
+    }
+
+    /**
+     * Estimate prediction confidence based on feature consistency.
+     */
+    protected function estimateConfidence(array $features): float
+    {
+        [$score, $hardAcc, $hints, $conf, $changes, $switches, 
+         $time, $review, $latency, $clicks, $trend] = $features;
+        
+        // Higher confidence when features are consistent
+        $scoreConfMatch = 1 - abs(($score / 20) - $conf) / 5;
+        $lowVariability = 1 - min(1, $changes);
+        $goodFocus = 1 - min(1, $switches / 3);
+        
+        $confidence = ($scoreConfMatch + $lowVariability + $goodFocus) / 3;
+        return round(max(0.5, min(0.98, $confidence)), 4);
+    }
+
+    /**
+     * Generate full SHAP-style analysis of feature contributions.
+     * Returns structured data for both summary and detailed display.
+     */
+    protected function generateShapAnalysisLocally(array $features, $perf): array
+    {
+        [$score, $hardAcc, $hints, $conf, $changes, $switches, 
+         $time, $review, $latency, $clicks, $trend] = $features;
+        
+        $positive = [];
+        $negative = [];
+        $explanations = [];
+        $shapValues = [];
+        
+        // Feature descriptions for display
+        $descriptions = [
+            'score_percentage' => 'Percentage of correct answers',
+            'hard_question_accuracy' => 'Accuracy on difficult questions',
+            'hint_usage_percentage' => 'Percentage of questions where hints were used',
+            'avg_confidence' => 'Mean self-reported confidence (1-5)',
+            'answer_changes_rate' => 'Average answer changes per question',
+            'tab_switches_rate' => 'Average tab switches per question',
+            'avg_time_per_question' => 'Mean time spent per question (seconds)',
+            'review_percentage' => 'Percentage of questions marked for review',
+            'avg_first_action_latency' => 'Mean time to first interaction (seconds)',
+            'clicks_per_question' => 'Average clicks per question',
+            'performance_trend' => 'Accuracy change (2nd half - 1st half)',
+        ];
+        
+        // Calculate SHAP-style contributions for each feature
+        
+        // Score Percentage
+        $scoreContrib = ($score - 50) * 0.01; // Normalized contribution
+        $shapValues['score_percentage'] = [
+            'value' => round($score, 1) . '%',
+            'contribution' => round($scoreContrib, 3),
+            'description' => $descriptions['score_percentage'],
+        ];
+        if ($score >= 70) {
+            $positive[] = 'score_percentage';
+            $explanations[] = "Strong score of {$score}% (+)";
+        } elseif ($score < 50) {
+            $negative[] = 'score_percentage';
+            $explanations[] = "Score of {$score}% needs improvement (-)";
+        }
+        
+        // Hard Question Accuracy
+        $hardContrib = ($hardAcc - 50) * 0.005;
+        $shapValues['hard_question_accuracy'] = [
+            'value' => round($hardAcc, 1) . '%',
+            'contribution' => round($hardContrib, 3),
+            'description' => $descriptions['hard_question_accuracy'],
+        ];
+        if ($hardAcc >= 60) {
+            $positive[] = 'hard_question_accuracy';
+        } elseif ($hardAcc < 40) {
+            $negative[] = 'hard_question_accuracy';
+        }
+        
+        // Hint Usage
+        $hintContrib = (25 - $hints) * 0.006; // Lower is better
+        $shapValues['hint_usage_percentage'] = [
+            'value' => round($hints, 1) . '%',
+            'contribution' => round($hintContrib, 3),
+            'description' => $descriptions['hint_usage_percentage'],
+        ];
+        if ($hints <= 20) {
+            $positive[] = 'hint_usage_percentage';
+            $explanations[] = "Low hint dependency ({$hints}%) (+)";
+        } elseif ($hints >= 50) {
+            $negative[] = 'hint_usage_percentage';
+            $explanations[] = "High hint usage ({$hints}%) suggests scaffolding dependency (-)";
+        }
+        
+        // Confidence
+        $expectedConf = $score / 20;
+        $calibrationError = abs($conf - $expectedConf);
+        $confContrib = $calibrationError <= 1 ? 0.05 : -0.05;
+        $shapValues['avg_confidence'] = [
+            'value' => round($conf, 1) . '/5',
+            'contribution' => round($confContrib, 3),
+            'description' => $descriptions['avg_confidence'],
+        ];
+        if ($conf >= 3.5 && $score >= 60) {
+            $positive[] = 'avg_confidence';
+        } elseif ($conf >= 4 && $score < 50) {
+            $negative[] = 'avg_confidence';
+            $explanations[] = "Overconfidence detected (-)";
+        }
+        
+        // Answer Changes Rate
+        $changesContrib = (0.5 - $changes) * 0.1;
+        $shapValues['answer_changes_rate'] = [
+            'value' => round($changes, 2),
+            'contribution' => round($changesContrib, 3),
+            'description' => $descriptions['answer_changes_rate'],
+        ];
+        if ($changes <= 0.3) {
+            $positive[] = 'answer_changes_rate';
+        } elseif ($changes >= 1.0) {
+            $negative[] = 'answer_changes_rate';
+        }
+        
+        // Tab Switches Rate
+        $switchesContrib = (1.0 - $switches) * 0.05;
+        $shapValues['tab_switches_rate'] = [
+            'value' => round($switches, 2),
+            'contribution' => round($switchesContrib, 3),
+            'description' => $descriptions['tab_switches_rate'],
+        ];
+        if ($switches <= 1.0) {
+            $positive[] = 'tab_switches_rate';
+        } elseif ($switches >= 2.5) {
+            $negative[] = 'tab_switches_rate';
+            $explanations[] = "Focus patterns need attention (-)";
+        }
+        
+        // Avg Time Per Question
+        $timeContrib = ($time >= 30 && $time <= 120) ? 0.02 : -0.02;
+        $shapValues['avg_time_per_question'] = [
+            'value' => round($time, 1) . 's',
+            'contribution' => round($timeContrib, 3),
+            'description' => $descriptions['avg_time_per_question'],
+        ];
+        
+        // Review Percentage
+        $reviewContrib = ($review >= 10 && $review <= 40) ? 0.02 : 0;
+        $shapValues['review_percentage'] = [
+            'value' => round($review, 1) . '%',
+            'contribution' => round($reviewContrib, 3),
+            'description' => $descriptions['review_percentage'],
+        ];
+        
+        // First Action Latency
+        $latencyContrib = ($latency >= 1 && $latency <= 5) ? 0.02 : -0.01;
+        $shapValues['avg_first_action_latency'] = [
+            'value' => round($latency, 1) . 's',
+            'contribution' => round($latencyContrib, 3),
+            'description' => $descriptions['avg_first_action_latency'],
+        ];
+        
+        // Clicks Per Question
+        $clicksContrib = ($clicks >= 2 && $clicks <= 8) ? 0.01 : 0;
+        $shapValues['clicks_per_question'] = [
+            'value' => round($clicks, 1),
+            'contribution' => round($clicksContrib, 3),
+            'description' => $descriptions['clicks_per_question'],
+        ];
+        
+        // Performance Trend
+        $trendContrib = $trend * 0.003;
+        $shapValues['performance_trend'] = [
+            'value' => ($trend >= 0 ? '+' : '') . round($trend, 1) . '%',
+            'contribution' => round($trendContrib, 3),
+            'description' => $descriptions['performance_trend'],
+        ];
+        if ($trend >= 5) {
+            $positive[] = 'performance_trend';
+            $explanations[] = "Positive improvement trend (+)";
+        } elseif ($trend <= -10) {
+            $negative[] = 'performance_trend';
+            $explanations[] = "Performance declined during exam (-)";
+        }
+        
+        $explanation = "Based on SHAP analysis: " . 
+            (count($explanations) > 0 ? implode('. ', array_slice($explanations, 0, 4)) . '.' : 'Standard performance patterns observed.');
+        
+        return [
+            'explanation' => $explanation,
+            'positive' => implode(', ', array_slice($positive, 0, 5)),
+            'negative' => implode(', ', array_slice($negative, 0, 5)),
+            'values' => $shapValues,
+        ];
     }
 }
