@@ -45,7 +45,7 @@ return [
     |
     */
     'ml_api' => [
-        'url' => env('ML_API_URL', 'http://localhost:5000'),
+        'url' => env('ML_API_URL', 'http://localhost:5500'),
         'timeout' => env('ML_API_TIMEOUT', 10),
     ],
 

@@ -297,11 +297,11 @@ if __name__ == '__main__':
     print("\n" + "=" * 50)
     print("X-SCAFFOLD PREDICTION API")
     print("=" * 50)
-    print(f"Starting server on http://localhost:5000")
+    print(f"Starting server on http://localhost:5500")
     print("Endpoints:")
     print("  GET  /health  - Health check")
     print("  POST /predict - Single prediction with SHAP")
     print("  POST /batch_predict - Batch predictions")
     print("=" * 50 + "\n")
     
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5500, debug=True)

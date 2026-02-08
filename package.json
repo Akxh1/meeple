@@ -6,7 +6,7 @@
         "build:ssr": "vite build && vite build --ssr",
         "dev": "vite",
         "dev:full": "concurrently --names \"VITE,FLASK\" --prefix-colors \"cyan,green\" \"npm run dev\" \"npm run flask\"",
-        "flask": "cd ml_model && python app.py",
+        "flask": "cd ml_model && python api.py",
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
