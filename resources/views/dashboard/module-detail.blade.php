@@ -183,7 +183,7 @@
                             </div>
                         </div>
 
-                        <a href="#" class="block w-full py-3 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white rounded-xl font-medium text-center shadow-lg shadow-purple-500/25 transition-all hover:shadow-purple-500/40">
+                        <a href="{{ route('mock-exam.show', $module) }}" class="block w-full py-3 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white rounded-xl font-medium text-center shadow-lg shadow-purple-500/25 transition-all hover:shadow-purple-500/40">
                             <i class="fas fa-rocket mr-2"></i>Start Mock Exam
                         </a>
                     </div>

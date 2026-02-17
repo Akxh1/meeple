@@ -10,6 +10,7 @@ use App\Http\Controllers\RiskPredictorController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\LevelIndicatorExamController;
+use App\Http\Controllers\MockExamController;
 
 
 
@@ -60,6 +61,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('level-indicator.submit');
     Route::get('/module/{module}/level-indicator/results/{attempt}', [LevelIndicatorExamController::class, 'results'])
         ->name('level-indicator.results');
+});
+
+// ================================================================
+// Mock Exam Routes (Unlimited Practice with Adaptive Hints)
+// ================================================================
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/module/{module}/mock-exam', [MockExamController::class, 'show'])
+        ->name('mock-exam.show');
+    Route::get('/module/{module}/mock-exam/start', [MockExamController::class, 'start'])
+        ->name('mock-exam.start');
+    Route::post('/module/{module}/mock-exam/submit', [MockExamController::class, 'submit'])
+        ->name('mock-exam.submit');
+    Route::get('/module/{module}/mock-exam/results/{attempt}', [MockExamController::class, 'results'])
+        ->name('mock-exam.results');
 });
 
 // Student Detail Page (for instructors)
