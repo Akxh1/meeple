@@ -1,11 +1,10 @@
 """
 X-Scaffold ML Model Training Script
 =====================================
-Trains a Bagging Classifier for student mastery level prediction.
+Trains an XGBoost Classifier for student mastery level prediction.
 
 Model Architecture:
-- Base Estimator: Decision Tree
-- Ensemble Method: Bagging (Bootstrap Aggregating)
+- Algorithm: XGBoost (Extreme Gradient Boosting)
 - Task: 4-class classification (at_risk, developing, proficient, advanced)
 
 Features (11):
@@ -18,13 +17,14 @@ Target:
 - mastery_level: 0=at_risk, 1=developing, 2=proficient, 3=advanced
 
 Research Justification:
-- Bagging reduces variance and prevents overfitting
-- Robust to noisy educational data
-- Handles class imbalance through bootstrap sampling
-- Provides feature importance through aggregation
+- XGBoost ranked #1 across ALL metrics in model comparison testing
+- Superior at-risk class detection (95.24% F1 vs 78.05% for Bagging)
+- Built-in L1/L2 regularization prevents overfitting
+- Natively compatible with SHAP TreeExplainer for XAI
+- Industry standard for tabular/structured data classification
 
 Author: X-Scaffold Research Team
-Date: January 2026
+Date: February 2026 (Updated — switched from Bagging to XGBoost)
 """
 
 import numpy as np
@@ -36,14 +36,15 @@ from datetime import datetime
 
 # Scikit-learn imports
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
-from sklearn.ensemble import BaggingClassifier
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     classification_report, confusion_matrix, roc_auc_score
 )
 from sklearn.inspection import permutation_importance
+
+# XGBoost
+import xgboost as xgb
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -70,23 +71,15 @@ TARGET_COLUMN = 'mastery_level'
 
 CLASS_NAMES = ['at_risk', 'developing', 'proficient', 'advanced']
 
-# Model hyperparameters (tuned for educational data)
-BAGGING_CONFIG = {
-    'n_estimators': 50,           # Number of base estimators
-    'max_samples': 0.8,           # 80% of samples per estimator
-    'max_features': 1.0,          # 100% of features per estimator (use all)
-    'bootstrap': True,            # Use bootstrap sampling
-    'bootstrap_features': False,  # Don't bootstrap features
-    'oob_score': True,            # Compute out-of-bag score
+# XGBoost hyperparameters (tuned for educational data)
+XGBOOST_CONFIG = {
+    'n_estimators': 50,           # Number of boosting rounds
+    'max_depth': 8,               # Maximum tree depth
+    'learning_rate': 0.1,         # Step size shrinkage
+    'eval_metric': 'mlogloss',    # Multi-class log loss
+    'use_label_encoder': False,   # Suppress deprecation warning
     'random_state': 42,
     'n_jobs': -1                  # Use all CPU cores
-}
-
-BASE_ESTIMATOR_CONFIG = {
-    'max_depth': 8,               # Limit tree depth
-    'min_samples_split': 10,      # Require 10 samples to split
-    'min_samples_leaf': 5,        # Require 5 samples per leaf
-    'random_state': 42
 }
 
 # ============================================================
@@ -114,28 +107,22 @@ def load_dataset(filepath: str) -> tuple:
     return X, y, df
 
 
-def train_bagging_classifier(X_train, y_train):
-    """Train Bagging Classifier with Decision Tree base estimators."""
+def train_xgboost_classifier(X_train, y_train):
+    """Train XGBoost Classifier."""
     
     print("\n" + "=" * 50)
-    print("TRAINING BAGGING CLASSIFIER")
+    print("TRAINING XGBOOST CLASSIFIER")
     print("=" * 50)
     
-    # Create base estimator
-    base_estimator = DecisionTreeClassifier(**BASE_ESTIMATOR_CONFIG)
-    
-    # Create Bagging Classifier
-    model = BaggingClassifier(
-        estimator=base_estimator,
-        **BAGGING_CONFIG
-    )
+    # Create XGBoost Classifier
+    model = xgb.XGBClassifier(**XGBOOST_CONFIG)
     
     print("\nModel Configuration:")
-    print(f"  Base Estimator: DecisionTreeClassifier")
-    print(f"  Number of Estimators: {BAGGING_CONFIG['n_estimators']}")
-    print(f"  Max Samples per Estimator: {BAGGING_CONFIG['max_samples']*100}%")
-    print(f"  Max Features per Estimator: {BAGGING_CONFIG['max_features']*100}%")
-    print(f"  Bootstrap Sampling: {BAGGING_CONFIG['bootstrap']}")
+    print(f"  Algorithm: XGBoost (Gradient Boosting)")
+    print(f"  Number of Estimators: {XGBOOST_CONFIG['n_estimators']}")
+    print(f"  Max Depth: {XGBOOST_CONFIG['max_depth']}")
+    print(f"  Learning Rate: {XGBOOST_CONFIG['learning_rate']}")
+    print(f"  Eval Metric: {XGBOOST_CONFIG['eval_metric']}")
     
     # Train model
     print("\nTraining...")
@@ -144,9 +131,6 @@ def train_bagging_classifier(X_train, y_train):
     training_time = (datetime.now() - start_time).total_seconds()
     
     print(f"  Training completed in {training_time:.2f} seconds")
-    
-    if hasattr(model, 'oob_score_'):
-        print(f"  Out-of-Bag Score: {model.oob_score_:.4f}")
     
     return model
 
@@ -237,28 +221,22 @@ def compute_feature_importance(model, X_train, y_train, X_test, y_test):
     print("FEATURE IMPORTANCE ANALYSIS")
     print("=" * 50)
     
-    # Method 1: Aggregate from base estimators (for tree-based)
-    print("\n  [Method 1] Mean Decrease in Impurity (Gini):")
+    # Method 1: XGBoost built-in feature importance (gain-based)
+    print("\n  [Method 1] XGBoost Feature Importance (Gain):")
     
-    # Get feature importances from all base estimators
-    all_importances = []
-    for estimator in model.estimators_:
-        all_importances.append(estimator.feature_importances_)
-    all_importances = np.array(all_importances)
-    mean_importance = all_importances.mean(axis=0)
-    std_importance = all_importances.std(axis=0)
+    mean_importance = model.feature_importances_
     
     # Create list of (index, importance) and sort
-    importance_list = [(i, mean_importance[i], std_importance[i]) for i in range(len(FEATURE_COLUMNS))]
+    importance_list = [(i, mean_importance[i]) for i in range(len(FEATURE_COLUMNS))]
     importance_list.sort(key=lambda x: x[1], reverse=True)
     
     print("  " + "-" * 50)
     gini_ranks = {}
-    for rank, (idx, imp, std) in enumerate(importance_list, 1):
+    for rank, (idx, imp) in enumerate(importance_list, 1):
         name = FEATURE_COLUMNS[idx]
         gini_ranks[idx] = rank
         bar = "█" * int(imp * 50)
-        print(f"    {rank:2d}. {name:25s} {imp:.4f} (±{std:.4f}) {bar}")
+        print(f"    {rank:2d}. {name:25s} {imp:.4f} {bar}")
     
     # Method 2: Permutation Importance
     print("\n  [Method 2] Permutation Importance (on test set):")
@@ -285,14 +263,13 @@ def compute_feature_importance(model, X_train, y_train, X_test, y_test):
     
     # Return importance dict for saving
     importance_dict = {
-        'gini_importance': {},
+        'xgboost_importance': {},
         'permutation_importance': {}
     }
     
     for i, feat_name in enumerate(FEATURE_COLUMNS):
-        importance_dict['gini_importance'][feat_name] = {
+        importance_dict['xgboost_importance'][feat_name] = {
             'mean': float(mean_importance[i]),
-            'std': float(std_importance[i]),
             'rank': gini_ranks.get(i, len(FEATURE_COLUMNS))
         }
         importance_dict['permutation_importance'][feat_name] = {
@@ -314,7 +291,7 @@ def save_model_artifacts(model, scaler, metrics, importance, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
     
     # Save model
-    model_path = os.path.join(output_dir, 'xscaffold_bagging_model.pkl')
+    model_path = os.path.join(output_dir, 'xscaffold_xgboost_model.pkl')
     joblib.dump(model, model_path)
     print(f"  ✅ Model saved: {model_path}")
     
@@ -349,12 +326,11 @@ def save_model_artifacts(model, scaler, metrics, importance, output_dir: str):
     config_path = os.path.join(output_dir, 'model_config.json')
     with open(config_path, 'w') as f:
         json.dump({
-            'model_type': 'BaggingClassifier',
-            'base_estimator': 'DecisionTreeClassifier',
-            'bagging_config': BAGGING_CONFIG,
-            'base_estimator_config': BASE_ESTIMATOR_CONFIG,
+            'model_type': 'XGBClassifier',
+            'algorithm': 'XGBoost (Extreme Gradient Boosting)',
+            'xgboost_config': XGBOOST_CONFIG,
             'training_date': datetime.now().isoformat(),
-            'sklearn_version': '1.3.0'
+            'xgboost_version': xgb.__version__
         }, f, indent=2)
     print(f"  ✅ Config saved: {config_path}")
 
@@ -364,7 +340,7 @@ def main():
     
     print("\n" + "=" * 60)
     print("X-SCAFFOLD ML TRAINING PIPELINE")
-    print("Bagging Classifier for Mastery Level Prediction")
+    print("XGBoost Classifier for Mastery Level Prediction")
     print("=" * 60)
     
     # Paths
@@ -390,7 +366,7 @@ def main():
     X_test_scaled = scaler.transform(X_test)
     
     # Step 4: Train model
-    model = train_bagging_classifier(X_train_scaled, y_train)
+    model = train_xgboost_classifier(X_train_scaled, y_train)
     
     # Step 5: Evaluate model
     metrics = evaluate_model(model, X_test_scaled, y_test, X_train_scaled, y_train)

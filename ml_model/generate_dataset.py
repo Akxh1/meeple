@@ -153,25 +153,37 @@ def generate_synthetic_from_real(real_df: pd.DataFrame, n_students: int = 2000) 
 
 def calculate_lms(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Calculate Learning Mastery Score (LMS) using the research-backed formula.
+    Calculate Learning Mastery Score (LMS) using the hybrid formula.
     
-    Formula:
-    LMS = 0.50×S + 0.15×Hd + 10×Ccal + 10×Ks + 10×Af − 15×Hu^1.5
+    The weights were derived through a two-stage process:
+    
+    Stage 1 — Literature-Based Initial Formula:
+        LMS = 0.50×S + 0.15×Hd + 10×Ccal + 10×Ks + 10×Af − 15×Hu^1.5
+        (Pardos & Baker, 2014; Chi et al., 2018; Aleven et al., 2016)
+    
+    Stage 2 — Data-Driven Correlation Analysis (N=56 real students):
+        Four unsupervised methods (PCA, Entropy, Factor Analysis, CRITIC)
+        applied to the 6 core features to derive empirical weights.
+        Results: Hd(26.6%), S(25.6%), C(16.5%), Ts(15.2%), Hu(11.0%), Ac(5.1%)
+        (Jolliffe, 2002; Shannon, 1948; Diakoulaki et al., 1995)
+    
+    Stage 3 — Refined Hybrid Formula (literature-inspired, data-validated):
+        LMS = 0.30×S + 0.25×(Hd×100) + 15×Ccal + 15×Af − 10×Hu − 5×Ac
     
     Where:
-    - S = score_percentage (0-100)
-    - Hd = hard_question_accuracy / 100 (0-1)
-    - Ccal = Calibration bonus based on avg_confidence alignment
-    - Ks = Knowledge stability bonus based on answer_changes_rate
-    - Af = Attention factor bonus based on tab_switches_rate
-    - Hu = hint_usage_percentage / 100 (0-1)
+    - S = score_percentage (0-100) — reduced from 50% to 30% per data analysis
+    - Hd = hard_question_accuracy / 100 — increased from 15% to 25% (data: #1 differentiator)
+    - Ccal = Calibration bonus based on avg_confidence alignment — increased from 10 to 15
+    - Af = Attention factor bonus based on tab_switches_rate — increased from 10 to 15
+    - Hu = hint_usage_percentage / 100 — reduced from 15 to 10
+    - Ac = answer_changes_rate penalty — reduced from 10 to 5 (data: low variance)
     """
     df = df.copy()
     
-    # S - Score percentage (50% weight)
+    # S - Score percentage (30% weight — data shows tied with Hd, not dominant)
     S = df['score_percentage']
     
-    # Hd - Hard question accuracy (normalized, 15% weight)
+    # Hd - Hard question accuracy (25% weight — data: #1 differentiator, r=0.87 with S)
     Hd = df['hard_question_accuracy'] / 100
     
     # Ccal - Calibration bonus (confidence alignment with performance)
@@ -179,23 +191,25 @@ def calculate_lms(df: pd.DataFrame) -> pd.DataFrame:
     confidence_diff = np.abs(df['avg_confidence'] - expected_confidence)
     Ccal = np.where(confidence_diff <= 1, 1, 0)
     
-    # Ks - Knowledge stability (low answer changes = stable = bonus)
-    Ks = np.clip(1 - (df['answer_changes_rate'] - 0.5) / 1.0, 0, 1)
-    
     # Af - Attention factor (low tab switches = focused = bonus)
+    # Data: r=0.50 with hard_question_accuracy — stronger than expected
     Af = np.clip(1 - (df['tab_switches_rate'] - 1) / 2.0, 0, 1)
     
-    # Hu - Hint usage penalty
+    # Hu - Hint usage penalty (reduced from 15 to 10 — data: 11.0% weight)
     Hu = df['hint_usage_percentage'] / 100
     
-    # Calculate LMS
+    # Ac - Answer changes penalty (reduced from 10 to 5 — data: only 5.1% weight,
+    # 75% of students have near-zero variance on this feature)
+    Ac = np.clip((df['answer_changes_rate'] - 0.5) / 1.0, 0, 1)
+    
+    # Calculate LMS using hybrid formula
     df['learning_mastery_score'] = (
-        0.50 * S +
-        0.15 * (Hd * 100) +
-        10 * Ccal +
-        10 * Ks +
-        10 * Af -
-        15 * np.power(Hu, 1.5)
+        0.30 * S +
+        0.25 * (Hd * 100) +
+        15 * Ccal +
+        15 * Af -
+        10 * Hu -
+        5 * Ac
     ).round(1)
     
     # Clip to 0-100 range

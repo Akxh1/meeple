@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-Scaffold ML Testing Documentation</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #0d47a1;
+            --success: #0f9d58;
+            --warning: #f4b400;
+            --danger: #db4437;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+            --code-bg: #f1f3f4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--primary-dark);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.3rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin: 1.2rem 0 0.6rem 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .card.highlight {
+            border-left: 4px solid var(--primary);
+        }
+
+        .card.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .card.warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            padding: 10px 14px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #e6f4ea;
+            color: #137333;
+        }
+
+        .badge-warning {
+            background: #fef7e0;
+            color: #b06000;
+        }
+
+        .badge-danger {
+            background: #fce8e6;
+            color: #c5221f;
+        }
+
+        .badge-info {
+            background: #e8f0fe;
+            color: #1a73e8;
+        }
+
+        .badge-star {
+            background: #fef7e0;
+            color: #b06000;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin: 1rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -1.55rem;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .timeline-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .conclusion {
+            background: linear-gradient(135deg, #e8f0fe, #f8f9fa);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .conclusion strong {
+            color: var(--primary-dark);
+        }
+
+        ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        li {
+            margin-bottom: 0.3rem;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .star {
+            color: #f4b400;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <h1>🧪 X-Scaffold ML Testing Documentation</h1>
+        <p class="subtitle">
+            Machine Learning Model Comparison &amp; Selection Testing Report<br>
+            <strong>Project:</strong> X-Scaffold — Explainable AI-Powered Adaptive Learning System<br>
+            <strong>Last Updated:</strong> February 2026
+        </p>
+
+        <!-- ============================================================ -->
+        <!-- TESTING OVERVIEW -->
+        <!-- ============================================================ -->
+
+        <h2>1. Testing Overview</h2>
+
+        <div class="card highlight">
+            <h3>Objective</h3>
+            <p>
+                Compare and evaluate 6 popular machine learning classifiers on the X-Scaffold
+                student mastery level prediction task. The goal is to identify the most viable
+                model based on predictive performance, robustness, and compatibility with
+                the SHAP Explainable AI (XAI) framework.
+            </p>
+        </div>
+
+        <h3>Testing Environment</h3>
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Details</th>
+            </tr>
+            <tr>
+                <td>Platform</td>
+                <td>Google Colab (Python 3.10+)</td>
+            </tr>
+            <tr>
+                <td>Dataset</td>
+                <td><code>xscaffold_student_dataset.csv</code> — 2000 synthetic students</td>
+            </tr>
+            <tr>
+                <td>Data Origin</td>
+                <td>Cholesky decomposition on 56 real student records (<code>student_research_data_2.csv</code>)</td>
+            </tr>
+            <tr>
+                <td>Features</td>
+                <td>11 features (6 LMS tier-1 + 5 ML tier-2)</td>
+            </tr>
+            <tr>
+                <td>Target</td>
+                <td>4-class: at_risk (0), developing (1), proficient (2), advanced (3)</td>
+            </tr>
+            <tr>
+                <td>Split</td>
+                <td>80% train / 20% test, stratified, <code>random_state=42</code></td>
+            </tr>
+            <tr>
+                <td>Scaling</td>
+                <td>StandardScaler (zero mean, unit variance)</td>
+            </tr>
+            <tr>
+                <td>Test Script</td>
+                <td><code>ml_model/testing/model_comparison.py</code></td>
+            </tr>
+        </table>
+
+        <!-- ============================================================ -->
+        <!-- MODELS TESTED -->
+        <!-- ============================================================ -->
+
+        <h2>2. Models Tested</h2>
+
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Model</th>
+                <th>Key Hyperparameters</th>
+                <th>Type</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Bagging Classifier (DT)</td>
+                <td><code>n_estimators=50</code>, <code>max_samples=0.8</code>, base DT: <code>max_depth=8</code>,
+                    <code>min_samples_split=10</code>, <code>min_samples_leaf=5</code>
+                </td>
+                <td>Ensemble (Bagging)</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Random Forest</td>
+                <td><code>n_estimators=50</code>, <code>max_depth=8</code>, <code>min_samples_split=10</code>,
+                    <code>min_samples_leaf=5</code>
+                </td>
+                <td>Ensemble (Bagging)</td>
+            </tr>
+            <tr style="background: #e8f0fe;">
+                <td><span class="star">⭐</span> 3</td>
+                <td><strong>XGBoost</strong></td>
+                <td><code>n_estimators=50</code>, <code>max_depth=8</code>, <code>learning_rate=0.1</code>,
+                    <code>eval_metric='mlogloss'</code>
+                </td>
+                <td>Ensemble (Boosting)</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>ANN (Keras MLP)</td>
+                <td>Layers: 128→64→32, Dropout: 0.3/0.3/0.2, BatchNorm, 50 epochs</td>
+                <td>Neural Network</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>SVM (RBF kernel)</td>
+                <td><code>C=1.0</code>, <code>kernel='rbf'</code>, <code>gamma='scale'</code>, probability=True</td>
+                <td>Support Vector</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Gradient Boosting</td>
+                <td><code>n_estimators=50</code>, <code>max_depth=8</code>, <code>learning_rate=0.1</code>,
+                    <code>min_samples_split=10</code>
+                </td>
+                <td>Ensemble (Boosting)</td>
+            </tr>
+        </table>
+
+        <div class="card">
+            <h3>Hyperparameter Fairness</h3>
+            <p>
+                Tree-based models share comparable hyperparameters (<code>n_estimators=50</code>,
+                <code>max_depth=8</code>) for a fair comparison. The ANN uses a standard
+                3-layer architecture since direct parameter mapping to tree-based models is
+                not meaningful. SVM uses default RBF kernel parameters.
+            </p>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- RESULTS -->
+        <!-- ============================================================ -->
+
+        <h2>3. Results — Model Comparison</h2>
+
+        <h3>3.1 Overall Performance Metrics</h3>
+
+        <table>
+            <tr>
+                <th>Model</th>
+                <th>Accuracy</th>
+                <th>Precision</th>
+                <th>Recall</th>
+                <th>F1 Score</th>
+                <th>AUC</th>
+                <th>Rank</th>
+            </tr>
+            <tr style="background: #e8f0fe; font-weight: 600;">
+                <td><span class="star">⭐</span> XGBoost</td>
+                <td>0.9100</td>
+                <td>0.9101</td>
+                <td>0.9100</td>
+                <td>0.9097</td>
+                <td>0.9828</td>
+                <td><span class="badge badge-success">#1</span></td>
+            </tr>
+            <tr>
+                <td>Gradient Boosting</td>
+                <td>0.8950</td>
+                <td>0.8952</td>
+                <td>0.8950</td>
+                <td>0.8942</td>
+                <td>0.9817</td>
+                <td><span class="badge badge-info">#2</span></td>
+            </tr>
+            <tr>
+                <td>ANN (MLP)</td>
+                <td>0.8750</td>
+                <td>0.8770</td>
+                <td>0.8750</td>
+                <td>0.8756</td>
+                <td>0.9774</td>
+                <td><span class="badge badge-info">#3</span></td>
+            </tr>
+            <tr>
+                <td>Bagging (DT)</td>
+                <td>0.8675</td>
+                <td>0.8670</td>
+                <td>0.8675</td>
+                <td>0.8657</td>
+                <td>0.9718</td>
+                <td><span class="badge badge-warning">#4</span></td>
+            </tr>
+            <tr>
+                <td>Random Forest</td>
+                <td>0.8575</td>
+                <td>0.8629</td>
+                <td>0.8575</td>
+                <td>0.8529</td>
+                <td>0.9663</td>
+                <td><span class="badge badge-warning">#5</span></td>
+            </tr>
+            <tr>
+                <td>SVM (RBF)</td>
+                <td>0.8525</td>
+                <td>0.8537</td>
+                <td>0.8525</td>
+                <td>0.8493</td>
+                <td>0.9677</td>
+                <td><span class="badge badge-danger">#6</span></td>
+            </tr>
+        </table>
+
+        <div class="metric-grid">
+            <div class="metric-card">
+                <div class="metric-value">91.0%</div>
+                <div class="metric-label">XGBoost Accuracy</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">91.0%</div>
+                <div class="metric-label">XGBoost Precision</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">91.0%</div>
+                <div class="metric-label">XGBoost Recall</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">90.97%</div>
+                <div class="metric-label">XGBoost F1 Score</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">98.28%</div>
+                <div class="metric-label">XGBoost AUC</div>
+            </div>
+        </div>
+
+        <h3>3.2 Critical Class: At-Risk Student Detection</h3>
+
+        <div class="card warning">
+            <p>
+                <strong>Why this matters:</strong> In educational AI, correctly identifying
+                at_risk students is the most critical capability. Missing a struggling student
+                means they don't receive timely intervention. The at_risk class has only
+                22 test samples, making reliable detection challenging.
+            </p>
+        </div>
+
+        <table>
+            <tr>
+                <th>Model</th>
+                <th>at_risk Precision</th>
+                <th>at_risk Recall</th>
+                <th>at_risk F1</th>
+                <th>Students Missed</th>
+            </tr>
+            <tr style="background: #e8f0fe; font-weight: 600;">
+                <td><span class="star">⭐</span> XGBoost</td>
+                <td>1.0000</td>
+                <td>0.9091</td>
+                <td>0.9524</td>
+                <td>~2 of 22</td>
+            </tr>
+            <tr>
+                <td>Gradient Boosting</td>
+                <td>0.9444</td>
+                <td>0.7727</td>
+                <td>0.8500</td>
+                <td>~5 of 22</td>
+            </tr>
+            <tr>
+                <td>ANN (MLP)</td>
+                <td>0.8000</td>
+                <td>0.9091</td>
+                <td>0.8511</td>
+                <td>~2 of 22</td>
+            </tr>
+            <tr>
+                <td>Bagging (DT)</td>
+                <td>0.8421</td>
+                <td>0.7273</td>
+                <td>0.7805</td>
+                <td>~6 of 22</td>
+            </tr>
+            <tr>
+                <td>SVM (RBF)</td>
+                <td>0.9167</td>
+                <td>0.5000</td>
+                <td>0.6471</td>
+                <td>~11 of 22</td>
+            </tr>
+            <tr>
+                <td>Random Forest</td>
+                <td>1.0000</td>
+                <td>0.5000</td>
+                <td>0.6667</td>
+                <td>~11 of 22</td>
+            </tr>
+        </table>
+
+        <h3>3.3 Cross-Validation Results (5-Fold Stratified)</h3>
+
+        <table>
+            <tr>
+                <th>Model</th>
+                <th>CV Accuracy</th>
+                <th>Std Dev (±2σ)</th>
+            </tr>
+            <tr style="background: #e8f0fe; font-weight: 600;">
+                <td><span class="star">⭐</span> XGBoost</td>
+                <td>0.9060</td>
+                <td>±0.0384</td>
+            </tr>
+            <tr>
+                <td>Gradient Boosting</td>
+                <td>0.8990</td>
+                <td>±0.0384</td>
+            </tr>
+            <tr>
+                <td>Bagging (DT)</td>
+                <td>0.8900</td>
+                <td>±0.0485</td>
+            </tr>
+            <tr>
+                <td>ANN (MLP)</td>
+                <td>0.8750</td>
+                <td>(single eval)</td>
+            </tr>
+            <tr>
+                <td>Random Forest</td>
+                <td>0.8745</td>
+                <td>±0.0357</td>
+            </tr>
+            <tr>
+                <td>SVM (RBF)</td>
+                <td>0.8610</td>
+                <td>±0.0357</td>
+            </tr>
+        </table>
+
+        <div class="card success">
+            <h3>Overfitting Analysis — XGBoost</h3>
+            <p>
+                XGBoost's cross-validation accuracy (<strong>90.6%</strong>) closely matches
+                its test accuracy (<strong>91.0%</strong>), with only a 0.4% gap. This
+                confirms the model generalizes well and is <strong>not overfitting</strong>.
+                XGBoost's built-in L1/L2 regularization provides superior overfitting control
+                compared to unregularized methods like Bagging.
+            </p>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- VISUALIZATIONS -->
+        <!-- ============================================================ -->
+
+        <h2>4. Visualizations Generated</h2>
+
+        <div class="card">
+            <p>The following 6 visualizations were generated during testing (saved as PNG files in Colab):</p>
+            <table>
+                <tr>
+                    <th>#</th>
+                    <th>Visualization</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Grouped Bar Chart</td>
+                    <td>All 5 metrics side-by-side per model</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Radar/Spider Chart</td>
+                    <td>Multi-axis comparison overlay</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Confusion Matrices (2×3 grid)</td>
+                    <td>Per-class prediction accuracy heatmaps</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>ROC Curves</td>
+                    <td>Macro-averaged One-vs-Rest ROC for all models</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Per-Class F1 Comparison</td>
+                    <td>F1 score per mastery level per model</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Training Time</td>
+                    <td>Computational efficiency comparison</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ANALYSIS -->
+        <!-- ============================================================ -->
+
+        <h2>5. Analysis — Why XGBoost is the Most Viable Model</h2>
+
+        <div class="card highlight">
+            <h3>5.1 Superior Accuracy (#1 Across ALL Metrics)</h3>
+            <p>
+                XGBoost achieved the highest score in every single evaluation metric:
+                Accuracy (91.0%), Precision (91.0%), Recall (91.0%), F1 Score (90.97%),
+                and AUC (98.28%). No other model came close across all five dimensions.
+            </p>
+        </div>
+
+        <div class="card highlight">
+            <h3>5.2 Critical Class Performance — At-Risk Students</h3>
+            <p>
+                XGBoost achieved <strong>95.24% F1</strong> on the at_risk class — the most
+                critical class in educational AI. By comparison, the previously-used Bagging
+                Classifier achieved only 78.05% F1, missing approximately 6 at-risk students
+                out of 22 compared to XGBoost's 2. In an educational intervention context,
+                this difference is significant.
+            </p>
+        </div>
+
+        <div class="card highlight">
+            <h3>5.3 Robust Generalization (No Overfitting)</h3>
+            <p>
+                Cross-validation accuracy (90.6%) closely matches test accuracy (91.0%),
+                confirming the model generalizes well. XGBoost's built-in L1/L2
+                regularization (<code>reg_alpha</code>, <code>reg_lambda</code>) provides
+                superior overfitting control compared to unregularized ensemble methods.
+            </p>
+        </div>
+
+        <div class="card highlight">
+            <h3>5.4 Full SHAP / XAI Compatibility</h3>
+            <p>
+                XGBoost is natively supported by SHAP's <code>TreeExplainer</code>, enabling
+                individual student-level explanations with <strong>exact</strong> (not
+                approximate) SHAP values. This is actually faster and more accurate than
+                the <code>KernelExplainer</code> previously used with the Bagging Classifier.
+            </p>
+        </div>
+
+        <div class="card highlight">
+            <h3>5.5 Gradient Boosting Advantage</h3>
+            <p>
+                Unlike Bagging (which trains independent trees and averages), XGBoost trains
+                trees sequentially — each new tree corrects the errors of the previous ones.
+                This reduces <strong>both bias and variance</strong>, whereas Bagging only
+                reduces variance.
+            </p>
+        </div>
+
+        <div class="card highlight">
+            <h3>5.6 Industry Standard</h3>
+            <p>
+                XGBoost is the most widely adopted algorithm for structured/tabular data
+                classification in both industry and academic research, with extensive
+                validation across thousands of Kaggle competitions and peer-reviewed
+                publications (Chen &amp; Guestrin, 2016).
+            </p>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- DECISION LOG -->
+        <!-- ============================================================ -->
+
+        <h2>6. Model Selection Decision Log</h2>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-date">January 2026</div>
+                <p>
+                    <strong>Initial Model:</strong> Bagging Classifier with Decision Trees
+                    selected for initial deployment. Achieved 86.75% test accuracy.
+                    Rationale: simplicity and interpretability.
+                </p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">February 2026 — Model Comparison Testing</div>
+                <p>
+                    <strong>6-model comparison</strong> conducted in Google Colab.
+                    XGBoost ranked <span class="badge badge-success">#1</span> across all
+                    5 metrics. Bagging ranked <span class="badge badge-warning">#4</span>.
+                </p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">February 2026 — Model Switch Decision</div>
+                <p>
+                    <strong>Decision:</strong> Switch production model from Bagging Classifier
+                    to XGBoost. Key factors:
+                </p>
+                <ul>
+                    <li>+4.25% accuracy improvement (86.75% → 91.0%)</li>
+                    <li>+17.19% F1 improvement on at_risk class (78.05% → 95.24%)</li>
+                    <li>Full SHAP TreeExplainer compatibility (faster than KernelExplainer)</li>
+                    <li>No overfitting confirmed via cross-validation</li>
+                </ul>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">February 2026 — Production Update</div>
+                <p>
+                    <strong>Files updated:</strong>
+                </p>
+                <ul>
+                    <li><code>train_model.py</code> — Rewritten for XGBoost</li>
+                    <li><code>predict.py</code> — Updated model path to <code>xscaffold_xgboost_model.pkl</code></li>
+                    <li><code>api.py</code> — Updated to use SHAP TreeExplainer + new model path</li>
+                    <li><code>model_comparison.py</code> — Comparison script updated to reflect findings</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- CONCLUSION -->
+        <!-- ============================================================ -->
+
+        <h2>7. Conclusion</h2>
+
+        <div class="conclusion">
+            <p>
+                <strong>XGBoost is the most viable model</strong> for the X-Scaffold student
+                mastery prediction task. It achieved the highest scores across all five
+                evaluation metrics (Accuracy, Precision, Recall, F1 Score, AUC), demonstrated
+                superior performance on the critical at_risk class, and maintains full
+                compatibility with SHAP TreeExplainer for the Explainable AI layer.
+            </p>
+            <br>
+            <p>
+                The model switch from Bagging Classifier to XGBoost represents a
+                <strong>+4.25% accuracy improvement</strong> and a
+                <strong>+17.19% F1 improvement</strong> on at-risk student detection, with
+                no trade-off in explainability or computational efficiency.
+            </p>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- LMS WEIGHT DERIVATION TESTING -->
+        <!-- ============================================================ -->
+
+        <h2>8. LMS Weight Derivation Testing</h2>
+
+        <div class="card highlight">
+            <h3>Objective</h3>
+            <p>
+                Empirically validate and refine the literature-based Learning Mastery Score (LMS) formula
+                weights using unsupervised multi-method analysis on real student data, without requiring
+                a ground-truth target variable (which would introduce circularity).
+            </p>
+        </div>
+
+        <h3>8.1 Testing Environment</h3>
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Details</th>
+            </tr>
+            <tr>
+                <td>Platform</td>
+                <td>Google Colab (Python 3.10+)</td>
+            </tr>
+            <tr>
+                <td>Dataset</td>
+                <td><code>student_research_data_2.csv</code> — 56 real student records</td>
+            </tr>
+            <tr>
+                <td>Features Analyzed</td>
+                <td>6 LMS core features: score_percentage, hard_question_accuracy, avg_confidence,
+                    tab_switches_rate, hint_usage_percentage, answer_changes_rate</td>
+            </tr>
+            <tr>
+                <td>Test Script</td>
+                <td><code>ml_model/testing/lms_weight_derivation.py</code></td>
+            </tr>
+        </table>
+
+        <h3>8.2 Methods Applied</h3>
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Method</th>
+                <th>Principle</th>
+                <th>Citation</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Principal Component Analysis (PCA)</td>
+                <td>Weights from PC1 loadings (maximum variance direction)</td>
+                <td>Jolliffe, 2002</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Entropy-Based Weighting</td>
+                <td>Higher weight for features with more information content</td>
+                <td>Shannon, 1948</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Factor Analysis</td>
+                <td>Single-factor loadings representing latent "mastery" construct</td>
+                <td>Hair et al., 2019</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>CRITIC Method</td>
+                <td>Combines standard deviation with inter-criteria correlation</td>
+                <td>Diakoulaki et al., 1995</td>
+            </tr>
+        </table>
+
+        <h3>8.3 Key Results</h3>
+
+        <div class="card success">
+            <h3>Finding 1: hard_question_accuracy is the #1 differentiator</h3>
+            <p>
+                Across all 4 methods, <code>hard_question_accuracy</code> ranked #1 with a composite weight of
+                <strong>26.6%</strong>, closely followed by <code>score_percentage</code> at <strong>25.6%</strong>.
+                This challenged the literature-based assumption that score_percentage should dominate at 50%.
+            </p>
+        </div>
+
+        <div class="card success">
+            <h3>Finding 2: answer_changes_rate has minimal discriminating power</h3>
+            <p>
+                <code>answer_changes_rate</code> received only <strong>5.1%</strong> composite weight — the lowest
+                across all methods. 75% of students showed near-zero variance on this feature, indicating it provides
+                little information for differentiating mastery levels in the collected data.
+            </p>
+        </div>
+
+        <div class="card success">
+            <h3>Finding 3: All feature directions match literature</h3>
+            <p>
+                All six features maintained the <strong>same positive/negative direction</strong> as the
+                literature-based
+                formula. This validates the theoretical framework — the refinement only adjusts weight magnitudes,
+                not the directional relationships between features and mastery.
+            </p>
+        </div>
+
+        <h3>8.4 Outcome: Hybrid LMS Formula</h3>
+
+        <div class="conclusion">
+            <p>
+                <strong>The refined hybrid formula</strong> balances literature-inspired structure with data-validated
+                weights:
+            </p>
+            <p style="text-align: center; font-family: 'Consolas', monospace; font-size: 1.1rem; margin: 1rem 0;">
+                LMS = 0.30×S + 0.25×(Hd×100) + 15×C<sub>cal</sub> + 15×A<sub>f</sub> − 10×Hu − 5×A<sub>c</sub>
+            </p>
+            <p>
+                This formula was implemented in <code>generate_dataset.py</code> (v2.1.0) and validated to produce
+                reasonable LMS distributions across all four mastery classes.
+            </p>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- REFERENCES -->
+        <!-- ============================================================ -->
+
+        <h2>References</h2>
+        <div class="card">
+            <ul>
+                <li>Chen, T., &amp; Guestrin, C. (2016). XGBoost: A Scalable Tree Boosting System. <em>Proceedings of
+                        the 22nd ACM SIGKDD</em>, 785–794.</li>
+                <li>Lundberg, S.M., &amp; Lee, S.I. (2017). A Unified Approach to Interpreting Model Predictions.
+                    <em>Advances in Neural Information Processing Systems (NIPS)</em>, 30.
+                </li>
+                <li>Breiman, L. (1996). Bagging Predictors. <em>Machine Learning</em>, 24(2), 123–140.</li>
+                <li>Jolliffe, I. T. (2002). <em>Principal Component Analysis</em> (2nd ed.). Springer.</li>
+                <li>Shannon, C. E. (1948). A Mathematical Theory of Communication. <em>Bell System Technical Journal,
+                        27</em>(3), 379–423.</li>
+                <li>Diakoulaki, D., et al. (1995). The CRITIC method. <em>Computers &amp; Operations Research,
+                        22</em>(7), 763–770.</li>
+                <li>Hair, J. F., et al. (2019). <em>Multivariate Data Analysis</em> (8th ed.). Cengage Learning.</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            X-Scaffold ML Testing Documentation • February 2026 • Generated by X-Scaffold Research Team
+        </div>
+    </div>
+</body>
+
+</html>

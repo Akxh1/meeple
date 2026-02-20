@@ -392,21 +392,32 @@
 
             <h3>4.2. Target Variable: Learning Mastery Score (LMS)</h3>
             <p>The target variable is derived from a weighted formula encompassing performance and behavior, rather than
-                raw score alone. This aligns with the project's goal of measuring <em>holistic mastery</em>.</p>
+                raw score alone. This aligns with the project's goal of measuring <em>holistic mastery</em>. The formula
+                underwent a three-stage refinement process: initial literature-based weights, data-driven correlation
+                analysis, and a final hybrid formula.</p>
+
+            <h4>Initial Literature-Based Formula</h4>
             <div class="formula">
-                LMS = 0.50(S) + 0.15(Hd) + 10(C<sub>cal</sub>) + 10(K<sub>s</sub>) + 10(A<sub>f</sub>) −
+                LMS<sub>initial</sub> = 0.50(S) + 0.15(Hd) + 10(C<sub>cal</sub>) + 10(K<sub>s</sub>) + 10(A<sub>f</sub>)
+                −
                 15(Hu)<sup>1.5</sup>
             </div>
-            <p><em>Where S=Score, Hd=Hard Accuracy, C<sub>cal</sub>=Calibration, K<sub>s</sub>=Stability,
-                    A<sub>f</sub>=Attention, Hu=Hint Usage.</em>
+
+            <h4>Refined Hybrid Formula (Production)</h4>
+            <div class="formula" style="background-color: #e8f5e9; border-color: #4caf50;">
+                LMS<sub>hybrid</sub> = 0.30(S) + 0.25(Hd × 100) + 15(C<sub>cal</sub>) + 15(A<sub>f</sub>) − 10(Hu) −
+                5(A<sub>c</sub>)
+            </div>
+            <p><em>Where S=Score, Hd=Hard Accuracy (normalized 0-1), C<sub>cal</sub>=Calibration,
+                    A<sub>f</sub>=Attention, Hu=Hint Usage (normalized 0-1), A<sub>c</sub>=Answer Changes Penalty.</em>
             </p>
 
             <h3>4.3. Literature Review: Justification for LMS Component Weights</h3>
             <p>The weighted components of the Learning Mastery Score are grounded in educational data mining and
                 learning analytics research from 2010-2025. The following subsections provide empirical justifications
-                for each feature's inclusion and relative weight in the composite LMS formula.</p>
+                for each feature's inclusion and relative weight in the initial LMS formula.</p>
 
-            <h4>4.3.1. Score Percentage (S) — Weight: 0.50</h4>
+            <h4>4.3.1. Score Percentage (S) — Initial Weight: 0.50</h4>
             <p>Pardos &amp; Baker (2014) demonstrate that overall score serves as the primary performance anchor in MOOC
                 analytics, explaining approximately 50% of variance in future academic success when baseline-weighted in
                 predictive models. This substantial weight reflects the foundational importance of raw performance as
@@ -414,9 +425,10 @@
                 validates score percentage as the cornerstone metric for mastery evaluation.</p>
             <p><strong>Citation:</strong> Pardos, Z. A., &amp; Baker, R. S. (2014). Affective states and state tests:
                 Investigating how affect and engagement during the school year predict end-of-year learning outcomes.
-                <em>Journal of Learning Analytics, 1</em>(1), 107-128.</p>
+                <em>Journal of Learning Analytics, 1</em>(1), 107-128.
+            </p>
 
-            <h4>4.3.2. Hard Question Accuracy (Hd) — Weight: 0.15</h4>
+            <h4>4.3.2. Hard Question Accuracy (Hd) — Initial Weight: 0.15</h4>
             <p>Chi et al. (2018) established that hard-item success discriminates deep conceptual understanding
                 significantly better than performance on easy items. Their research on worked examples and comprehension
                 demonstrates that students who succeed on challenging problems exhibit transfer potential and robust
@@ -427,7 +439,7 @@
                 the classroom: The implications of learning from worked examples. <em>Educational Psychology Review,
                     30</em>(3), 839-866.</p>
 
-            <h4>4.3.3. Confidence Calibration (C<sub>cal</sub>) — Weight: 10</h4>
+            <h4>4.3.3. Confidence Calibration (C<sub>cal</sub>) — Initial Weight: 10</h4>
             <p>Tobias &amp; Everson (2002) established the foundational link between calibration accuracy (the alignment
                 between self-reported confidence and actual performance) and metacognitive regulation. Recent syntheses
                 in metacognition research (2024) confirm that well-calibrated learners demonstrate superior retention
@@ -438,7 +450,7 @@
                 don't: Further research on metacognitive knowledge monitoring. <em>College Board Research Report No.
                     2002-3</em>. See also: Annual Review of Psychology (2024) on metacognition and learning.</p>
 
-            <h4>4.3.4. Knowledge Stability (K<sub>s</sub>) — Weight: 10</h4>
+            <h4>4.3.4. Knowledge Stability (K<sub>s</sub>) — Initial Weight: 10</h4>
             <p>Answer changes rate inversely reflects knowledge stability and uncertainty. Educational Data Mining (EDM)
                 research post-2010 treats low revision rates as signals of stable, consolidated knowledge, warranting
                 behavioral weighting beyond mere accuracy. The ×10 multiplier acknowledges that students who commit to
@@ -448,7 +460,7 @@
                     Research, 78</em>(1), 153-189. Extended in subsequent EDM literature on behavioral predictors of
                 learning.</p>
 
-            <h4>4.3.5. Attention Focus (A<sub>f</sub>) — Weight: 10</h4>
+            <h4>4.3.5. Attention Focus (A<sub>f</sub>) — Initial Weight: 10</h4>
             <p>Baker et al. (2004) established the correlation between off-task behaviors like tab switching and
                 negative learning outcomes, with findings suggesting 10-20% drops in performance associated with
                 attention fragmentation. The inverse relationship—rewarding focused behavior—is operationalized through
@@ -458,7 +470,7 @@
                 Off-task behavior in the cognitive tutor classroom: When students "game the system." <em>Proceedings of
                     the SIGCHI Conference on Human Factors in Computing Systems</em>, 383-390.</p>
 
-            <h4>4.3.6. Hint Usage Penalty (Hu) — Weight: 15 × Hu<sup>1.5</sup></h4>
+            <h4>4.3.6. Hint Usage Penalty (Hu) — Initial Weight: 15 × Hu<sup>1.5</sup></h4>
             <p>Aleven et al. (2016) demonstrate that excessive hint usage indicates shallow mastery and scaffold
                 dependency rather than independent problem-solving capability. The nonlinear penalty exponent (1.5)
                 amplifies the negative impact of heavy hint reliance, reflecting that the cost of dependency increases
@@ -469,72 +481,218 @@
                 seeking and help design in interactive learning environments. <em>Review of Educational Research,
                     86</em>(1), 227-268.</p>
 
-            <h4>4.3.7. Summary of Weight Justifications</h4>
+            <h3>4.4. Data-Driven Correlation Analysis</h3>
+            <p>To empirically validate and refine the literature-based weights, an unsupervised multi-method weight
+                derivation analysis was conducted on N=56 real student records collected from the Mock Exam Application.
+                Since no ground-truth LMS score existed (the LMS formula is itself the definition), supervised methods
+                such as regression could not be applied without circular reasoning. Instead, four established
+                unsupervised techniques were employed to derive objective feature weights from the data's inherent
+                structure.</p>
+
+            <h4>4.4.1. Method 1 — Principal Component Analysis (PCA)</h4>
+            <p>PCA identifies the direction of maximum variance in multi-dimensional data. The loadings of the first
+                principal component (PC1) indicate which features contribute most to distinguishing students from each
+                other. In this analysis, PC1 explained 41.0% of total variance. The absolute loadings yielded weights:
+                hard_question_accuracy (27.5%), score_percentage (27.4%), tab_switches_rate (20.5%), avg_confidence
+                (16.5%), hint_usage_percentage (6.2%), and answer_changes_rate (1.9%).</p>
+            <p><strong>Citation:</strong> Jolliffe, I. T. (2002). <em>Principal Component Analysis</em> (2nd ed.).
+                Springer. See also: Abdi, H. &amp; Williams, L. J. (2010). Principal Component Analysis. <em>WIREs
+                    Computational Statistics, 2</em>(4), 433-459.</p>
+
+            <h4>4.4.2. Method 2 — Entropy-Based Weighting</h4>
+            <p>Entropy weighting assigns higher weights to features with more information content (variation).
+                Features where all students score similarly contribute less to differentiation and receive lower
+                weights. Results: hard_question_accuracy (28.5%), score_percentage (25.6%), avg_confidence (23.2%),
+                hint_usage_percentage (13.4%), tab_switches_rate (5.3%), answer_changes_rate (3.9%).</p>
+            <p><strong>Citation:</strong> Shannon, C. E. (1948). A Mathematical Theory of Communication. <em>Bell
+                    System Technical Journal, 27</em>(3), 379-423. See also: Zou, Z. H., et al. (2006). Entropy
+                method for determination of weight of evaluating indicators. <em>Journal of Software, 17</em>(8).</p>
+
+            <h4>4.4.3. Method 3 — Factor Analysis</h4>
+            <p>A single-factor Factor Analysis model was applied, assuming one latent "mastery" construct underlying all
+                six observed features. The factor loadings represent each feature's relationship to this latent mastery
+                dimension. Results: hard_question_accuracy (31.9%), score_percentage (31.7%), tab_switches_rate
+                (17.0%), avg_confidence (12.9%), hint_usage_percentage (5.0%), answer_changes_rate (1.5%).</p>
+            <p><strong>Citation:</strong> Hair, J. F., et al. (2019). <em>Multivariate Data Analysis</em> (8th ed.).
+                Cengage Learning. See also: Thompson, B. (2004). <em>Exploratory and Confirmatory Factor
+                    Analysis</em>. APA.</p>
+
+            <h4>4.4.4. Method 4 — CRITIC Method</h4>
+            <p>The CRITIC (Criteria Importance Through Intercriteria Correlation) method combines standard deviation
+                (information content) with inter-criteria correlation (contrast between features). Features with high
+                variation AND low correlation with other features receive higher weights, as they provide unique
+                information. Results: hint_usage_percentage (19.6%), hard_question_accuracy (18.4%), tab_switches_rate
+                (17.8%), score_percentage (17.7%), avg_confidence (13.4%), answer_changes_rate (13.1%).</p>
+            <p><strong>Citation:</strong> Diakoulaki, D., Mavrotas, G., &amp; Papayannakis, L. (1995). Determining
+                objective weights in multiple criteria problems: The CRITIC method. <em>Computers &amp; Operations
+                    Research, 22</em>(7), 763-770.</p>
+
+            <h4>4.4.5. Composite Data-Driven Weights</h4>
+            <p>The final data-driven weights were calculated as the arithmetic mean of all four methods, re-normalized
+                to sum to 1.0:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>PCA</th>
+                        <th>Entropy</th>
+                        <th>Factor Analysis</th>
+                        <th>CRITIC</th>
+                        <th>Composite</th>
+                        <th>Direction</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>hard_question_accuracy</td>
+                        <td>27.5%</td>
+                        <td>28.5%</td>
+                        <td>31.9%</td>
+                        <td>18.4%</td>
+                        <td><strong>26.6%</strong></td>
+                        <td>Positive</td>
+                    </tr>
+                    <tr>
+                        <td>score_percentage</td>
+                        <td>27.4%</td>
+                        <td>25.6%</td>
+                        <td>31.7%</td>
+                        <td>17.7%</td>
+                        <td><strong>25.6%</strong></td>
+                        <td>Positive</td>
+                    </tr>
+                    <tr>
+                        <td>avg_confidence</td>
+                        <td>16.5%</td>
+                        <td>23.2%</td>
+                        <td>12.9%</td>
+                        <td>13.4%</td>
+                        <td><strong>16.5%</strong></td>
+                        <td>Positive</td>
+                    </tr>
+                    <tr>
+                        <td>tab_switches_rate</td>
+                        <td>20.5%</td>
+                        <td>5.3%</td>
+                        <td>17.0%</td>
+                        <td>17.8%</td>
+                        <td><strong>15.2%</strong></td>
+                        <td>Negative</td>
+                    </tr>
+                    <tr>
+                        <td>hint_usage_percentage</td>
+                        <td>6.2%</td>
+                        <td>13.4%</td>
+                        <td>5.0%</td>
+                        <td>19.6%</td>
+                        <td><strong>11.0%</strong></td>
+                        <td>Negative</td>
+                    </tr>
+                    <tr>
+                        <td>answer_changes_rate</td>
+                        <td>1.9%</td>
+                        <td>3.9%</td>
+                        <td>1.5%</td>
+                        <td>13.1%</td>
+                        <td><strong>5.1%</strong></td>
+                        <td>Negative</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>4.4.6. Bootstrap Validation</h4>
+            <p>Bootstrap resampling (n=1,000 iterations) was applied to the PCA-derived weights to assess stability.
+                The 95% confidence intervals confirmed that the weight estimates are stable despite the moderate sample
+                size (N=56), with score_percentage and hard_question_accuracy consistently emerging as the two dominant
+                features.</p>
+
+            <h3>4.5. Refined Hybrid Formula</h3>
+            <p>The final LMS formula was derived by combining the literature-based theoretical framework with the
+                empirical data-driven weights. Rather than adopting either approach in isolation, a hybrid strategy was
+                employed: the data-driven weights were rounded to practical values and adjusted to balance the
+                insights from both sources.</p>
+
+            <h4>4.5.1. Key Adjustments and Justifications</h4>
             <table>
                 <thead>
                     <tr>
                         <th>Component</th>
-                        <th>Weight</th>
-                        <th>Primary Research Basis</th>
-                        <th>Theoretical Construct</th>
+                        <th>Literature Weight</th>
+                        <th>Data-Driven Weight</th>
+                        <th>Hybrid Weight</th>
+                        <th>Rationale for Adjustment</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>Score Percentage (S)</td>
                         <td>0.50</td>
-                        <td>Pardos &amp; Baker, 2014</td>
-                        <td>Performance anchor, ~50% variance explained</td>
+                        <td>25.6%</td>
+                        <td><strong>0.30</strong></td>
+                        <td>Data shows S and Hd are near-equal differentiators (r=0.87). Reduced dominance while
+                            retaining literature-position as the top weight.</td>
                     </tr>
                     <tr>
                         <td>Hard Question Accuracy (Hd)</td>
                         <td>0.15</td>
-                        <td>Chi et al., 2018</td>
-                        <td>Deep conceptual understanding, transfer potential</td>
+                        <td>26.6%</td>
+                        <td><strong>0.25</strong></td>
+                        <td>Data: #1 differentiator across all 4 methods. Elevated substantially to reflect empirical
+                            importance.</td>
                     </tr>
                     <tr>
                         <td>Confidence Calibration (C<sub>cal</sub>)</td>
                         <td>×10</td>
-                        <td>Tobias &amp; Everson, 2002</td>
-                        <td>Metacognitive regulation accuracy</td>
-                    </tr>
-                    <tr>
-                        <td>Knowledge Stability (K<sub>s</sub>)</td>
-                        <td>×10</td>
-                        <td>Shute, 2008; EDM literature</td>
-                        <td>Consolidated knowledge, low uncertainty</td>
+                        <td>16.5%</td>
+                        <td><strong>×15</strong></td>
+                        <td>Data supports higher metacognitive weight. Increased to reflect importance of
+                            self-assessment accuracy.</td>
                     </tr>
                     <tr>
                         <td>Attention Focus (A<sub>f</sub>)</td>
                         <td>×10</td>
-                        <td>Baker et al., 2004</td>
-                        <td>Engagement quality, on-task behavior</td>
+                        <td>15.2%</td>
+                        <td><strong>×15</strong></td>
+                        <td>Data: r=0.50 with hard_question_accuracy — stronger relationship than expected. Increased
+                            to match data-driven importance.</td>
                     </tr>
                     <tr>
-                        <td>Hint Usage Penalty (Hu)</td>
+                        <td>Hint Usage (Hu)</td>
                         <td>-15 × Hu<sup>1.5</sup></td>
-                        <td>Aleven et al., 2016</td>
-                        <td>Scaffold dependency, shallow mastery indicator</td>
+                        <td>11.0%</td>
+                        <td><strong>-10 × Hu</strong></td>
+                        <td>Data suggests lower impact than literature implied. Simplified from nonlinear
+                            (Hu<sup>1.5</sup>)
+                            to linear penalty for interpretability.</td>
+                    </tr>
+                    <tr>
+                        <td>Answer Changes (A<sub>c</sub>)</td>
+                        <td>×10 (bonus)</td>
+                        <td>5.1%</td>
+                        <td><strong>-5 × A<sub>c</sub></strong></td>
+                        <td>Data: lowest weight across all 4 methods. 75% of students show near-zero variance.
+                            Reduced to reflect low discriminating power in the collected data.</td>
                     </tr>
                 </tbody>
             </table>
+
+            <h4>4.5.2. Validation: Feature Direction Consistency</h4>
+            <p>All six features maintain the <strong>same positive/negative direction</strong> across both the
+                literature-based and data-driven analyses, providing strong validation that the theoretical framework
+                is empirically sound. The refinement adjusts magnitude (how much each feature contributes) without
+                changing direction (whether it helps or hurts mastery).</p>
+
         </section>
 
         <section id="ml-framework">
             <h2>5. Machine Learning Framework</h2>
 
-            <h3>5.1. Model Selection: Bagging Classifier</h3>
-            <p>The research utilizes a <strong>Bagging Classifier</strong> (Bootstrap Aggregating) with an ensemble of
-                50 Decision Trees. This architectural choice was driven by specific requirements of educational data:
+            <h3>5.1. Model Selection: XGBoost Classifier</h3>
+            <p>Following comprehensive model comparison testing (February 2026), the research utilizes an
+                <strong>XGBoost Classifier</strong> (Extreme Gradient Boosting, Chen &amp; Guestrin, 2016). This model
+                was selected based on superior performance across all evaluation metrics (91.0% accuracy, 95.24% at-risk
+                F1 score) and full compatibility with SHAP TreeExplainer for the Explainable AI layer.
             </p>
-            <ol>
-                <li><strong>Variance Reduction:</strong> Educational data is inherently noisy; bagging smoothes out
-                    anomalies by averaging predictions across multiple base estimators.</li>
-                <li><strong>Class Imbalance Handling:</strong> The bootstrap sampling method ensures that minority
-                    classes (e.g., At-Risk) are adequately represented in the training process of individual trees.</li>
-                <li><strong>Interpretability Support:</strong> While ensemble models are complex, they remain compatible
-                    with model-agnostic interpretation techniques like SHAP.</li>
-            </ol>
 
             <h3>5.2. Validation Strategy</h3>
             <p>Model performance is validated using <strong>Stratified K-Fold Cross-Validation (k=5)</strong>. This
@@ -542,8 +700,41 @@
                 of the model's generalization capability across different student cohorts.</p>
         </section>
 
+        <section id="references">
+            <h2>6. References</h2>
+            <ol>
+                <li>Pardos, Z. A., &amp; Baker, R. S. (2014). Affective states and state tests. <em>Journal of Learning
+                        Analytics, 1</em>(1), 107-128.</li>
+                <li>Chi, M., et al. (2018). Translating a cognitive theory to the classroom. <em>Educational Psychology
+                        Review, 30</em>(3), 839-866.</li>
+                <li>Aleven, V., et al. (2016). Help seeking and help design in interactive learning environments.
+                    <em>Review of Educational Research, 86</em>(1), 227-268.</li>
+                <li>Tobias, S., &amp; Everson, H. T. (2002). Knowing what you know and what you don't. <em>College Board
+                        Research Report No. 2002-3</em>.</li>
+                <li>Shute, V. J. (2008). Focus on formative feedback. <em>Review of Educational Research, 78</em>(1),
+                    153-189.</li>
+                <li>Baker, R. S., et al. (2004). Off-task behavior in the cognitive tutor classroom. <em>SIGCHI</em>,
+                    383-390.</li>
+                <li>Jolliffe, I. T. (2002). <em>Principal Component Analysis</em> (2nd ed.). Springer.</li>
+                <li>Abdi, H. &amp; Williams, L. J. (2010). Principal Component Analysis. <em>WIREs Computational
+                        Statistics, 2</em>(4), 433-459.</li>
+                <li>Shannon, C. E. (1948). A Mathematical Theory of Communication. <em>Bell System Technical Journal,
+                        27</em>(3), 379-423.</li>
+                <li>Zou, Z. H., et al. (2006). Entropy method for determination of weight of evaluating indicators.
+                    <em>Journal of Software, 17</em>(8).</li>
+                <li>Hair, J. F., et al. (2019). <em>Multivariate Data Analysis</em> (8th ed.). Cengage Learning.</li>
+                <li>Diakoulaki, D., et al. (1995). The CRITIC method. <em>Computers &amp; Operations Research,
+                        22</em>(7), 763-770.</li>
+                <li>Chen, T., &amp; Guestrin, C. (2016). XGBoost: A Scalable Tree Boosting System. <em>ACM SIGKDD</em>,
+                    785-794.</li>
+                <li>D'Mello, S., &amp; Graesser, A. (2012). Dynamics of affective states during complex learning.
+                    <em>Learning and Instruction</em>.</li>
+            </ol>
+        </section>
+
         <footer>
             <p>&copy; 2026 X-Scaffold Research Project. All Rights Reserved.</p>
+            <p><em>Last Updated: February 2026 (v2.1.0 — Hybrid LMS Formula)</em></p>
         </footer>
     </div>
 

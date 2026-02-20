@@ -1,6 +1,6 @@
 # X-Scaffold ML Model
 
-Machine Learning pipeline for student mastery level prediction using Bagging Classifier with SHAP explanations.
+Machine Learning pipeline for student mastery level prediction using XGBoost Classifier with SHAP explanations.
 
 ## 🚀 Quick Start
 
@@ -21,7 +21,7 @@ python api.py
 |------|-------------|
 | `setup_ml.py` | One-command setup script (recommended) |
 | `generate_dataset.py` | Synthetic dataset generator (2000 students) |
-| `train_model.py` | Bagging Classifier training with feature importance |
+| `train_model.py` | XGBoost Classifier training with feature importance |
 | `predict.py` | Command-line prediction tool |
 | `api.py` | Flask API server for Laravel integration |
 | `requirements.txt` | Python dependencies |
@@ -29,7 +29,7 @@ python api.py
 
 ## 📊 Model Details
 
-- **Algorithm**: Bagging Classifier (50 Decision Tree estimators)
+- **Algorithm**: XGBoost Classifier (Gradient Boosting)
 - **Features**: 11 behavioral features from exam interactions
 - **Target**: 4-class mastery level (at_risk, developing, proficient, advanced)
 - **Expected Accuracy**: 85-92%

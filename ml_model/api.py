@@ -31,7 +31,7 @@ CORS(app)  # Enable CORS for Laravel to call this API
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Load trained model
-MODEL_PATH = os.path.join(SCRIPT_DIR, 'xscaffold_bagging_model.pkl')
+MODEL_PATH = os.path.join(SCRIPT_DIR, 'xscaffold_xgboost_model.pkl')
 model = joblib.load(MODEL_PATH)
 
 # Load scaler
@@ -50,10 +50,8 @@ with open(FEATURES_PATH, 'r') as f:
 # We'll use a sample of training data as background
 print("Initializing SHAP explainer...")
 try:
-    # For tree-based models wrapped in Bagging, we use TreeExplainer on base estimators
-    # But for simplicity, use KernelExplainer with a background sample
-    background_sample = np.zeros((1, len(FEATURE_NAMES)))  # Will be replaced with real data
-    explainer = shap.KernelExplainer(model.predict_proba, background_sample)
+    # XGBoost is natively supported by SHAP TreeExplainer (fast + exact)
+    explainer = shap.TreeExplainer(model)
     SHAP_AVAILABLE = True
 except Exception as e:
     print(f"SHAP initialization warning: {e}")
@@ -147,7 +145,7 @@ def health_check():
     """Health check endpoint."""
     return jsonify({
         'status': 'healthy',
-        'model': 'xscaffold_bagging_model',
+        'model': 'xscaffold_xgboost_model',
         'features_count': len(FEATURE_NAMES),
         'classes': CLASS_NAMES,
         'shap_available': SHAP_AVAILABLE

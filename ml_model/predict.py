@@ -44,7 +44,7 @@ CLASS_NAMES = ['at_risk', 'developing', 'proficient', 'advanced']
 def load_model():
     """Load model and scaler."""
     
-    model_path = os.path.join(SCRIPT_DIR, 'xscaffold_bagging_model.pkl')
+    model_path = os.path.join(SCRIPT_DIR, 'xscaffold_xgboost_model.pkl')
     scaler_path = os.path.join(SCRIPT_DIR, 'xscaffold_scaler.pkl')
     
     if not os.path.exists(model_path):
@@ -65,7 +65,7 @@ def predict_single(features_dict: dict, model, scaler) -> dict:
     
     Args:
         features_dict: Dictionary with all 11 features
-        model: Trained Bagging Classifier
+        model: Trained XGBoost Classifier
         scaler: StandardScaler
     
     Returns:

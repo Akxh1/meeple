@@ -30,7 +30,7 @@ from generate_dataset import generate_dataset
 df = generate_dataset(n_students=2000, output_path="xscaffold_student_dataset.csv")
 
 # Step 2: Train Model
-print("\n[STEP 2/3] Training Model...")
+print("\n[STEP 2/3] Training XGBoost Classifier...")
 print("-" * 40)
 from train_model import main as train_main
 model, scaler, metrics = train_main()
@@ -68,7 +68,7 @@ print("SETUP COMPLETE!")
 print("=" * 60)
 print("\nFiles created:")
 print("  ✅ xscaffold_student_dataset.csv (2000 students)")
-print("  ✅ xscaffold_bagging_model.pkl")
+print("  ✅ xscaffold_xgboost_model.pkl")
 print("  ✅ xscaffold_scaler.pkl")
 print("  ✅ feature_names.json")
 print("  ✅ model_metrics.json")
