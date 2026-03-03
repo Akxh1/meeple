@@ -65,59 +65,125 @@ print(f"✅ Classes: {CLASS_NAMES}")
 # HELPER FUNCTIONS
 # ============================================================
 
-def format_shap_explanation(shap_values: np.ndarray, feature_names: list, prediction: int) -> dict:
+def format_shap_explanation(shap_values: np.ndarray, feature_names: list, 
+                             prediction: int, raw_features: list) -> dict:
     """
-    Format SHAP values into human-readable explanation.
+    Format SHAP values into human-readable explanation with domain awareness.
+    
+    Uses pedagogical thresholds from the LMS formula to classify features
+    as strengths or weaknesses, rather than relying on raw SHAP sign alone.
+    
+    Args:
+        shap_values: SHAP output array (1, n_features, n_classes)
+        feature_names: List of feature name strings
+        prediction: Predicted class index
+        raw_features: Original (unscaled) feature values in the same order
     
     Returns:
-        dict with feature contributions and natural language summary
+        dict matching Blade template schema:
+        {contributions: {feature: {value, contribution, description}},
+         top_positive: [...], top_negative: [...], natural_language: "..."}
     """
     
     # Get SHAP values for the predicted class
     class_shap_values = shap_values[0, :, prediction]
     
-    # Create feature contribution dict
+    # Feature descriptions for display (matching local fallback)
+    descriptions = {
+        'score_percentage': 'Percentage of correct answers',
+        'hard_question_accuracy': 'Accuracy on difficult questions',
+        'hint_usage_percentage': 'Percentage of questions where hints were used',
+        'avg_confidence': 'Mean self-reported confidence (1-5)',
+        'answer_changes_rate': 'Average answer changes per question',
+        'tab_switches_rate': 'Average tab switches per question',
+        'avg_time_per_question': 'Mean time spent per question (seconds)',
+        'review_percentage': 'Percentage of questions marked for review',
+        'avg_first_action_latency': 'Mean time to first interaction (seconds)',
+        'clicks_per_question': 'Average clicks per question',
+        'performance_trend': 'Accuracy change (2nd half - 1st half)',
+    }
+    
+    # Domain-aware thresholds from the LMS formula
+    # Each entry: (good_check, bad_check, value_format)
+    # good_check: lambda that returns True if the raw value is pedagogically good
+    # bad_check: lambda that returns True if the raw value is pedagogically bad
+    feature_semantics = {
+        # Higher = Better
+        'score_percentage':         (lambda v: v >= 70.0, lambda v: v < 50.0, lambda v: f"{round(v, 1)}%"),
+        'hard_question_accuracy':   (lambda v: v >= 60.0, lambda v: v < 40.0, lambda v: f"{round(v, 1)}%"),
+        'performance_trend':        (lambda v: v >= 5.0,  lambda v: v <= -10.0, lambda v: f"{'+' if v >= 0 else ''}{round(v, 1)}%"),
+        # Lower = Better (inverse)
+        'hint_usage_percentage':    (lambda v: v <= 20.0, lambda v: v >= 50.0, lambda v: f"{round(v, 1)}%"),
+        'answer_changes_rate':      (lambda v: v <= 0.3,  lambda v: v >= 1.0,  lambda v: f"{round(v, 2)}"),
+        'tab_switches_rate':        (lambda v: v <= 1.0,  lambda v: v >= 2.5,  lambda v: f"{round(v, 2)}"),
+        # Range = Best
+        'avg_time_per_question':    (lambda v: 30 <= v <= 120, lambda v: v < 30 or v > 120, lambda v: f"{round(v, 1)}s"),
+        'review_percentage':        (lambda v: 10 <= v <= 40,  lambda v: v < 10 or v > 40,  lambda v: f"{round(v, 1)}%"),
+        'avg_first_action_latency': (lambda v: 1 <= v <= 5,    lambda v: v < 1 or v > 5,    lambda v: f"{round(v, 1)}s"),
+        'clicks_per_question':      (lambda v: 2 <= v <= 8,    lambda v: v < 2 or v > 8,    lambda v: f"{round(v, 1)}"),
+        # Contextual (confidence depends on score alignment — simplified here)
+        'avg_confidence':           (lambda v: v >= 3.5,  lambda v: v < 2.0,  lambda v: f"{round(v, 1)}/5"),
+    }
+    
+    # Build contributions dict matching the Blade template schema
     contributions = {}
+    strengths = []
+    weaknesses = []
+    
     for i, name in enumerate(feature_names):
+        shap_val = float(class_shap_values[i])
+        raw_val = float(raw_features[i])
+        
+        semantics = feature_semantics.get(name)
+        if semantics:
+            is_good_fn, is_bad_fn, fmt_fn = semantics
+            formatted_value = fmt_fn(raw_val)
+            is_good = is_good_fn(raw_val)
+            is_bad = is_bad_fn(raw_val)
+        else:
+            formatted_value = str(round(raw_val, 2))
+            is_good = shap_val > 0
+            is_bad = shap_val < 0
+        
         contributions[name] = {
-            'value': float(class_shap_values[i]),
-            'direction': 'positive' if class_shap_values[i] > 0 else 'negative',
-            'magnitude': abs(float(class_shap_values[i]))
+            'value': formatted_value,
+            'contribution': round(shap_val, 3),
+            'description': descriptions.get(name, name.replace('_', ' ').title()),
         }
+        
+        # Classify as strength/weakness using domain thresholds
+        if is_good and not is_bad:
+            strengths.append((name, abs(shap_val)))
+        elif is_bad and not is_good:
+            weaknesses.append((name, abs(shap_val)))
     
-    # Sort by absolute magnitude
-    sorted_features = sorted(
-        contributions.items(), 
-        key=lambda x: x[1]['magnitude'], 
-        reverse=True
-    )
+    # Sort by SHAP magnitude and take top 3
+    strengths.sort(key=lambda x: x[1], reverse=True)
+    weaknesses.sort(key=lambda x: x[1], reverse=True)
     
-    # Get top 3 positive and negative contributors
-    positive_contributors = [
-        f for f, v in sorted_features if v['direction'] == 'positive'
-    ][:3]
-    
-    negative_contributors = [
-        f for f, v in sorted_features if v['direction'] == 'negative'
-    ][:3]
+    top_positive = [f for f, _ in strengths[:3]]
+    top_negative = [f for f, _ in weaknesses[:3]]
     
     # Generate natural language summary
     summary_parts = []
+    if top_positive:
+        pos_text = ", ".join([
+            f"{f} ({contributions[f]['value']})" for f in top_positive
+        ])
+        summary_parts.append(f"Strengths: {pos_text}")
     
-    if positive_contributors:
-        pos_text = ", ".join([f"{f} (+{contributions[f]['value']:.3f})" for f in positive_contributors])
-        summary_parts.append(f"Positive factors: {pos_text}")
-    
-    if negative_contributors:
-        neg_text = ", ".join([f"{f} ({contributions[f]['value']:.3f})" for f in negative_contributors])
+    if top_negative:
+        neg_text = ", ".join([
+            f"{f} ({contributions[f]['value']})" for f in top_negative
+        ])
         summary_parts.append(f"Areas for improvement: {neg_text}")
     
-    natural_language = ". ".join(summary_parts) + "."
+    natural_language = ". ".join(summary_parts) + "." if summary_parts else "Standard performance patterns observed."
     
     return {
         'contributions': contributions,
-        'top_positive': positive_contributors,
-        'top_negative': negative_contributors,
+        'top_positive': top_positive,
+        'top_negative': top_negative,
         'natural_language': natural_language
     }
 
@@ -225,7 +291,7 @@ def predict():
         try:
             shap_values = explainer.shap_values(features_scaled)
             explanation = format_shap_explanation(
-                shap_values, FEATURE_NAMES, prediction
+                shap_values, FEATURE_NAMES, prediction, features
             )
             response['explanation'] = explanation
         except Exception as e:
