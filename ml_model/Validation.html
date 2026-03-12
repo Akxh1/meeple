@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataset Validation Form - X-Scaffold Project</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            color: #000;
+            background-color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 40px;
+            border: 1px solid #000;
+        }
+
+        h1 {
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 24px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-top: 30px;
+            color: #000;
+            text-transform: uppercase;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            font-size: 15px;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            color: #000;
+        }
+
+        .project-details {
+            margin-bottom: 30px;
+        }
+
+        .info-row {
+            margin-bottom: 10px;
+        }
+
+        .label {
+            font-weight: bold;
+            width: 180px;
+            display: inline-block;
+        }
+
+        .dataset-summary {
+            background: #fff;
+            padding: 15px;
+            border: 1px solid #000;
+            margin: 20px 0;
+        }
+
+        .validation-section {
+            margin-top: 30px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .checkbox-box {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 1px solid #000;
+            margin-right: 15px;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .expert-info {
+            margin-top: 50px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .input-line {
+            border-bottom: 1px solid #000;
+            margin-top: 25px;
+            height: 25px;
+        }
+
+        .comment-box {
+            width: 100%;
+            height: 120px;
+            border: 1px solid #000;
+            margin-top: 10px;
+            box-sizing: border-box;
+        }
+
+        .comment-box-small {
+            width: 100%;
+            height: 70px;
+            border: 1px solid #000;
+            margin-top: 8px;
+            box-sizing: border-box;
+        }
+
+        .footer {
+            margin-top: 60px;
+            font-size: 12px;
+            text-align: center;
+            color: #000;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+        }
+
+        .rating-scale {
+            display: flex;
+            gap: 6px;
+            margin: 8px 0 4px 0;
+            align-items: center;
+        }
+
+        .rating-scale .rating-box {
+            display: inline-block;
+            width: 30px;
+            height: 22px;
+            border: 1px solid #000;
+            text-align: center;
+            font-size: 11px;
+            line-height: 22px;
+        }
+
+        .rating-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #555;
+            margin-top: 2px;
+            width: 218px;
+        }
+
+        .methodology-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 12px;
+        }
+
+        .methodology-table th,
+        .methodology-table td {
+            border: 1px solid #000;
+            padding: 6px 10px;
+            text-align: left;
+        }
+
+        .methodology-table th {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+
+        .sub-label {
+            font-weight: bold;
+            font-size: 13px;
+            margin-top: 14px;
+            margin-bottom: 6px;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        .confidentiality-note {
+            font-size: 11px;
+            font-style: italic;
+            color: #444;
+            margin-top: 8px;
+            padding: 8px;
+            border: 1px dashed #999;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .container {
+                border: none;
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Domain Expert Validation Form</h1>
+        <p style="text-align: center; font-style: italic;"> IPEA: Integrated Predict-Explain-Act Framework for Learning
+            Management Systems
+        </p>
+
+        <!-- SECTION 1: RESEARCHER & PROJECT INFO -->
+        <div class="project-details">
+            <h2>1. Researcher &amp; Project Information</h2>
+            <div class="info-row"><span class="label">Researcher Name:</span> Akssayan Kalaharan</div>
+            <div class="info-row"><span class="label">Project Title:</span> IPEA: Integrated Predict-Explain-Act
+                Framework for Learning Management Systems</div>
+            <div class="info-row"><span class="label">Supervisor:</span> Mrs. Dileeka Alwis</div>
+            <div class="info-row"><span class="label">Institution:</span> Informatics Institute of Technology,
+                in collaboration with University of Westminster</div>
+            <div class="info-row"><span class="label">Programme:</span> BEng (Hons) Software Engineering</div>
+            <div class="info-row"><span class="label">Date:</span>
+                ____________________________________
+            </div>
+        </div>
+
+        <!-- SECTION 2: DATASET SPECIFICATION -->
+        <div class="dataset-summary">
+            <h2>2. Dataset &amp; Methodology Summary</h2>
+            <p>The researcher has developed a synthetic training dataset for an adaptive learning
+                classification model. The expert is asked to validate the methodology and assumptions described
+                below.</p>
+
+            <table class="methodology-table">
+                <tr>
+                    <th style="width: 35%;">Aspect</th>
+                    <th>Detail</th>
+                </tr>
+                <tr>
+                    <td><strong>Data Source</strong></td>
+                    <td>Custom-built Mock Exam Application capturing real-time student interactions</td>
+                </tr>
+                <tr>
+                    <td><strong>Real Data Collected</strong></td>
+                    <td>77 unique student records (collected Dec 2025 &ndash; Feb 2026)</td>
+                </tr>
+                <tr>
+                    <td><strong>Synthetic Expansion</strong></td>
+                    <td>2,000 records generated via <strong>Cholesky Decomposition</strong> on the real
+                        correlation matrix</td>
+                </tr>
+                <tr>
+                    <td><strong>Features</strong></td>
+                    <td>11 behavioural features (6 core Tier 1 + 5 additional Tier 2 predictors)</td>
+                </tr>
+                <tr>
+                    <td><strong>Target Variable</strong></td>
+                    <td>Learning Mastery Score (LMS) &rarr; 4-class classification (At-Risk, Developing,
+                        Proficient, Advanced)</td>
+                </tr>
+                <tr>
+                    <td><strong>LMS Formula</strong></td>
+                    <td>Hybrid: literature-based weights refined via 4 unsupervised data-driven methods (PCA,
+                        Entropy, Factor Analysis, CRITIC)</td>
+                </tr>
+                <tr>
+                    <td><strong>ML Model</strong></td>
+                    <td>XGBoost Classifier - 90.75% test accuracy, 5-fold stratified CV</td>
+                </tr>
+            </table>
+
+            <div class="confidentiality-note">
+                <strong>Note:</strong> A comprehensive pipeline documentation
+                (<em>DATA_PIPELINE_DOCUMENTATION.html</em>) has been provided separately for detailed review
+                before completing this form.
+            </div>
+        </div>
+
+        <!-- SECTION 3: VALIDATION CHECKLIST -->
+        <div class="validation-section">
+            <h2>3. Validation Checklist</h2>
+            <p>I, the undersigned domain expert, confirm that I have reviewed the data pipeline documentation
+                and the items listed below. Please tick (&check;) where you agree:</p>
+
+            <h3>3.1 Data Collection Instrument</h3>
+            <div style="margin-left: 10px;">
+                <div class="checkbox-item"><span class="checkbox-box"></span> The Mock Exam Application is a
+                    suitable instrument for capturing authentic student behavioural data.</div>
+                <div class="checkbox-item"><span class="checkbox-box"></span> The 11 selected features
+                    (score, hint usage, confidence, tab switches, etc.) are relevant and appropriate for
+                    modelling student performance and mastery.</div>
+            </div>
+
+            <h3>3.2 Synthetic Data Generation Technique</h3>
+            <div style="margin-left: 10px;">
+                <div class="checkbox-item"><span class="checkbox-box"></span> Cholesky Decomposition is a
+                    methodologically sound technique for expanding the dataset from 77 real records to 2,000
+                    synthetic records while preserving inter-feature correlations.</div>
+                <div class="checkbox-item"><span class="checkbox-box"></span> The synthetic dataset maintains
+                    realistic statistical properties (means, standard deviations, correlation structure)
+                    suitable for training purposes.</div>
+            </div>
+
+            <h3>3.3 Learning Mastery Score (LMS) Formula</h3>
+            <div style="margin-left: 10px;">
+                <div class="checkbox-item"><span class="checkbox-box"></span> The hybrid approach to LMS
+                    weight derivation (combining literature-based and data-driven methods) is a sound
+                    methodology.</div>
+                <div class="checkbox-item"><span class="checkbox-box"></span> The 4-level mastery
+                    classification (At-Risk, Developing, Proficient, Advanced) is appropriate for this
+                    educational context.</div>
+            </div>
+
+            <h3>3.4 Overall Dataset Validity</h3>
+            <div style="margin-left: 10px;">
+                <div class="checkbox-item"><span class="checkbox-box"></span> The overall dataset generation
+                    pipeline is logically sound and suitable for training an ML model in this
+                    domain.</div>
+                <div class="checkbox-item"><span class="checkbox-box"></span> The dataset is appropriate for
+                    use in a research context to validate the Predict, Explain, Act
+                    framework.</div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: RATING SCALES -->
+        <div class="validation-section">
+            <h2>4. Expert Assessment Ratings</h2>
+            <p>Please rate the following on a scale of 1 (Poor) to 5 (Excellent):</p>
+
+            <div class="sub-label">a) Relevance of selected features to student mastery prediction:</div>
+            <div class="rating-scale">
+                <div class="rating-box">1</div>
+                <div class="rating-box">2</div>
+                <div class="rating-box">3</div>
+                <div class="rating-box">4</div>
+                <div class="rating-box">5</div>
+            </div>
+            <div class="rating-labels"><span>Poor</span><span>Fair</span><span>Good</span><span>Very
+                    Good</span><span>Excellent</span></div>
+
+            <div class="sub-label">b) Appropriateness of the synthetic data generation technique:</div>
+            <div class="rating-scale">
+                <div class="rating-box">1</div>
+                <div class="rating-box">2</div>
+                <div class="rating-box">3</div>
+                <div class="rating-box">4</div>
+                <div class="rating-box">5</div>
+            </div>
+            <div class="rating-labels"><span>Poor</span><span>Fair</span><span>Good</span><span>Very
+                    Good</span><span>Excellent</span></div>
+
+            <div class="sub-label">c) Soundness of the LMS formula derivation methodology:</div>
+            <div class="rating-scale">
+                <div class="rating-box">1</div>
+                <div class="rating-box">2</div>
+                <div class="rating-box">3</div>
+                <div class="rating-box">4</div>
+                <div class="rating-box">5</div>
+            </div>
+            <div class="rating-labels"><span>Poor</span><span>Fair</span><span>Good</span><span>Very
+                    Good</span><span>Excellent</span></div>
+
+            <div class="sub-label">d) Overall suitability of the dataset for the stated research
+                purpose:</div>
+            <div class="rating-scale">
+                <div class="rating-box">1</div>
+                <div class="rating-box">2</div>
+                <div class="rating-box">3</div>
+                <div class="rating-box">4</div>
+                <div class="rating-box">5</div>
+            </div>
+            <div class="rating-labels"><span>Poor</span><span>Fair</span><span>Good</span><span>Very
+                    Good</span><span>Excellent</span></div>
+        </div>
+
+        <!-- SECTION 5: COMMENTS (PAGE 2) -->
+        <div class="validation-section page-break">
+            <h2>5. Expert Comments &amp; Recommendations</h2>
+
+            <div class="sub-label">a) Are there any features that should be added or removed? Please
+                explain:</div>
+            <div class="comment-box-small"></div>
+
+            <div class="sub-label">b) Any concerns about the synthetic data generation approach?</div>
+            <div class="comment-box-small"></div>
+
+            <div class="sub-label">c) Suggestions for improving the LMS formula or mastery classification:</div>
+            <div class="comment-box-small"></div>
+
+            <div class="sub-label">d) General comments or observations:</div>
+            <div class="comment-box"></div>
+        </div>
+
+        <!-- SECTION 6: EXPERT DECLARATION -->
+        <div class="validation-section">
+            <h2>6. Expert Declaration &amp; Signature</h2>
+            <p>I confirm that I have reviewed the dataset documentation and methodology presented, and the
+                above represents my professional assessment.</p>
+
+            <div class="expert-info">
+                <div>
+                    <p>Expert Name:</p>
+                    <div class="input-line"></div>
+                    <p>Designation / Title:</p>
+                    <div class="input-line"></div>
+                    <p>Organisation / Institution:</p>
+                    <div class="input-line"></div>
+                    <p>Area of Expertise:</p>
+                    <div class="input-line"></div>
+                </div>
+                <div>
+                    <p>Date of Validation:</p>
+                    <div class="input-line"></div>
+                    <p>Contact Email (optional):</p>
+                    <div class="input-line"></div>
+                    <p>Signature:</p>
+                    <div class="input-line" style="margin-top: 65px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            X-Scaffold Research Project | Domain Expert Validation Form<br>
+            Generated for Final Year Degree Research Project Validation Purposes &bull; March 2026
+        </div>
+
+
+    </div>
+
+</body>
+
+</html>

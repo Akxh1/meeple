@@ -417,4 +417,96 @@ class DashboardController extends Controller
         
         return back()->with('success', 'Module settings updated successfully!');
     }
+
+    /**
+     * Export student feature data as CSV for ML retraining.
+     * Supports: ?module=all (default) or ?module={id} for per-module export.
+     */
+    public function exportData(Request $request)
+    {
+        $moduleFilter = $request->get('module', 'all');
+
+        // Build query
+        $query = StudentModulePerformance::with(['student', 'module']);
+
+        if ($moduleFilter !== 'all') {
+            $query->where('module_id', (int) $moduleFilter);
+        }
+
+        $performances = $query->orderBy('module_id')->orderBy('student_id')->get();
+
+        // Determine filename
+        if ($moduleFilter !== 'all' && $performances->isNotEmpty()) {
+            $moduleName = str_replace(' ', '_', strtolower($performances->first()->module->name));
+            $filename = "xscaffold_pipeline_data_{$moduleName}_" . now()->format('Y-m-d') . '.csv';
+        } else {
+            $filename = 'xscaffold_pipeline_data_all_modules_' . now()->format('Y-m-d') . '.csv';
+        }
+
+        // CSV headers
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+        ];
+
+        $columns = [
+            'student_id',
+            'student_name',
+            'module_name',
+            // Tier 1: Core 6 Features
+            'score_percentage',
+            'hard_question_accuracy',
+            'hint_usage_percentage',
+            'avg_confidence',
+            'answer_changes_rate',
+            'tab_switches_rate',
+            // Tier 2: 5 ML Predictor Features
+            'avg_time_per_question',
+            'review_percentage',
+            'avg_first_action_latency',
+            'clicks_per_question',
+            'performance_trend',
+            // ML Outputs
+            'learning_mastery_score',
+            'mastery_level',
+            'ml_prediction_confidence',
+            'prediction_source',
+            'recorded_at',
+        ];
+
+        $callback = function () use ($performances, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($performances as $perf) {
+                fputcsv($file, [
+                    $perf->student->student_id ?? '',
+                    $perf->student->name ?? '',
+                    $perf->module->name ?? '',
+                    $perf->score_percentage,
+                    $perf->hard_question_accuracy,
+                    $perf->hint_usage_percentage,
+                    $perf->avg_confidence,
+                    $perf->answer_changes_rate,
+                    $perf->tab_switches_rate,
+                    $perf->avg_time_per_question,
+                    $perf->review_percentage,
+                    $perf->avg_first_action_latency,
+                    $perf->clicks_per_question,
+                    $perf->performance_trend,
+                    $perf->learning_mastery_score,
+                    $perf->mastery_level,
+                    $perf->ml_prediction_confidence,
+                    $perf->prediction_source,
+                    $perf->created_at?->toDateTimeString(),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

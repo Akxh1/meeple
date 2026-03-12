@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-Scaffold — Data Pipeline &amp; Synthetic Generation Methodology</title>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --accent: #2b6cb0;
+            --accent-light: #ebf4ff;
+            --success: #276749;
+            --success-bg: #f0fff4;
+            --warn-bg: #fffff0;
+            --text: #2d3748;
+            --muted: #718096;
+            --border: #e2e8f0;
+            --bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Times New Roman", Georgia, serif;
+            line-height: 1.7;
+            color: var(--text);
+            background: #f0f4f8;
+        }
+
+        .container {
+            max-width: 920px;
+            margin: 30px auto;
+            background: var(--bg);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            border-radius: 4px;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 40px 50px 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-family: Arial, sans-serif;
+            font-size: 22pt;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        header .subtitle {
+            font-family: Arial, sans-serif;
+            font-size: 13pt;
+            color: #bee3f8;
+            font-weight: normal;
+        }
+
+        header .meta {
+            margin-top: 15px;
+            font-size: 10pt;
+            color: #a0bfe0;
+        }
+
+        .content {
+            padding: 40px 50px;
+        }
+
+        .abstract {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            padding: 18px 22px;
+            margin-bottom: 35px;
+            font-style: italic;
+            font-size: 11pt;
+        }
+
+        h2 {
+            font-family: Arial, sans-serif;
+            font-size: 16pt;
+            color: var(--primary);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 6px;
+            margin: 35px 0 15px;
+        }
+
+        h3 {
+            font-family: Arial, sans-serif;
+            font-size: 13pt;
+            color: var(--primary);
+            margin: 22px 0 10px;
+        }
+
+        h4 {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            color: #4a5568;
+            margin: 15px 0 8px;
+        }
+
+        p {
+            margin-bottom: 14px;
+            text-align: justify;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-family: Arial, sans-serif;
+            font-size: 9.5pt;
+        }
+
+        th,
+        td {
+            border: 1px solid #cbd5e0;
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #f7fafc;
+        }
+
+        ul,
+        ol {
+            margin: 10px 0 14px 22px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        code {
+            font-family: "Courier New", monospace;
+            background: #edf2f7;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        .formula-box {
+            background: #f7fafc;
+            border: 1px dashed #a0aec0;
+            padding: 16px;
+            text-align: center;
+            font-family: "Courier New", monospace;
+            font-size: 11pt;
+            margin: 16px 0;
+            border-radius: 4px;
+        }
+
+        .formula-box.final {
+            background: var(--success-bg);
+            border-color: var(--success);
+        }
+
+        .highlight-box {
+            padding: 16px 20px;
+            border-radius: 4px;
+            margin: 16px 0;
+        }
+
+        .highlight-box.info {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+        }
+
+        .highlight-box.success {
+            background: var(--success-bg);
+            border-left: 4px solid var(--success);
+        }
+
+        .highlight-box.warn {
+            background: var(--warn-bg);
+            border-left: 4px solid #d69e2e;
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: flex-start;
+            margin: 14px 0;
+            gap: 14px;
+        }
+
+        .step-num {
+            background: var(--accent);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 20px;
+            color: var(--accent);
+            margin: 4px 0;
+        }
+
+        footer {
+            background: #f7fafc;
+            border-top: 1px solid var(--border);
+            padding: 20px 50px;
+            text-align: center;
+            font-size: 9.5pt;
+            color: var(--muted);
+        }
+
+        /* ===== VISUAL PIPELINE DIAGRAM STYLES ===== */
+        .diagram-container {
+            background: #f7fafc;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 30px 20px;
+            margin: 20px 0 28px;
+            overflow-x: auto;
+        }
+
+        .diagram-title {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .diagram-caption {
+            font-family: Arial, sans-serif;
+            font-size: 8.5pt;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 14px;
+            font-style: italic;
+        }
+
+        /* Horizontal flow */
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0;
+        }
+
+        .flow-node {
+            background: white;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 10px 14px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 8.5pt;
+            min-width: 100px;
+            max-width: 140px;
+            position: relative;
+        }
+
+        .flow-node.highlight {
+            background: var(--accent);
+            color: white;
+            font-weight: bold;
+        }
+
+        .flow-node.phase1-only {
+            background: #fff5f5;
+            border-color: #c53030;
+            color: #c53030;
+        }
+
+        .flow-node.phase2-only {
+            background: var(--success-bg);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .flow-node .node-label {
+            font-weight: 700;
+            font-size: 9pt;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .flow-node .node-detail {
+            font-size: 7.5pt;
+            color: var(--muted);
+        }
+
+        .flow-node.highlight .node-detail {
+            color: #bee3f8;
+        }
+
+        .flow-node.phase1-only .node-detail {
+            color: #fc8181;
+        }
+
+        .flow-node.phase2-only .node-detail {
+            color: #68d391;
+        }
+
+        .flow-arrow {
+            font-size: 18px;
+            color: var(--accent);
+            padding: 0 6px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .flow-arrow.down {
+            display: block;
+            text-align: center;
+            padding: 4px 0;
+            font-size: 20px;
+        }
+
+        /* Vertical stacked flow */
+        .flow-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+
+        .flow-vertical .flow-node {
+            min-width: 280px;
+            max-width: 400px;
+        }
+
+        /* Side-by-side comparison */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin: 16px 0;
+        }
+
+        .comparison-col {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 18px;
+        }
+
+        .comparison-col.phase1 {
+            border-color: #c53030;
+        }
+
+        .comparison-col.phase2 {
+            border-color: var(--success);
+        }
+
+        .comparison-col h4 {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin: 0 0 14px;
+            font-size: 10pt;
+        }
+
+        .comparison-col.phase1 h4 {
+            background: #fff5f5;
+            color: #c53030;
+        }
+
+        .comparison-col.phase2 h4 {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        /* PEA circular diagram */
+        .pea-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin: 20px 0;
+        }
+
+        .pea-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+        }
+
+        .pea-circle.predict {
+            background: linear-gradient(135deg, #2b6cb0, #1a365d);
+        }
+
+        .pea-circle.explain {
+            background: linear-gradient(135deg, #d69e2e, #b7791f);
+        }
+
+        .pea-circle.act {
+            background: linear-gradient(135deg, #276749, #22543d);
+        }
+
+        .pea-circle .pea-letter {
+            font-size: 26pt;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .pea-circle .pea-label {
+            font-size: 8pt;
+            margin-top: 2px;
+            font-weight: 600;
+        }
+
+        .pea-circle .pea-tech {
+            font-size: 6.5pt;
+            margin-top: 3px;
+            opacity: 0.85;
+        }
+
+        .pea-arrow {
+            font-size: 24px;
+            color: var(--muted);
+            font-weight: bold;
+        }
+
+        /* Feedback loop arrow */
+        .feedback-loop {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 8.5pt;
+            color: var(--muted);
+            margin: 8px 0;
+            padding: 8px;
+            border: 1px dashed var(--border);
+            border-radius: 4px;
+            background: #fafbfc;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .container {
+                box-shadow: none;
+                margin: 0;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>X-SCAFFOLD DATA PIPELINE DOCUMENTATION</h1>
+            <div class="subtitle">Synthetic Dataset Generation Methodology for Expert Validation</div>
+            <div class="meta">
+                Project: Predict&ndash;Explain&ndash;Act Framework for Intelligent LMS<br>
+                Prepared for: Domain Expert Validation Meeting &bull; March 2026<br>
+                Document Version: 3.0
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="abstract">
+                <strong>Purpose:</strong> This document provides a comprehensive, transparent account of how real
+                student data
+                (initially N&asymp;55, now N=77) was collected, processed, and scaled to a synthetic training dataset
+                (N=2,000)
+                using Cholesky decomposition. It is intended for domain expert review to validate the techniques,
+                assumptions,
+                and methodological decisions made throughout the pipeline.
+            </div>
+
+            <!-- ============ SECTION 1: OVERVIEW ============ -->
+            <h2>1. Pipeline Overview</h2>
+            <p>The complete data pipeline transforms a small set of real student interaction records into a
+                statistically
+                grounded synthetic dataset suitable for training a mastery-level classification model. The pipeline
+                comprises
+                five major stages:</p>
+
+            <div class="pipeline-step">
+                <div class="step-num">1</div>
+                <div class="step-content"><strong>Real Data Collection</strong> &mdash; 77 student records from a custom
+                    Mock Exam Application</div>
+            </div>
+            <div class="arrow">&darr;</div>
+            <div class="pipeline-step">
+                <div class="step-num">2</div>
+                <div class="step-content"><strong>Exploratory Data Analysis</strong> &mdash; Feature selection,
+                    correlation analysis, and statistical profiling</div>
+            </div>
+            <div class="arrow">&darr;</div>
+            <div class="pipeline-step">
+                <div class="step-num">3</div>
+                <div class="step-content"><strong>Synthetic Data Generation</strong> &mdash; Cholesky decomposition on
+                    the real correlation matrix &rarr; 2,000 records</div>
+            </div>
+            <div class="arrow">&darr;</div>
+            <div class="pipeline-step">
+                <div class="step-num">4</div>
+                <div class="step-content"><strong>Target Variable Construction</strong> &mdash; Hybrid LMS formula
+                    (literature + data-driven) &rarr; mastery classification</div>
+            </div>
+            <div class="arrow">&darr;</div>
+            <div class="pipeline-step">
+                <div class="step-num">5</div>
+                <div class="step-content"><strong>Model Training &amp; Validation</strong> &mdash; XGBoost Classifier
+                    with 5-fold stratified cross-validation</div>
+            </div>
+
+            <!-- ============ SECTION 2: REAL DATA ============ -->
+            <h2>2. Real Data Collection</h2>
+
+            <h3>2.1. The Data Collection Instrument</h3>
+            <p>Real-world behavioural data was captured using a purpose-built <strong>Mock Exam Application</strong>
+                &mdash;
+                a web-based assessment tool designed to simulate a high-stakes exam environment. Unlike standard quizzes
+                that
+                record only final answers, this instrument logged granular behavioural interactions in real time:</p>
+            <ul>
+                <li><strong>Temporal Dynamics:</strong> Time per question, hesitation latencies, total duration</li>
+                <li><strong>Navigation Patterns:</strong> Tab switching frequency, answer revision rates, question
+                    review markings</li>
+                <li><strong>Cognitive States:</strong> Self-reported confidence ratings (1&ndash;5 Likert scale) and
+                    hint usage patterns</li>
+                <li><strong>Performance Metrics:</strong> Score percentage, hard question accuracy, performance trend
+                    (1st vs 2nd half)</li>
+            </ul>
+
+            <h3>2.2. Data Collection Batches: From 55 to 77 Real Records</h3>
+            <p>Data was collected in two batches from participants (primarily university students) who voluntarily took
+                the mock exam:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Batch</th>
+                        <th>Source File</th>
+                        <th>Records</th>
+                        <th>Period</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Batch 1</strong></td>
+                        <td><code>student_research_data.csv</code></td>
+                        <td>51</td>
+                        <td>Dec 2025 &ndash; Jan 2026</td>
+                        <td>Initial collection round (~55 unique participants after accounting for retakes)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Batch 2</strong></td>
+                        <td><code>student_research_data_2.csv</code></td>
+                        <td>57</td>
+                        <td>Dec 2025 &ndash; Feb 2026</td>
+                        <td>Expanded dataset: includes Batch 1 + new participants (Feb 2026 additions), bringing unique
+                            total to <strong>77</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box info">
+                <strong>How 55 became 77:</strong> The initial real dataset contained approximately 55 unique student
+                records
+                (Batch 1). A second round of data collection in February 2026 added approximately 22 new participants,
+                bringing
+                the total unique real data pool to <strong>77 records</strong>. Batch 2
+                (<code>student_research_data_2.csv</code>)
+                is the combined superset used as the statistical basis for synthetic generation.
+            </div>
+
+            <h3>2.3. The 11 Collected Features</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Type</th>
+                        <th>Range</th>
+                        <th>Tier</th>
+                        <th>Research Justification</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>score_percentage</code></td>
+                        <td>Float</td>
+                        <td>0&ndash;100</td>
+                        <td>1</td>
+                        <td>Primary performance indicator (Pardos &amp; Baker, 2014)</td>
+                    </tr>
+                    <tr>
+                        <td><code>hard_question_accuracy</code></td>
+                        <td>Float</td>
+                        <td>0&ndash;100</td>
+                        <td>1</td>
+                        <td>Deep understanding proxy (Chi et al., 2018)</td>
+                    </tr>
+                    <tr>
+                        <td><code>hint_usage_percentage</code></td>
+                        <td>Float</td>
+                        <td>0&ndash;100</td>
+                        <td>1</td>
+                        <td>Independence indicator (Aleven et al., 2016)</td>
+                    </tr>
+                    <tr>
+                        <td><code>avg_confidence</code></td>
+                        <td>Float</td>
+                        <td>1&ndash;5</td>
+                        <td>1</td>
+                        <td>Metacognitive awareness (Tobias &amp; Everson, 2002)</td>
+                    </tr>
+                    <tr>
+                        <td><code>answer_changes_rate</code></td>
+                        <td>Float</td>
+                        <td>0&ndash;5</td>
+                        <td>1</td>
+                        <td>Knowledge stability (Shute, 2008)</td>
+                    </tr>
+                    <tr>
+                        <td><code>tab_switches_rate</code></td>
+                        <td>Float</td>
+                        <td>0&ndash;10</td>
+                        <td>1</td>
+                        <td>Attention &amp; focus (Baker et al., 2004)</td>
+                    </tr>
+                    <tr>
+                        <td><code>avg_time_per_question</code></td>
+                        <td>Float</td>
+                        <td>1&ndash;300s</td>
+                        <td>2</td>
+                        <td>Processing speed (D&rsquo;Mello &amp; Graesser, 2012)</td>
+                    </tr>
+                    <tr>
+                        <td><code>review_percentage</code></td>
+                        <td>Float</td>
+                        <td>0&ndash;100</td>
+                        <td>2</td>
+                        <td>Metacognitive monitoring strategy</td>
+                    </tr>
+                    <tr>
+                        <td><code>avg_first_action_latency</code></td>
+                        <td>Float</td>
+                        <td>0.5&ndash;60s</td>
+                        <td>2</td>
+                        <td>Cognitive load indicator (Sweller, 2011)</td>
+                    </tr>
+                    <tr>
+                        <td><code>clicks_per_question</code></td>
+                        <td>Float</td>
+                        <td>1&ndash;50</td>
+                        <td>2</td>
+                        <td>Engagement intensity (Cocea &amp; Weibelzahl, 2009)</td>
+                    </tr>
+                    <tr>
+                        <td><code>performance_trend</code></td>
+                        <td>Float</td>
+                        <td>-1 to 1</td>
+                        <td>2</td>
+                        <td>Fatigue vs improvement (Roscoe et al., 2014)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>Tier 1</strong> (6 features) are used directly in the LMS formula. <strong>Tier 2</strong> (5
+                features)
+                are additional ML predictors that enhance model accuracy but are not part of the deterministic LMS
+                calculation.</p>
+
+            <!-- ============ SECTION 3: SYNTHETIC GEN ============ -->
+            <h2>3. Synthetic Data Generation: 77 Real &rarr; 2,000 Synthetic</h2>
+
+            <h3>3.1. Why Synthetic Data?</h3>
+            <ul>
+                <li><strong>Insufficient Real Data:</strong> 77 records are too few to train a robust multi-class ML
+                    classifier
+                    (typical minimum: 500&ndash;2,000).</li>
+                <li><strong>Privacy Protection:</strong> Synthetic data contains no identifiable individual records.
+                </li>
+                <li><strong>Class Balance Control:</strong> Enables producing balanced representation across mastery
+                    levels.</li>
+            </ul>
+
+            <h3>3.2. Technique: Cholesky Decomposition</h3>
+            <p>The <strong>Cholesky Decomposition</strong> method was chosen because it preserves the exact
+                inter-feature
+                correlation structure observed in the real data. This means the synthetic students exhibit the same
+                realistic
+                relationships between features as real students (e.g., students who use more hints typically take longer
+                per
+                question and have lower confidence).</p>
+
+            <h4>Step-by-Step Process:</h4>
+
+            <div class="pipeline-step">
+                <div class="step-num">1</div>
+                <div class="step-content"><strong>Extract Statistics from Real Data:</strong> Calculate the mean (&mu;),
+                    standard deviation (&sigma;), and full Pearson correlation matrix (R) from all 11 features across
+                    all real records.</div>
+            </div>
+            <div class="arrow">&darr;</div>
+            <div class="pipeline-step">
+                <div class="step-num">2</div>
+                <div class="step-content"><strong>Regularise Correlation Matrix:</strong> Add a small regularisation
+                    term (0.001 &times; I) for numerical stability and positive-definiteness: R' = R + 0.001 &times; I
+                </div>
+            </div>
+            <div class="arrow">&darr;</div>
+            <div class="pipeline-step">
+                <div class="step-num">3</div>
+                <div class="step-content"><strong>Cholesky Decomposition:</strong> Decompose R' into a lower-triangular
+                    matrix L such that R' = L &times; L<sup>T</sup>. This matrix L encodes all inter-feature
+                    correlations.</div>
+            </div>
+            <div class="arrow">&darr;</div>
+            <div class="pipeline-step">
+                <div class="step-num">4</div>
+                <div class="step-content"><strong>Generate Uncorrelated Samples:</strong> Draw 2,000 &times; 11 random
+                    samples from a standard normal distribution N(0,1). These are independent, uncorrelated values.
+                </div>
+            </div>
+            <div class="arrow">&darr;</div>
+            <div class="pipeline-step">
+                <div class="step-num">5</div>
+                <div class="step-content"><strong>Induce Correlations:</strong> Multiply uncorrelated samples by
+                    L<sup>T</sup> to produce correlated samples: X<sub>correlated</sub> = X<sub>uncorrelated</sub>
+                    &times; L<sup>T</sup></div>
+            </div>
+            <div class="arrow">&darr;</div>
+            <div class="pipeline-step">
+                <div class="step-num">6</div>
+                <div class="step-content"><strong>Scale to Original Distribution:</strong> Transform from N(0,1) to real
+                    data&rsquo;s distribution: X<sub>final</sub> = X<sub>correlated</sub> &times; &sigma; + &mu;</div>
+            </div>
+            <div class="arrow">&darr;</div>
+            <div class="pipeline-step">
+                <div class="step-num">7</div>
+                <div class="step-content"><strong>Apply Realistic Constraints:</strong> Clip each feature to its valid
+                    domain range (e.g., score_percentage: 0&ndash;100, avg_confidence: 1&ndash;5) and round to 2 decimal
+                    places.</div>
+            </div>
+
+            <div class="formula-box">
+                R' = R + 0.001I &nbsp;&nbsp;&rarr;&nbsp;&nbsp; L = cholesky(R') &nbsp;&nbsp;&rarr;&nbsp;&nbsp;
+                X<sub>synth</sub> = (Z &times; L<sup>T</sup>) &times; &sigma; + &mu;
+            </div>
+
+            <div class="highlight-box success">
+                <strong>Why Cholesky over SMOTE or GANs?</strong><br>
+                &bull; <strong>SMOTE</strong> interpolates between existing samples &mdash; requires a class label
+                beforehand and can create outliers at class boundaries.<br>
+                &bull; <strong>GANs</strong> require much larger datasets to train the generator/discriminator and are
+                prone to mode collapse.<br>
+                &bull; <strong>Cholesky</strong> is deterministic, reproducible (seed=42), preserves exact correlation
+                structure, and works well with small N. It is the standard approach in educational data mining for
+                small-sample augmentation.
+            </div>
+
+            <h3>3.3. Validation of Synthetic Fidelity</h3>
+            <p>After generation, the synthetic dataset is validated by comparing:</p>
+            <ul>
+                <li><strong>Mean/Std Alignment:</strong> Synthetic means and standard deviations closely match real
+                    data.</li>
+                <li><strong>Correlation Matrix Preservation:</strong> The synthetic 11&times;11 correlation matrix
+                    mirrors the real one (core guarantee of Cholesky).</li>
+                <li><strong>LMS Distribution Comparison:</strong> Real vs synthetic mean LMS is compared for
+                    consistency.</li>
+            </ul>
+
+            <!-- ============ SECTION 4: LMS ============ -->
+            <h2>4. Target Variable: Learning Mastery Score (LMS)</h2>
+
+            <h3>4.1. Three-Stage Formula Derivation</h3>
+            <p>The LMS formula &mdash; converting 11 raw features into a single mastery score &mdash; was developed
+                through
+                a rigorous three-stage process:</p>
+
+            <h4>Stage 1: Literature-Based Formula (Initial)</h4>
+            <div class="formula-box">
+                LMS<sub>initial</sub> = 0.50(S) + 0.15(Hd) + 10(C<sub>cal</sub>) + 10(K<sub>s</sub>) + 10(A<sub>f</sub>)
+                &minus; 15(Hu)<sup>1.5</sup>
+            </div>
+            <p>Each weight is justified by specific research papers (Pardos &amp; Baker 2014, Chi et al. 2018, Aleven et
+                al. 2016, Tobias &amp; Everson 2002, Baker et al. 2004).</p>
+
+            <h4>Stage 2: Data-Driven Correlation Analysis (N=56 Real Students)</h4>
+            <p>Since no ground-truth LMS exists (the formula itself defines mastery), supervised regression would be
+                circular.
+                Instead, <strong>four unsupervised methods</strong> were applied to derive empirical feature weights:
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>PCA</th>
+                        <th>Entropy</th>
+                        <th>Factor Analysis</th>
+                        <th>CRITIC</th>
+                        <th>Composite</th>
+                        <th>Direction</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>hard_question_accuracy</td>
+                        <td>27.5%</td>
+                        <td>28.5%</td>
+                        <td>31.9%</td>
+                        <td>18.4%</td>
+                        <td><strong>26.6%</strong></td>
+                        <td>Positive &uarr;</td>
+                    </tr>
+                    <tr>
+                        <td>score_percentage</td>
+                        <td>27.4%</td>
+                        <td>25.6%</td>
+                        <td>31.7%</td>
+                        <td>17.7%</td>
+                        <td><strong>25.6%</strong></td>
+                        <td>Positive &uarr;</td>
+                    </tr>
+                    <tr>
+                        <td>avg_confidence</td>
+                        <td>16.5%</td>
+                        <td>23.2%</td>
+                        <td>12.9%</td>
+                        <td>13.4%</td>
+                        <td><strong>16.5%</strong></td>
+                        <td>Positive &uarr;</td>
+                    </tr>
+                    <tr>
+                        <td>tab_switches_rate</td>
+                        <td>20.5%</td>
+                        <td>5.3%</td>
+                        <td>17.0%</td>
+                        <td>17.8%</td>
+                        <td><strong>15.2%</strong></td>
+                        <td>Negative &darr;</td>
+                    </tr>
+                    <tr>
+                        <td>hint_usage_percentage</td>
+                        <td>6.2%</td>
+                        <td>13.4%</td>
+                        <td>5.0%</td>
+                        <td>19.6%</td>
+                        <td><strong>11.0%</strong></td>
+                        <td>Negative &darr;</td>
+                    </tr>
+                    <tr>
+                        <td>answer_changes_rate</td>
+                        <td>1.9%</td>
+                        <td>3.9%</td>
+                        <td>1.5%</td>
+                        <td>13.1%</td>
+                        <td><strong>5.1%</strong></td>
+                        <td>Negative &darr;</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Bootstrap resampling (n=1,000) confirmed weight stability despite moderate sample size.</p>
+
+            <h4>Stage 3: Refined Hybrid Formula (Production)</h4>
+            <div class="formula-box final">
+                LMS<sub>hybrid</sub> = 0.30(S) + 0.25(Hd &times; 100) + 15(C<sub>cal</sub>) + 15(A<sub>f</sub>) &minus;
+                10(Hu) &minus; 5(A<sub>c</sub>)
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Literature</th>
+                        <th>Data-Driven</th>
+                        <th>Hybrid</th>
+                        <th>Rationale</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Score (S)</td>
+                        <td>0.50</td>
+                        <td>25.6%</td>
+                        <td><strong>0.30</strong></td>
+                        <td>Data: S and Hd near-equal; reduced dominance</td>
+                    </tr>
+                    <tr>
+                        <td>Hard Accuracy (Hd)</td>
+                        <td>0.15</td>
+                        <td>26.6%</td>
+                        <td><strong>0.25</strong></td>
+                        <td>#1 differentiator across all 4 methods; elevated</td>
+                    </tr>
+                    <tr>
+                        <td>Calibration (C<sub>cal</sub>)</td>
+                        <td>&times;10</td>
+                        <td>16.5%</td>
+                        <td><strong>&times;15</strong></td>
+                        <td>Metacognitive weight increased per data</td>
+                    </tr>
+                    <tr>
+                        <td>Attention (A<sub>f</sub>)</td>
+                        <td>&times;10</td>
+                        <td>15.2%</td>
+                        <td><strong>&times;15</strong></td>
+                        <td>r=0.50 with hard accuracy &mdash; stronger than expected</td>
+                    </tr>
+                    <tr>
+                        <td>Hint Usage (Hu)</td>
+                        <td>-15&times;Hu<sup>1.5</sup></td>
+                        <td>11.0%</td>
+                        <td><strong>-10&times;Hu</strong></td>
+                        <td>Lower impact than literature; simplified to linear</td>
+                    </tr>
+                    <tr>
+                        <td>Answer Changes (A<sub>c</sub>)</td>
+                        <td>&times;10</td>
+                        <td>5.1%</td>
+                        <td><strong>-5&times;A<sub>c</sub></strong></td>
+                        <td>75% near-zero variance; lowest discriminator</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box success">
+                <strong>Validation:</strong> All six features maintain the <strong>same positive/negative
+                    direction</strong>
+                across both literature and data-driven analyses, confirming empirical soundness of the theoretical
+                framework.
+            </div>
+
+            <h3>4.2. Mastery Level Classification</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Level</th>
+                        <th>Code</th>
+                        <th>LMS Range</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="color:#c53030">&#x1F534; At-Risk</td>
+                        <td>0</td>
+                        <td>0 &ndash; 35</td>
+                        <td>Significant struggle, immediate support needed</td>
+                    </tr>
+                    <tr>
+                        <td style="color:#c05621">&#x1F7E0; Developing</td>
+                        <td>1</td>
+                        <td>36 &ndash; 55</td>
+                        <td>Partial understanding, moderate support</td>
+                    </tr>
+                    <tr>
+                        <td style="color:#2b6cb0">&#x1F535; Proficient</td>
+                        <td>2</td>
+                        <td>56 &ndash; 75</td>
+                        <td>Good understanding, occasional guidance</td>
+                    </tr>
+                    <tr>
+                        <td style="color:#276749">&#x1F7E2; Advanced</td>
+                        <td>3</td>
+                        <td>76 &ndash; 100</td>
+                        <td>Excellent mastery, minimal intervention</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============ SECTION 5: MODEL ============ -->
+            <h2>5. Model Training &amp; Validation</h2>
+
+            <h3>5.1. Model: XGBoost Classifier</h3>
+            <p>Selected after comprehensive model comparison testing (Feb 2026) over multiple architectures (Linear,
+                Bagging,
+                Boosting). XGBoost was chosen for: superior accuracy (91.0%), critical at-risk F1 score (90.5%), and
+                native
+                SHAP TreeExplainer compatibility for the Explainable AI layer.</p>
+
+            <h3>5.2. Training Pipeline</h3>
+            <div class="pipeline-step">
+                <div class="step-num">1</div>
+                <div class="step-content">Load <code>xscaffold_student_dataset.csv</code> (2,000 synthetic records)
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">2</div>
+                <div class="step-content">80/20 stratified train/test split</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">3</div>
+                <div class="step-content">Feature scaling using StandardScaler</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">4</div>
+                <div class="step-content">Train XGBoost (50 estimators, max_depth=8, learning_rate=0.1)</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">5</div>
+                <div class="step-content">Evaluate with 5-fold Stratified Cross-Validation</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">6</div>
+                <div class="step-content">Feature importance analysis (Gini + Permutation)</div>
+            </div>
+
+            <h3>5.3. Results</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Test Accuracy</td>
+                        <td><strong>90.75%</strong></td>
+                    </tr>
+                    <tr>
+                        <td>F1 Macro</td>
+                        <td>0.899</td>
+                    </tr>
+                    <tr>
+                        <td>Cross-Validation Mean</td>
+                        <td>90.5% (&plusmn;1.97%)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Class</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>F1</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>At-Risk</td>
+                        <td>0.950</td>
+                        <td>0.864</td>
+                        <td>0.905</td>
+                    </tr>
+                    <tr>
+                        <td>Developing</td>
+                        <td>0.918</td>
+                        <td>0.937</td>
+                        <td>0.927</td>
+                    </tr>
+                    <tr>
+                        <td>Proficient</td>
+                        <td>0.907</td>
+                        <td>0.937</td>
+                        <td>0.922</td>
+                    </tr>
+                    <tr>
+                        <td>Advanced</td>
+                        <td>0.884</td>
+                        <td>0.803</td>
+                        <td>0.841</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>5.4. Feature Importance (Trained Model)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Feature</th>
+                        <th>XGBoost Importance</th>
+                        <th>Permutation Importance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>score_percentage</td>
+                        <td>39.8%</td>
+                        <td>39.4%</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>hard_question_accuracy</td>
+                        <td>15.3%</td>
+                        <td>16.8%</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>hint_usage_percentage</td>
+                        <td>13.3%</td>
+                        <td>12.3%</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>avg_confidence</td>
+                        <td>10.2%</td>
+                        <td>7.2%</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>clicks_per_question</td>
+                        <td>4.0%</td>
+                        <td>0.3%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============ SECTION 6: PHASE 1 ============== -->
+            <h2>6. Phase 1: Bootstrapping Architecture (Current Research Phase)</h2>
+            <p>
+                To overcome the &ldquo;cold start&rdquo; problem inherent in educational AI (lacking thousands of fully annotated student records on day one), the current architecture relies on synthetic generation and a formulaic target label. This phase proves that the underlying <strong>Predict &rarr; Explain &rarr; Act</strong> framework is technically viable.
+            </p>
+
+            <div class="highlight-box info">
+                <strong>77 Real Students</strong> (Mock Exam App)
+                &nbsp;&rarr;&nbsp; <strong>11 Behavioural Features</strong>
+                &nbsp;&rarr;&nbsp; <strong>Cholesky Decomposition</strong> (preserves correlations)
+                &nbsp;&rarr;&nbsp; <strong>2,000 Synthetic Records</strong>
+                &nbsp;&rarr;&nbsp; <strong>Hybrid LMS Formula</strong> (acting as the oracle)
+                &nbsp;&rarr;&nbsp; <strong>XGBoost Classifier</strong> (90.75% accuracy)
+            </div>
+
+            <h3>6.1. Phase 1 Pipeline Flowchart</h3>
+            <div class="diagram-container">
+                <div class="diagram-title">Figure P1: Phase 1 &mdash; Bootstrapping Data Pipeline (Current)</div>
+                <div class="flow-row">
+                    <div class="flow-node phase1-only">
+                        <span class="node-label">Real Data</span>
+                        <span class="node-detail">77 students via Mock Exam App</span>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node">
+                        <span class="node-label">EDA</span>
+                        <span class="node-detail">Correlation matrix, statistical profiling</span>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node phase1-only">
+                        <span class="node-label">Cholesky</span>
+                        <span class="node-detail">77 &rarr; 2,000 synthetic records</span>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node phase1-only">
+                        <span class="node-label">LMS Formula</span>
+                        <span class="node-detail">Hybrid oracle target variable</span>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node highlight">
+                        <span class="node-label">XGBoost</span>
+                        <span class="node-detail">Train &amp; validate (90.75%)</span>
+                    </div>
+                </div>
+                <div class="diagram-caption">
+                    <span style="color:#c53030;">&FilledSmallSquare;</span> Red-bordered nodes are <strong>Phase 1 only</strong> &mdash; removed in production.
+                    Blue-bordered nodes persist across both phases.
+                </div>
+            </div>
+
+            <!-- ============ SECTION 7: PHASE 2 ============== -->
+            <h2>7. Phase 2: Reusable Production Pipeline (Future Roadmap)</h2>
+            <p>
+                In a true production environment, the synthetic data generation and the formulaic target variable are <strong>completely removed</strong>. The pipeline becomes a self-sustaining loop powered by real-time data and continuous, organic learning. 
+            </p>
+            <p>
+                While the formulaic target (Phase 1) is rigid and requires complete data, the Machine Learning model acts as a robust <em>Surrogate Model</em>. It learns complex, non-linear interactions between variables (e.g., high scores combined with high latencies) which a fixed formula misses, and it can resiliently generate predictions even if real-time data streams drop certain telemetry features. 
+            </p>
+
+            <h3>7.1. The Predict &rarr; Explain &rarr; Act Core Loop</h3>
+
+            <!-- PEA Circular Diagram -->
+            <div class="diagram-container">
+                <div class="diagram-title">Figure P2: The Predict &rarr; Explain &rarr; Act (PEA) Core Loop</div>
+                <div class="pea-diagram">
+                    <div class="pea-circle predict">
+                        <span class="pea-letter">P</span>
+                        <span class="pea-label">PREDICT</span>
+                        <span class="pea-tech">XGBoost + Flask API</span>
+                    </div>
+                    <span class="pea-arrow">&rarr;</span>
+                    <div class="pea-circle explain">
+                        <span class="pea-letter">E</span>
+                        <span class="pea-label">EXPLAIN</span>
+                        <span class="pea-tech">SHAP TreeExplainer</span>
+                    </div>
+                    <span class="pea-arrow">&rarr;</span>
+                    <div class="pea-circle act">
+                        <span class="pea-letter">A</span>
+                        <span class="pea-label">ACT</span>
+                        <span class="pea-tech">LLM Adaptive Hints</span>
+                    </div>
+                </div>
+                <div class="feedback-loop">
+                    &#8635; <strong>Continuous Learning Loop:</strong> Each new student record feeds back into the production database &rarr; periodic model retraining with real ground truth
+                </div>
+                <div class="diagram-caption">The three pillars of the IPEA framework, forming a self-reinforcing cycle.</div>
+            </div>
+
+            <h3>7.2. Production Data Flow</h3>
+            <div class="pipeline-step">
+                <div class="step-num">P</div>
+                <div class="step-content"><strong>Predict (Real-Time Inference):</strong> A student finishes a mock exam. The Laravel backend aggregates their raw telemetry into an 11-feature vector and sends it to the Flask ML API. The XGBoost model immediately evaluates the vector and returns a Mastery Level prediction (e.g., <em>At-Risk</em>).</div>
+            </div>
+            <div class="arrow">&darr;</div>
+            <div class="pipeline-step">
+                <div class="step-num">E</div>
+                <div class="step-content"><strong>Explain (SHAP Context):</strong> The same 11-feature vector is passed through the SHAP <code>TreeExplainer</code>. It generates a local explainability payload detailing exactly <em>why</em> the prediction was made (e.g., &ldquo;Hint usage was unusually high (80%) and latency was above average&rdquo;).</div>
+            </div>
+            <div class="arrow">&darr;</div>
+            <div class="pipeline-step">
+                <div class="step-num">A</div>
+                <div class="step-content"><strong>Act (LLM Intervention):</strong> The Mastery Level and the SHAP context are sent to the Large Language Model. Using the specific weaknesses identified by SHAP, the LLM generates a highly personalised, adaptive hint targeted precisely at the student&rsquo;s behavioural deficits.</div>
+            </div>
+            <div class="arrow">&darr;</div>
+            <div class="pipeline-step">
+                <div class="step-num">&#8635;</div>
+                <div class="step-content"><strong>Continuous Learning Loop:</strong> The new, authentic student record is saved to the production database. As hundreds of students use the system, the dataset grows organically. Periodically, the formulaic target will be replaced by <em>actual end-of-year exam results</em> (ground truth), and the XGBoost model will be retrained, shedding all reliance on Phase 1 methodology.</div>
+            </div>
+
+            <h3>7.3. Phase 2 Production Pipeline Flowchart</h3>
+            <div class="diagram-container">
+                <div class="diagram-title">Figure P3: Phase 2 &mdash; Reusable Production Pipeline (No Synthetic Data)</div>
+                <div class="flow-vertical">
+                    <div class="flow-node phase2-only" style="min-width:380px;">
+                        <span class="node-label">&starf; Student Takes Mock Exam</span>
+                        <span class="node-detail">Real-time behavioural telemetry captured by the application</span>
+                    </div>
+                    <span class="flow-arrow down">&darr;</span>
+                    <div class="flow-node" style="min-width:380px;">
+                        <span class="node-label">Feature Aggregation (Laravel)</span>
+                        <span class="node-detail">Raw logs &rarr; 11-feature vector (score, hints, confidence, tabs&hellip;)</span>
+                    </div>
+                    <span class="flow-arrow down">&darr;</span>
+                    <div class="flow-node highlight" style="min-width:380px;">
+                        <span class="node-label">XGBoost Inference (Flask API)</span>
+                        <span class="node-detail">11-feature vector &rarr; Mastery Level (At-Risk / Developing / Proficient / Advanced)</span>
+                    </div>
+                    <span class="flow-arrow down">&darr;</span>
+                    <div class="flow-node" style="min-width:380px; border-color:#d69e2e;">
+                        <span class="node-label">SHAP TreeExplainer</span>
+                        <span class="node-detail">Local explainability &rarr; per-feature contribution payload</span>
+                    </div>
+                    <span class="flow-arrow down">&darr;</span>
+                    <div class="flow-node phase2-only" style="min-width:380px;">
+                        <span class="node-label">LLM Adaptive Hint Generation</span>
+                        <span class="node-detail">Mastery Level + SHAP context &rarr; personalised scaffolding hint</span>
+                    </div>
+                    <span class="flow-arrow down">&darr;</span>
+                    <div class="flow-node" style="min-width:380px; border-style:dashed;">
+                        <span class="node-label">&#8635; Save to Production DB</span>
+                        <span class="node-detail">Real record stored &rarr; grows dataset organically &rarr; periodic retraining</span>
+                    </div>
+                </div>
+                <div class="diagram-caption">
+                    <span style="color:#276749;">&FilledSmallSquare;</span> Green-bordered nodes are <strong>new in Phase 2</strong>.
+                    Dashed border indicates the continuous learning feedback loop.
+                </div>
+            </div>
+
+            <!-- ============ SECTION 7.4: COMPARISON ============== -->
+            <h3>7.4. Phase 1 vs Phase 2: Side-by-Side Comparison</h3>
+            <div class="diagram-container">
+                <div class="diagram-title">Figure P4: Architectural Comparison &mdash; Bootstrapping vs Production</div>
+                <div class="comparison-grid">
+                    <div class="comparison-col phase1">
+                        <h4>&cross; Phase 1: Bootstrapping</h4>
+                        <div class="flow-vertical">
+                            <div class="flow-node phase1-only"><span class="node-label">77 Real Records</span></div>
+                            <span class="flow-arrow down">&darr;</span>
+                            <div class="flow-node phase1-only"><span class="node-label">Cholesky &rarr; 2,000 Synthetic</span></div>
+                            <span class="flow-arrow down">&darr;</span>
+                            <div class="flow-node phase1-only"><span class="node-label">LMS Formula (Oracle)</span></div>
+                            <span class="flow-arrow down">&darr;</span>
+                            <div class="flow-node highlight"><span class="node-label">Train XGBoost</span></div>
+                            <span class="flow-arrow down">&darr;</span>
+                            <div class="flow-node"><span class="node-label">Deploy Model (.pkl)</span></div>
+                        </div>
+                    </div>
+                    <div class="comparison-col phase2">
+                        <h4>&check; Phase 2: Production</h4>
+                        <div class="flow-vertical">
+                            <div class="flow-node phase2-only"><span class="node-label">Live Student Exam</span></div>
+                            <span class="flow-arrow down">&darr;</span>
+                            <div class="flow-node"><span class="node-label">11-Feature Vector</span></div>
+                            <span class="flow-arrow down">&darr;</span>
+                            <div class="flow-node highlight"><span class="node-label">XGBoost Predict</span></div>
+                            <span class="flow-arrow down">&darr;</span>
+                            <div class="flow-node" style="border-color:#d69e2e;"><span class="node-label">SHAP Explain</span></div>
+                            <span class="flow-arrow down">&darr;</span>
+                            <div class="flow-node phase2-only"><span class="node-label">LLM Adaptive Hint</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="feedback-loop">
+                    &#8635; <strong>Phase 2 Continuous Loop:</strong> Real records accumulate &rarr; formulaic target replaced by <em>actual exam outcomes</em> &rarr; model retrained quarterly on authentic data only
+                </div>
+                <div class="diagram-caption">Red = Phase 1 only (discarded). Green = Phase 2 only (new). Blue = persists across both phases.</div>
+            </div>
+
+            <h3>7.5. System Architecture: End-to-End Data Flow</h3>
+            <div class="diagram-container">
+                <div class="diagram-title">Figure P5: Complete System Architecture &mdash; Data Flow Across Components</div>
+                <div class="flow-row" style="margin-bottom:10px;">
+                    <div class="flow-node phase2-only" style="max-width:160px;">
+                        <span class="node-label">&starf; Student</span>
+                        <span class="node-detail">Takes mock exam in browser</span>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node" style="max-width:160px;">
+                        <span class="node-label">React Frontend</span>
+                        <span class="node-detail">Captures clicks, times, hints, tabs</span>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node" style="max-width:160px;">
+                        <span class="node-label">Laravel API</span>
+                        <span class="node-detail">Aggregates into 11-feature vector</span>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node highlight" style="max-width:160px;">
+                        <span class="node-label">Flask ML API</span>
+                        <span class="node-detail">XGBoost + SHAP</span>
+                    </div>
+                </div>
+                <div class="flow-row">
+                    <div class="flow-node" style="max-width:160px;border-color:#d69e2e;">
+                        <span class="node-label">SHAP Payload</span>
+                        <span class="node-detail">Per-feature contributions</span>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node phase2-only" style="max-width:160px;">
+                        <span class="node-label">LLM (Gemini)</span>
+                        <span class="node-detail">Generates adaptive hint</span>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node" style="max-width:160px;">
+                        <span class="node-label">Results Page</span>
+                        <span class="node-detail">Mastery + SHAP chart + hint</span>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node" style="max-width:160px;border-style:dashed;">
+                        <span class="node-label">&#8635; Database</span>
+                        <span class="node-detail">Store for retraining loop</span>
+                    </div>
+                </div>
+                <div class="diagram-caption">Two-row layout showing the complete request lifecycle from student interaction to adaptive intervention and continuous learning.</div>
+            </div>
+
+            <!-- ============ SECTION 8: INVENTORY ============== -->
+            <h2>8. File Inventory</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>student_research_data.csv</code></td>
+                        <td>Batch 1 real data (51 records)</td>
+                    </tr>
+                    <tr>
+                        <td><code>student_research_data_2.csv</code></td>
+                        <td>Batch 2 real data (57 records, superset with new participants)</td>
+                    </tr>
+                    <tr>
+                        <td><code>generate_dataset.py</code></td>
+                        <td>Cholesky-based synthetic generation script</td>
+                    </tr>
+                    <tr>
+                        <td><code>xscaffold_student_dataset.csv</code></td>
+                        <td>Final synthetic dataset (2,000 records)</td>
+                    </tr>
+                    <tr>
+                        <td><code>train_model.py</code></td>
+                        <td>XGBoost training pipeline</td>
+                    </tr>
+                    <tr>
+                        <td><code>xscaffold_xgboost_model.pkl</code></td>
+                        <td>Trained model artifact</td>
+                    </tr>
+                    <tr>
+                        <td><code>xscaffold_scaler.pkl</code></td>
+                        <td>StandardScaler for inference</td>
+                    </tr>
+                    <tr>
+                        <td><code>api.py</code></td>
+                        <td>Flask API serving predictions + SHAP explanations</td>
+                    </tr>
+                    <tr>
+                        <td><code>testing/lms_weight_derivation.py</code></td>
+                        <td>Data-driven weight derivation (PCA, Entropy, Factor, CRITIC)</td>
+                    </tr>
+                    <tr>
+                        <td><code>testing/model_comparison.py</code></td>
+                        <td>Multi-model comparison testing</td>
+                    </tr>
+                    <tr>
+                        <td><code>testing/stress_test.py</code></td>
+                        <td>Robustness and sensitivity testing</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============ SECTION 9: LIMITATIONS ============ -->
+            <h2>9. Methodological Considerations &amp; Limitations</h2>
+            <ul>
+                <li><strong>Small Real Sample Size (N=77):</strong> While Cholesky faithfully preserves correlations, the estimated correlation matrix from 77 records has inherent sampling uncertainty. Bootstrap validation (n=1,000) confirms weight stability.</li>
+                <li><strong>Gaussian Assumption:</strong> Cholesky decomposition assumes multivariate normality. Some features (e.g., hint_usage_percentage) may have skewed distributions. Clipping to valid ranges mitigates unrealistic tail values.</li>
+                <li><strong>No Ground Truth for LMS (Phase 1):</strong> The mastery score is a constructed metric, not externally validated. The unsupervised data-driven analysis (Stage 2) provides empirical grounding but cannot replace external criterion validation (Phase 2).</li>
+                <li><strong>Synthetic &ne; Real:</strong> The synthetic data preserves first and second-order statistics (means, correlations) but may not capture higher-order patterns, multimodal distributions, or rare outlier behaviours present in real data.</li>
+                <li><strong>Reproducibility:</strong> Random seed is fixed at 42, ensuring deterministic output. Re-running the script produces identical results.</li>
+            </ul>
+
+            <!-- ============ SECTION 10: REFERENCES ============ -->
+            <h2>10. References</h2>
+            <ol>
+                <li>Pardos, Z. A., &amp; Baker, R. S. (2014). Affective states and state tests. <em>Journal of Learning
+                        Analytics, 1</em>(1), 107-128.</li>
+                <li>Chi, M., et al. (2018). Translating a cognitive theory to the classroom. <em>Educational Psychology
+                        Review, 30</em>(3), 839-866.</li>
+                <li>Aleven, V., et al. (2016). Help seeking and help design in interactive learning environments.
+                    <em>Review of Educational Research, 86</em>(1), 227-268.</li>
+                <li>Tobias, S., &amp; Everson, H. T. (2002). Knowing what you know and what you don&rsquo;t. <em>College
+                        Board Research Report No. 2002-3</em>.</li>
+                <li>Baker, R. S., et al. (2004). Off-task behavior in the cognitive tutor classroom. <em>SIGCHI</em>,
+                    383-390.</li>
+                <li>Shute, V. J. (2008). Focus on formative feedback. <em>Review of Educational Research, 78</em>(1),
+                    153-189.</li>
+                <li>Jolliffe, I. T. (2002). <em>Principal Component Analysis</em> (2nd ed.). Springer.</li>
+                <li>Shannon, C. E. (1948). A Mathematical Theory of Communication. <em>Bell System Technical Journal,
+                        27</em>(3), 379-423.</li>
+                <li>Diakoulaki, D., et al. (1995). The CRITIC method. <em>Computers &amp; Operations Research,
+                        22</em>(7), 763-770.</li>
+                <li>Hair, J. F., et al. (2019). <em>Multivariate Data Analysis</em> (8th ed.). Cengage Learning.</li>
+                <li>Chen, T., &amp; Guestrin, C. (2016). XGBoost: A Scalable Tree Boosting System. <em>ACM SIGKDD</em>,
+                    785-794.</li>
+                <li>D&rsquo;Mello, S., &amp; Graesser, A. (2012). Dynamics of affective states during complex learning.
+                    <em>Learning and Instruction</em>.</li>
+            </ol>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 X-Scaffold Research Project. All Rights Reserved.</p>
+            <p><em>Document prepared for domain expert validation &mdash; March 2026 (v3.0)</em></p>
+        </footer>
+    </div>
+</body>
+
+</html>

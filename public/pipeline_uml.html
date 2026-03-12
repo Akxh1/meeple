@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-Scaffold Reusable Data Pipeline — UML Diagram</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #818cf8, #a78bfa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+        }
+        .diagram-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .diagram-card h2 {
+            font-size: 1.3rem;
+            color: #e2e8f0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .badge {
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-activity { background: #4f46e5; color: #fff; }
+        .badge-component { background: #0891b2; color: #fff; }
+        .badge-sequence { background: #059669; color: #fff; }
+        .plantuml-img {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            border-radius: 8px;
+            background: #fff;
+            padding: 10px;
+        }
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: #0f172a;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            font-size: 0.85rem;
+        }
+        .legend-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .note {
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(99, 102, 241, 0.08);
+            border-left: 3px solid #6366f1;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            color: #a5b4fc;
+            line-height: 1.6;
+        }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab {
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #475569;
+            background: transparent;
+            color: #94a3b8;
+            transition: all 0.2s;
+        }
+        .tab.active, .tab:hover {
+            background: #4f46e5;
+            color: #fff;
+            border-color: #4f46e5;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        @media print {
+            body { background: #fff; color: #000; padding: 20px; }
+            .diagram-card { border: 1px solid #ccc; box-shadow: none; }
+            .plantuml-img { border: 1px solid #eee; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>X-Scaffold Predict-Explain-Act Pipeline</h1>
+        <p class="subtitle">UML Diagrams — Reusable Data Pipeline Architecture</p>
+
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('activity')">Activity Diagram</button>
+            <button class="tab" onclick="showTab('component')">Component Diagram</button>
+            <button class="tab" onclick="showTab('sequence')">Sequence Diagram</button>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- 1) ACTIVITY DIAGRAM — Full Pipeline Flow -->
+        <!-- ======================================================== -->
+        <div id="activity" class="tab-content active">
+            <div class="diagram-card">
+                <h2><span class="badge badge-activity">Activity</span> End-to-End Pipeline Flow</h2>
+                <img class="plantuml-img" id="activityImg" alt="Activity Diagram — X-Scaffold Pipeline">
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-dot" style="background:#4f46e5"></div> Data Collection (LMS)</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#059669"></div> ML Prediction (Flask / Fallback)</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div> XAI — SHAP Explanation</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div> Adaptive Hint Generation (Gemini)</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#0891b2"></div> Data Persistence & CSV Export</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- 2) COMPONENT DIAGRAM — System Architecture -->
+        <!-- ======================================================== -->
+        <div id="component" class="tab-content">
+            <div class="diagram-card">
+                <h2><span class="badge badge-component">Component</span> System Architecture</h2>
+                <img class="plantuml-img" id="componentImg" alt="Component Diagram — X-Scaffold Architecture">
+                <div class="note">
+                    <strong>Reusable Pipeline Design:</strong> The system persists all 11 ML features to the database after every exam attempt.
+                    Instructors can export this data as CSV (module-wise or combined) for model retraining.
+                    As real classroom data accumulates, the pipeline supports downstream ML iterations without re-engineering.
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- 3) SEQUENCE DIAGRAM — Predict-Explain-Act -->
+        <!-- ======================================================== -->
+        <div id="sequence" class="tab-content">
+            <div class="diagram-card">
+                <h2><span class="badge badge-sequence">Sequence</span> Predict → Explain → Act Lifecycle</h2>
+                <img class="plantuml-img" id="sequenceImg" alt="Sequence Diagram — Predict-Explain-Act">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // PlantUML Encoding (deflate + base64)
+        // We use the PlantUML server to render diagrams from encoded text
+        // ============================================================
+
+        // PlantUML text encoder helpers
+        function encode64(data) {
+            let r = "";
+            for (let i = 0; i < data.length; i += 3) {
+                if (i + 2 == data.length) {
+                    r += append3bytes(data.charCodeAt(i), data.charCodeAt(i + 1), 0);
+                } else if (i + 1 == data.length) {
+                    r += append3bytes(data.charCodeAt(i), 0, 0);
+                } else {
+                    r += append3bytes(data.charCodeAt(i), data.charCodeAt(i + 1), data.charCodeAt(i + 2));
+                }
+            }
+            return r;
+        }
+
+        function append3bytes(b1, b2, b3) {
+            let c1 = b1 >> 2;
+            let c2 = ((b1 & 0x3) << 4) | (b2 >> 4);
+            let c3 = ((b2 & 0xF) << 2) | (b3 >> 6);
+            let c4 = b3 & 0x3F;
+            return encode6bit(c1 & 0x3F) + encode6bit(c2 & 0x3F) + encode6bit(c3 & 0x3F) + encode6bit(c4 & 0x3F);
+        }
+
+        function encode6bit(b) {
+            if (b < 10) return String.fromCharCode(48 + b);
+            b -= 10;
+            if (b < 26) return String.fromCharCode(65 + b);
+            b -= 26;
+            if (b < 26) return String.fromCharCode(97 + b);
+            b -= 26;
+            if (b == 0) return '-';
+            if (b == 1) return '_';
+            return '?';
+        }
+
+        function compress(s) {
+            // Use deflate via pako if available
+            if (typeof pako !== 'undefined') {
+                var data = pako.deflateRaw(unescape(encodeURIComponent(s)));
+                // data is Uint8Array — use array indexing, not charCodeAt
+                let r = "";
+                for (let i = 0; i < data.length; i += 3) {
+                    let b1 = data[i], b2 = data[i+1] || 0, b3 = data[i+2] || 0;
+                    r += append3bytes(b1, b2, b3);
+                }
+                return r;
+            }
+            // Fallback: use PlantUML's ~h hex encoding (works without pako)
+            var encoded = unescape(encodeURIComponent(s));
+            var hex = "";
+            for (var i = 0; i < encoded.length; i++) {
+                hex += encoded.charCodeAt(i).toString(16).padStart(2, '0');
+            }
+            return "~h" + hex;
+        }
+
+        function plantUmlUrl(uml) {
+            return "https://www.plantuml.com/plantuml/svg/" + compress(uml);
+        }
+
+        // ============================================================
+        // Diagram Definitions
+        // ============================================================
+
+        const activityUML = `@startuml
+!theme cyborg
+skinparam backgroundColor #1e293b
+skinparam ActivityBackgroundColor #334155
+skinparam ActivityBorderColor #6366f1
+skinparam ActivityFontColor #e2e8f0
+skinparam ArrowColor #94a3b8
+skinparam PartitionBorderColor #475569
+skinparam PartitionFontColor #e2e8f0
+skinparam NoteBorderColor #6366f1
+skinparam NoteFontColor #e2e8f0
+skinparam NoteBackgroundColor #1e1b4b
+
+title X-Scaffold Predict-Explain-Act Pipeline
+
+|#334155| Student |
+|#1e3a5f| Laravel Backend |
+|#1a3328| Flask ML API |
+|#3b1f1f| Gemini LLM API |
+|#1e293b| Database |
+
+|Student|
+start
+:Start Level Indicator Exam;
+:Answer 10 stratified questions;
+:Frontend extracts 11 features;
+:Submit exam;
+
+|Laravel Backend|
+:Score exam answers;
+:Calculate hard_question_accuracy;
+:Calculate performance_trend;
+:Create LevelIndicatorAttempt;
+:Upsert StudentModulePerformance;
+:Call MLPredictionService;
+
+if (Flask API available?) then (yes)
+  |Flask ML API|
+  :Receive 11 features;
+  :StandardScaler.transform();
+  :XGBoost.predict();
+  :SHAP TreeExplainer;
+  :Return prediction + explanation;
+  |Laravel Backend|
+  :Map ML level to LMS score;
+  :Store SHAP values;
+  :prediction_source = flask_api;
+else (fallback)
+  |Laravel Backend|
+  :Local LMS formula;
+  :Classify mastery level;
+  :Generate local SHAP analysis;
+  :prediction_source = local_fallback;
+endif
+
+|Database|
+:Save to student_module_performance;
+
+note right
+  11 features + LMS + mastery_level
+  + SHAP values + XAI explanation
+  + prediction_source
+end note
+
+|Student|
+:View Results page;
+
+note right
+  **PREDICT** phase complete
+end note
+
+:Start Mock Exam;
+:Request adaptive hint;
+
+|Laravel Backend|
+:HintController reads\\nStudentModulePerformance;
+
+if (Has Level Indicator data?) then (yes)
+  :Build personalised prompt\\nwith SHAP + behavioural data;
+  :Map mastery to scaffold tier;
+else (no data)
+  :Build generic one-liner prompt;
+endif
+
+|Gemini LLM API|
+:Generate adaptive scaffolded hint;
+:Return hint text;
+
+|Student|
+:Display personalised hint;
+
+note right
+  **EXPLAIN + ACT** complete
+end note
+
+#a78bfa:=== REUSABLE PIPELINE ===\nExport and Retrain;
+
+:Instructor opens Dashboard;
+
+|Laravel Backend|
+:DashboardController loads all records;
+:Instructor clicks Export Data;
+:exportData() streams CSV;
+
+|Database|
+:Query student_module_performance;
+
+|Student|
+:Download CSV for ML retraining;
+
+note right
+  **RETRAIN** loop:
+  CSV -> retrain XGBoost
+  -> redeploy Flask API
+end note
+
+stop
+@enduml`;
+
+        const componentUML = `@startuml
+!theme cyborg
+skinparam backgroundColor #1e293b
+skinparam ComponentBackgroundColor #334155
+skinparam ComponentBorderColor #6366f1
+skinparam ComponentFontColor #e2e8f0
+skinparam ArrowColor #94a3b8
+skinparam PackageBorderColor #475569
+skinparam PackageFontColor #a5b4fc
+skinparam InterfaceBorderColor #6366f1
+skinparam DatabaseBackgroundColor #1e3a5f
+skinparam DatabaseBorderColor #3b82f6
+
+title X-Scaffold System Architecture — Component Diagram
+
+package "Frontend (React + Inertia.js)" {
+  [Mock Exam UI] as MockUI
+  [Level Indicator Exam UI] as LevelUI
+  [Student Dashboard] as StudentDash
+  [Instructor Dashboard] as InstructorDash
+  [Hint Display Widget] as HintWidget
+  [SHAP Visualization] as ShapViz
+}
+
+package "Laravel Backend (MVC)" {
+  [LevelIndicatorExamController] as LevelCtrl
+  [MockExamController] as MockCtrl
+  [HintController] as HintCtrl
+  [DashboardController] as DashCtrl
+  [MLPredictionService] as MLService
+  [GeminiInsightsService] as GeminiService
+}
+
+package "ML Microservice (Flask)" {
+  [api.py — /predict] as FlaskPredict
+  [XGBoost Classifier] as XGBoost
+  [StandardScaler] as Scaler
+  [SHAP TreeExplainer] as ShapEngine
+}
+
+package "External APIs" {
+  [Google Gemini 2.5 Flash] as Gemini
+}
+
+database "MySQL" {
+  [student_module_performance] as PerfTable
+  [level_indicator_attempts] as AttemptTable
+  [students] as StudentTable
+  [modules] as ModuleTable
+  [questions + answers] as QATable
+}
+
+cloud "CSV Export" {
+  [xscaffold_pipeline_data.csv] as CSVFile
+}
+
+' Frontend → Backend
+LevelUI --> LevelCtrl : Submit exam\\n(answers + 11 features)
+MockUI --> MockCtrl : Start mock exam
+MockUI --> HintCtrl : Request hint\\n(POST /generate-hint)
+StudentDash --> DashCtrl : View performance
+InstructorDash --> DashCtrl : View all students\\n+ Export CSV
+
+' Backend → Services
+LevelCtrl --> MLService : predictWithFallback()
+HintCtrl --> MLService : masteryToHintLevel()
+DashCtrl --> GeminiService : generateStudentInsights()
+
+' ML Service → Flask API
+MLService --> FlaskPredict : POST /predict\\n(11 features JSON)
+FlaskPredict --> Scaler : transform(features)
+Scaler --> XGBoost : predict(scaled)
+XGBoost --> ShapEngine : shap_values(scaled)
+
+' ML Service → HintController → Gemini
+HintCtrl --> Gemini : Personalised prompt\\n(SHAP + behavioural data)
+
+' Backend → Database
+LevelCtrl --> AttemptTable : Create attempt
+LevelCtrl --> PerfTable : Upsert performance
+DashCtrl --> PerfTable : Read all records
+DashCtrl --> CSVFile : Stream CSV download
+
+' Display
+HintWidget <-- HintCtrl : Adaptive hint (HTML)
+ShapViz <-- LevelCtrl : SHAP contributions
+
+' Return data
+FlaskPredict --> MLService : {prediction, explanation}
+Gemini --> HintCtrl : Generated hint text
+@enduml`;
+
+        const sequenceUML = `@startuml
+!theme cyborg
+skinparam backgroundColor #1e293b
+skinparam SequenceLifeLineBorderColor #6366f1
+skinparam SequenceArrowColor #94a3b8
+skinparam ParticipantBackgroundColor #334155
+skinparam ParticipantBorderColor #6366f1
+skinparam ParticipantFontColor #e2e8f0
+skinparam SequenceGroupBackgroundColor #1e1b4b
+skinparam SequenceGroupBorderColor #6366f1
+
+title Predict → Explain → Act Sequence
+
+actor Student as S
+participant "React\\nExam UI" as UI
+participant "LevelIndicator\\nExamController" as LCtrl
+participant "MLPrediction\\nService" as MLS
+participant "Flask API\\n(XGBoost + SHAP)" as Flask
+database "MySQL\\n(student_module\\n_performance)" as DB
+participant "HintController" as HC
+participant "Google\\nGemini API" as LLM
+participant "Dashboard\\nController" as DC
+
+== Phase 1: PREDICT ==
+
+S -> UI : Start Level Indicator Exam
+UI -> UI : Track 11 behavioural features\\n(confidence, time, clicks,\\ntab switches, answer changes...)
+S -> UI : Submit answers
+UI -> LCtrl : POST /submit\\n{answers, features, question_ids}
+activate LCtrl
+
+LCtrl -> LCtrl : Score exam\\nExtract performance_trend
+LCtrl -> DB : Create LevelIndicatorAttempt
+LCtrl -> DB : Upsert StudentModulePerformance\\n(11 features)
+
+LCtrl -> MLS : predictWithFallback(performance)
+activate MLS
+
+alt Flask API Available
+  MLS -> Flask : POST /predict {11 features}
+  activate Flask
+  Flask -> Flask : StandardScaler.transform()
+  Flask -> Flask : XGBoost.predict()\\n→ mastery_level + confidence
+  Flask -> Flask : SHAP TreeExplainer\\n→ feature contributions
+  Flask --> MLS : {prediction, explanation}
+  deactivate Flask
+  MLS -> DB : Save ML prediction + SHAP values\\n(prediction_source: flask_api)
+else Flask Unavailable
+  MLS -> MLS : Local LMS formula\\n+ local SHAP analysis
+  MLS -> DB : Save results\\n(prediction_source: local_fallback)
+end
+
+deactivate MLS
+LCtrl --> UI : Redirect to Results
+deactivate LCtrl
+
+== Phase 2: EXPLAIN ==
+
+UI -> UI : Render Results Page:\\n- LMS gauge (0-100)\\n- Mastery badge\\n- SHAP waterfall chart\\n- Feature breakdown table
+
+== Phase 3: ACT ==
+
+S -> UI : Start Mock Exam
+S -> UI : Click "Get Hint"
+UI -> HC : POST /generate-hint\\n{question_text, module_id}
+activate HC
+
+HC -> DB : Read StudentModulePerformance\\n(mastery_level, SHAP data, features)
+
+alt Has Level Indicator Data
+  HC -> HC : Build personalised prompt\\n(SHAP strengths/weaknesses\\n+ 11 behavioural features\\n+ scaffold tier L1/L2/L3)
+  HC -> LLM : POST Gemini API\\n(adaptive scaffolding prompt)
+  activate LLM
+  LLM --> HC : Personalised hint (HTML)
+  deactivate LLM
+else No Data
+  HC -> LLM : Generic one-liner prompt
+  LLM --> HC : Brief generic hint
+end
+
+HC --> UI : {hint, hint_mode, student_profile}
+deactivate HC
+UI -> UI : Display hint with\\nstudent profile badge
+
+== Reusable Pipeline: Export for Retraining ==
+
+S -> DC : Open Instructor Dashboard
+DC -> DB : Load all StudentModulePerformance
+DC --> S : Render dashboard + Export dropdown
+
+S -> DC : Click "Export All Modules (CSV)"
+DC -> DB : Query all records\\nwith student + module
+DC --> S : Stream CSV download\\n(11 features + identifiers + outputs)
+
+note over S, DC
+  **Retrain Loop**: Export CSV → retrain\\nXGBoost model → redeploy Flask API\\n→ improved future predictions
+end note
+
+@enduml`;
+
+        // ============================================================
+        // Load Pako (deflate library) then render diagrams
+        // Fallback: use PlantUML's ~h hex encoding when CDN is blocked
+        // ============================================================
+
+        function renderDiagrams() {
+            document.getElementById('activityImg').src = plantUmlUrl(activityUML);
+            document.getElementById('componentImg').src = plantUmlUrl(componentUML);
+            document.getElementById('sequenceImg').src = plantUmlUrl(sequenceUML);
+        }
+
+        // Try loading pako from CDN
+        const pakoScript = document.createElement('script');
+        pakoScript.src = 'https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js';
+        pakoScript.onload = function() {
+            console.log('Pako loaded, using deflate compression');
+            renderDiagrams();
+        };
+        pakoScript.onerror = function() {
+            console.log('Pako CDN blocked (file:// protocol), using hex encoding fallback');
+            renderDiagrams();
+        };
+        document.head.appendChild(pakoScript);
+
+        // Tab switching
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

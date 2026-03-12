@@ -101,6 +101,11 @@ Route::post('/dashboard/module/{module}/settings', [DashboardController::class, 
     ->middleware(['auth', 'verified'])
     ->name('instructor.module.settings.update');
 
+// Export pipeline data as CSV (for ML retraining)
+Route::get('/dashboard/export-data', [DashboardController::class, 'exportData'])
+    ->middleware(['auth', 'verified'])
+    ->name('instructor.export.data');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

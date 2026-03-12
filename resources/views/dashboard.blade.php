@@ -1,4 +1,26 @@
 <x-app-layout>
+    @php
+        $gradientMap = [
+            1 => 'from-red-500 to-rose-600',
+            2 => 'from-blue-500 to-cyan-600',
+            3 => 'from-green-500 to-emerald-600',
+            4 => 'from-purple-500 to-violet-600',
+            5 => 'from-amber-500 to-orange-600',
+            6 => 'from-indigo-500 to-blue-600',
+        ];
+    @endphp
+
+    <style>
+        #exportDropdown.open .export-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        #exportDropdown.open #exportChevron {
+            transform: rotate(180deg);
+        }
+    </style>
+
     {{-- Multi-Module Instructor Dashboard with Light/Dark Mode --}}
     <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -18,12 +40,57 @@
                         <p class="mt-2 text-slate-600 dark:text-slate-400">Multi-module student performance and learning mastery insights</p>
                     </div>
                     <div class="flex gap-3">
-                        <button class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-lg shadow-indigo-500/25">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            Export Data
-                        </button>
+                        {{-- Export Data Dropdown --}}
+                        <div class="relative" id="exportDropdown">
+                            <button onclick="document.getElementById('exportDropdown').classList.toggle('open')"
+                                class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-lg shadow-indigo-500/25">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Export Data
+                                <svg class="w-4 h-4 transition-transform duration-200" id="exportChevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            {{-- Dropdown Menu --}}
+                            <div class="export-menu absolute right-0 mt-2 w-72 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50 opacity-0 invisible translate-y-1 transition-all duration-200">
+                                <div class="px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-600">
+                                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Download Pipeline Data (CSV)</p>
+                                </div>
+                                <div class="py-1">
+                                    <a href="{{ route('instructor.export.data') }}" 
+                                       class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors group">
+                                        <div class="p-1.5 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg group-hover:bg-indigo-200 dark:group-hover:bg-indigo-500/30 transition-colors">
+                                            <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-slate-800 dark:text-white">All Modules (Combined)</p>
+                                            <p class="text-xs text-slate-500 dark:text-slate-400">{{ $totalPerformanceRecords }} records &middot; Best for ML retraining</p>
+                                        </div>
+                                    </a>
+                                    @if($totalPerformanceRecords > 0)
+                                    <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                                    <div class="px-4 py-1.5">
+                                        <p class="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Per Module</p>
+                                    </div>
+                                    @foreach($moduleStats as $module)
+                                    @if($module['student_count'] > 0)
+                                    <a href="{{ route('instructor.export.data', ['module' => $module['id']]) }}" 
+                                       class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                                        <div class="w-2 h-2 rounded-full bg-gradient-to-r {{ $gradientMap[$module['id']] ?? 'from-gray-500 to-slate-600' }}"></div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm text-slate-700 dark:text-slate-300 truncate">{{ $module['name'] }}</p>
+                                        </div>
+                                        <span class="text-xs text-slate-400 dark:text-slate-500">{{ $module['student_count'] }} records</span>
+                                    </a>
+                                    @endif
+                                    @endforeach
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -139,14 +206,6 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($moduleStats as $module)
                     @php
-                        $gradientMap = [
-                            1 => 'from-red-500 to-rose-600',
-                            2 => 'from-blue-500 to-cyan-600',
-                            3 => 'from-green-500 to-emerald-600',
-                            4 => 'from-purple-500 to-violet-600',
-                            5 => 'from-amber-500 to-orange-600',
-                            6 => 'from-indigo-500 to-blue-600',
-                        ];
                         $gradient = $gradientMap[$module['id']] ?? 'from-gray-500 to-slate-600';
                     @endphp
                     <div class="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-slate-700/50 hover:shadow-xl hover:border-blue-300 dark:hover:border-blue-500/50 transition-all duration-300 overflow-hidden">
@@ -518,5 +577,12 @@
                 }
             });
         }
+        // Export dropdown: close on outside click
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('exportDropdown');
+            if (dropdown && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
     </script>
 </x-app-layout>
