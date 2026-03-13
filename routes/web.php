@@ -101,6 +101,27 @@ Route::post('/dashboard/module/{module}/settings', [DashboardController::class, 
     ->middleware(['auth', 'verified'])
     ->name('instructor.module.settings.update');
 
+// Question Management (CRUD + Import)
+Route::post('/dashboard/module/{module}/questions', [DashboardController::class, 'storeQuestion'])
+    ->middleware(['auth', 'verified'])
+    ->name('instructor.module.questions.store');
+
+Route::put('/dashboard/module/{module}/questions/{question}', [DashboardController::class, 'updateQuestion'])
+    ->middleware(['auth', 'verified'])
+    ->name('instructor.module.questions.update');
+
+Route::delete('/dashboard/module/{module}/questions/{question}', [DashboardController::class, 'deleteQuestion'])
+    ->middleware(['auth', 'verified'])
+    ->name('instructor.module.questions.delete');
+
+Route::post('/dashboard/module/{module}/questions/import', [DashboardController::class, 'importQuestions'])
+    ->middleware(['auth', 'verified'])
+    ->name('instructor.module.questions.import');
+
+Route::get('/dashboard/module/questions/template', [DashboardController::class, 'downloadQuestionTemplate'])
+    ->middleware(['auth', 'verified'])
+    ->name('instructor.module.questions.template');
+
 // Export pipeline data as CSV (for ML retraining)
 Route::get('/dashboard/export-data', [DashboardController::class, 'exportData'])
     ->middleware(['auth', 'verified'])

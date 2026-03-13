@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
 use App\Models\StudentModulePerformance;
 use App\Models\Module;
+use App\Models\Question;
+use App\Models\Answer;
 
 class DashboardController extends Controller
 {
@@ -378,6 +380,12 @@ class DashboardController extends Controller
             'total_attempts' => \App\Models\LevelIndicatorAttempt::where('module_id', $module->id)->count(),
         ];
         
+        // Load questions with answers for the question bank
+        $questions = Question::where('module_id', $module->id)
+            ->with('answers')
+            ->orderBy('id')
+            ->get();
+        
         // Module styling
         $colorMap = [
             1 => 'from-red-500 to-rose-600',
@@ -394,7 +402,7 @@ class DashboardController extends Controller
             'gradient' => $colorMap[$module->id] ?? 'from-gray-500 to-slate-600',
         ];
         
-        return view('dashboard.instructor.module-settings', compact('module', 'moduleData', 'stats'));
+        return view('dashboard.instructor.module-settings', compact('module', 'moduleData', 'stats', 'questions'));
     }
 
     /**
@@ -416,6 +424,182 @@ class DashboardController extends Controller
         $module->save();
         
         return back()->with('success', 'Module settings updated successfully!');
+    }
+
+    /**
+     * Store a new question with answers for a module
+     */
+    public function storeQuestion(Request $request, Module $module)
+    {
+        $request->validate([
+            'question_text' => 'required|string|max:2000',
+            'type' => 'required|in:mcq,true_false,fill_in_blank',
+            'difficulty' => 'required|integer|min:1|max:3',
+            'is_hard' => 'sometimes|boolean',
+            'answers' => 'required|array|min:1',
+            'answers.*.answer_text' => 'required|string|max:1000',
+            'answers.*.is_correct' => 'sometimes|boolean',
+        ]);
+
+        $question = Question::create([
+            'question_text' => $request->question_text,
+            'type' => $request->type,
+            'difficulty' => $request->difficulty,
+            'is_hard' => $request->difficulty >= 3 || $request->boolean('is_hard'),
+            'module_id' => $module->id,
+        ]);
+
+        foreach ($request->answers as $answer) {
+            $question->answers()->create([
+                'answer_text' => $answer['answer_text'],
+                'is_correct' => $answer['is_correct'] ?? false,
+            ]);
+        }
+
+        return back()->with('success', 'Question added successfully!');
+    }
+
+    /**
+     * Update an existing question and its answers
+     */
+    public function updateQuestion(Request $request, Module $module, Question $question)
+    {
+        if ($question->module_id !== $module->id) {
+            abort(403, 'Question does not belong to this module.');
+        }
+
+        $request->validate([
+            'question_text' => 'required|string|max:2000',
+            'type' => 'required|in:mcq,true_false,fill_in_blank',
+            'difficulty' => 'required|integer|min:1|max:3',
+            'is_hard' => 'sometimes|boolean',
+            'answers' => 'required|array|min:1',
+            'answers.*.answer_text' => 'required|string|max:1000',
+            'answers.*.is_correct' => 'sometimes|boolean',
+        ]);
+
+        $question->update([
+            'question_text' => $request->question_text,
+            'type' => $request->type,
+            'difficulty' => $request->difficulty,
+            'is_hard' => $request->difficulty >= 3 || $request->boolean('is_hard'),
+        ]);
+
+        // Replace all answers: delete existing, insert new
+        $question->answers()->delete();
+        foreach ($request->answers as $answer) {
+            $question->answers()->create([
+                'answer_text' => $answer['answer_text'],
+                'is_correct' => $answer['is_correct'] ?? false,
+            ]);
+        }
+
+        return back()->with('success', 'Question updated successfully!');
+    }
+
+    /**
+     * Delete a question and its answers (cascade)
+     */
+    public function deleteQuestion(Module $module, Question $question)
+    {
+        if ($question->module_id !== $module->id) {
+            abort(403, 'Question does not belong to this module.');
+        }
+
+        $question->delete(); // answers cascade via FK
+
+        return back()->with('success', 'Question deleted successfully!');
+    }
+
+    /**
+     * Bulk import questions from Excel/CSV file
+     */
+    public function importQuestions(Request $request, Module $module)
+    {
+        $request->validate([
+            'excel_file' => 'required|file|mimes:xlsx,xls,csv|max:5120',
+        ]);
+
+        try {
+            $import = new \App\Imports\QuestionsImport();
+            \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('excel_file'));
+
+            $count = 0;
+            foreach ($import->questions as $q) {
+                $difficulty = (int) ($q['difficulty'] ?? 2);
+                $isHard = isset($q['is_hard'])
+                    ? in_array(strtolower(trim($q['is_hard'])), ['true', '1', 'yes'], true)
+                    : $difficulty >= 3;
+
+                $question = Question::create([
+                    'question_text' => $q['question_text'],
+                    'type' => $q['type'],
+                    'difficulty' => $difficulty,
+                    'is_hard' => $isHard,
+                    'module_id' => $module->id,
+                ]);
+
+                foreach ($q['answers'] as $answer) {
+                    $question->answers()->create([
+                        'answer_text' => $answer['answer_text'],
+                        'is_correct' => $answer['is_correct'],
+                    ]);
+                }
+                $count++;
+            }
+
+            return back()->with('success', "{$count} questions imported successfully!");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Import failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Download a CSV template for question bulk import
+     */
+    public function downloadQuestionTemplate()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="question_import_template.csv"',
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+            // Header row
+            fputcsv($file, [
+                'question_text', 'type', 'difficulty', 'is_hard',
+                'answer_1', 'correct_1',
+                'answer_2', 'correct_2',
+                'answer_3', 'correct_3',
+                'answer_4', 'correct_4',
+            ]);
+            // Example rows
+            fputcsv($file, [
+                'What is the capital of France?', 'mcq', '2', 'false',
+                'Paris', 'true',
+                'London', 'false',
+                'Berlin', 'false',
+                'Madrid', 'false',
+            ]);
+            fputcsv($file, [
+                'The Earth is flat.', 'true_false', '1', 'false',
+                'True', 'false',
+                'False', 'true',
+                '', '',
+                '', '',
+            ]);
+            fputcsv($file, [
+                'What is 2+2?', 'fill_in_blank', '1', 'false',
+                '4', 'true',
+                '', '',
+                '', '',
+                '', '',
+            ]);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     /**

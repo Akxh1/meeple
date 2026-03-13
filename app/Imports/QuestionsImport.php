@@ -25,9 +25,13 @@ class QuestionsImport implements ToCollection
             $questionText = trim($row[0] ?? '');
             $type = strtolower(trim($row[1] ?? ''));
 
-            // Parse answers from remaining columns in pairs (answer, is_correct)
+            // Read difficulty and is_hard (columns 2 and 3)
+            $difficulty = trim($row[2] ?? '2');
+            $isHard = trim($row[3] ?? '');
+
+            // Parse answers from remaining columns in pairs (answer, is_correct) starting col 4
             $answers = [];
-            for ($i = 2; $i < count($row); $i += 2) {
+            for ($i = 4; $i < count($row); $i += 2) {
                 $answerText = trim($row[$i] ?? '');
                 $isCorrect = isset($row[$i + 1]) ? strtolower(trim($row[$i + 1])) : 'false';
 
@@ -46,6 +50,8 @@ class QuestionsImport implements ToCollection
                 $this->questions[] = [
                     'question_text' => $questionText,
                     'type' => $type,
+                    'difficulty' => $difficulty,
+                    'is_hard' => $isHard,
                     'answers' => $answers
                 ];
             }

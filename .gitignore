@@ -26,3 +26,7 @@ yarn-error.log
 /Report Writing
 /mock_exam_source_files
 /MISC
+/public/pipeline_uml.html
+/public/use_case_diagram.html
+/public/rich_picture.html
+/public/rich_picture_and_use_case.html
