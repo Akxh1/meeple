@@ -200,8 +200,8 @@
             </h2>
             <div class="meta-info">
                 Project: Predict-Explain-Act Framework for Intelligent LMS<br>
-                Date: January 2026<br>
-                Version: 1.0.0
+                Date: March 2026<br>
+                Version: 3.0.0 (Teacher-Labelled Target Variable)
             </div>
         </header>
 
@@ -210,7 +210,9 @@
             the X-Scaffold Student Dataset. Designed to support the "Predict-Explain-Act" framework, this dataset
             synthesizes authentic behavioral patterns captured from a Mock Exam data collection instrument. It enables
             the training of robust Machine Learning models for identifying at-risk students and driving automated
-            interventions in educational settings.
+            interventions in educational settings. <strong>As of v3.0, the target variable is derived from independent
+            teacher ratings rather than a formulaic proxy, eliminating the circular dependency between features and
+            labels.</strong>
         </div>
 
         <section id="introduction">
@@ -270,39 +272,60 @@
                 students exhibit realistic relationships between features (e.g., students who use more hints typically
                 take longer per question).</p>
 
-            <h3>3.2. Student Archetypes</h3>
-            <p>The data generation process modeled four distinct student profiles derived from educational theory:</p>
+            <h3>3.2. Real Data Base &amp; Teacher Labelling</h3>
+            <p>The synthetic dataset is generated from <strong>81 real student records</strong> collected via the Mock
+                Exam Application. Each record was independently reviewed and labelled by a teacher, who assigned one of
+                four mastery classifications (At Risk, Developing, Proficient, Advanced) based on the student's exam
+                performance and behavioral metrics.</p>
             <table>
                 <thead>
                     <tr>
-                        <th>Archetype</th>
-                        <th>Distribution</th>
-                        <th>Key Characteristics</th>
+                        <th>Teacher Rating</th>
+                        <th>Count</th>
+                        <th>Percentage</th>
+                        <th>Avg Score</th>
+                        <th>Score Range</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><strong>At-Risk</strong></td>
-                        <td>15%</td>
-                        <td>Low scores, high hint reliance, erratic navigation, low confidence.</td>
+                        <td><strong>At Risk</strong></td>
+                        <td>24</td>
+                        <td>29.6%</td>
+                        <td>15.8%</td>
+                        <td>0&ndash;30%</td>
                     </tr>
                     <tr>
                         <td><strong>Developing</strong></td>
-                        <td>35%</td>
-                        <td>Moderate scores, inconsistent behavior, moderate hint usage.</td>
+                        <td>17</td>
+                        <td>21.0%</td>
+                        <td>47.6%</td>
+                        <td>40&ndash;50%</td>
                     </tr>
                     <tr>
                         <td><strong>Proficient</strong></td>
-                        <td>35%</td>
-                        <td>Good understanding, low hint usage, stable engagement patterns.</td>
+                        <td>27</td>
+                        <td>33.3%</td>
+                        <td>71.9%</td>
+                        <td>60&ndash;90%</td>
                     </tr>
                     <tr>
                         <td><strong>Advanced</strong></td>
-                        <td>15%</td>
-                        <td>High distinction scores, minimal hints, high confidence, efficient processing.</td>
+                        <td>13</td>
+                        <td>16.0%</td>
+                        <td>94.6%</td>
+                        <td>90&ndash;100%</td>
                     </tr>
                 </tbody>
             </table>
+
+            <h3>3.3. Label Propagation (KNN)</h3>
+            <p>After generating 2,000 synthetic feature samples via Cholesky, mastery labels are assigned using
+                <strong>K-Nearest Neighbours (K=5, distance-weighted)</strong>. Each synthetic sample inherits the
+                teacher label of its nearest real neighbours in feature space. This preserves the teacher's independent
+                judgement rather than reapplying the formulaic LMS, eliminating the circular target variable problem.</p>
+            <p><em>Agreement between teacher labels and the formulaic LMS was 59.3% (48/81), confirming that the
+                teacher target captures pedagogical nuances the formula cannot.</em></p>
         </section>
 
         <section id="dataset-specification">
@@ -390,13 +413,16 @@
                 </tbody>
             </table>
 
-            <h3>4.2. Target Variable: Learning Mastery Score (LMS)</h3>
-            <p>The target variable is derived from a weighted formula encompassing performance and behavior, rather than
-                raw score alone. This aligns with the project's goal of measuring <em>holistic mastery</em>. The formula
-                underwent a three-stage refinement process: initial literature-based weights, data-driven correlation
-                analysis, and a final hybrid formula.</p>
+            <h3>4.2. Target Variable</h3>
+            <p>The primary target variable (<code>mastery_level</code>) is derived from <strong>independent teacher
+                ratings</strong>. A teacher reviewed all 81 real student records and assigned mastery classifications
+                based on exam scores, hard question performance, and behavioral patterns. This provides a non-circular,
+                externally validated target variable.</p>
+            <p>The LMS formula (shown below) is retained as a <strong>fallback</strong> for deployments without teacher
+                data. It was the original target variable in v1.0&ndash;v2.1 and remains available via the
+                <code>use_teacher_labels=False</code> parameter.</p>
 
-            <h4>Initial Literature-Based Formula</h4>
+            <h4>LMS Fallback Formula</h4>
             <div class="formula">
                 LMS<sub>initial</sub> = 0.50(S) + 0.15(Hd) + 10(C<sub>cal</sub>) + 10(K<sub>s</sub>) + 10(A<sub>f</sub>)
                 −
@@ -688,10 +714,12 @@
             <h2>5. Machine Learning Framework</h2>
 
             <h3>5.1. Model Selection: XGBoost Classifier</h3>
-            <p>Following comprehensive model comparison testing (February 2026), the research utilizes an
+            <p>Following comprehensive model comparison testing, the research utilizes an
                 <strong>XGBoost Classifier</strong> (Extreme Gradient Boosting, Chen &amp; Guestrin, 2016). This model
-                was selected based on superior performance across all evaluation metrics (91.0% accuracy, 95.24% at-risk
-                F1 score) and full compatibility with SHAP TreeExplainer for the Explainable AI layer.
+                was selected based on superior performance across all evaluation metrics. With teacher-labelled data
+                (v3.0), the model achieves <strong>85.25% test accuracy</strong>, <strong>91.7% at-risk F1 score</strong>,
+                and <strong>97.54% AUC-ROC</strong>. It maintains full compatibility with SHAP TreeExplainer for the
+                Explainable AI layer.
             </p>
 
             <h3>5.2. Validation Strategy</h3>
@@ -734,7 +762,7 @@
 
         <footer>
             <p>&copy; 2026 X-Scaffold Research Project. All Rights Reserved.</p>
-            <p><em>Last Updated: February 2026 (v2.1.0 — Hybrid LMS Formula)</em></p>
+            <p><em>Last Updated: March 2026 (v3.0.0 &mdash; Teacher-Labelled Target Variable)</em></p>
         </footer>
     </div>
 

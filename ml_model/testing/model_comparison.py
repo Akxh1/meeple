@@ -6,6 +6,8 @@
 # mastery prediction task, evaluating each on Accuracy, Precision, Recall,
 # F1 Score, and AUC.
 #
+# **Target Variable:** Teacher-assigned mastery labels (v3.0)
+# **Data:** 81 real teacher-rated records → Cholesky → 2000 synthetic samples → KNN labels
 # **Models Compared:**
 # 1. Bagging Classifier (Decision Trees)
 # 2. Random Forest
@@ -72,9 +74,9 @@ print("✅ All packages imported successfully!")
 
 # %% [markdown]
 # ## 2. Dataset Generation
-# Using Cholesky decomposition on 51 real student records to generate
-# 2000 synthetic samples — the exact same methodology used to train
-# the production Bagging Classifier.
+# Using Cholesky decomposition on 81 real teacher-rated student records
+# to generate 2000 synthetic samples with KNN label propagation.
+# This uses the same methodology as the production pipeline (v3.0).
 
 # %%
 # --------------- CONFIGURATION ---------------
@@ -111,19 +113,23 @@ FEATURE_CONSTRAINTS = {
 
 # %%
 # --------------- LOAD REAL DATA ---------------
-# Upload student_research_data.csv to Colab first, or place it alongside this script.
+# Upload student_research_data_teacher_reviewed.csv to Colab first, or place it alongside this script.
 # In Colab, uncomment the following lines:
 # from google.colab import files
 # uploaded = files.upload()
 
-real_df = pd.read_csv('student_research_data.csv')
-print(f"✅ Loaded {len(real_df)} real student records")
+real_df = pd.read_csv('student_research_data_teacher_reviewed.csv')
+
+# Map teacher labels to numeric
+TEACHER_LABEL_MAP = {'At Risk': 0, 'Developing': 1, 'Proficient': 2, 'Advanced': 3}
+real_df['mastery_level'] = real_df['Teacher Rating'].map(TEACHER_LABEL_MAP)
+print(f"✅ Loaded {len(real_df)} real student records with TEACHER labels")
 print(f"   Features: {len(FEATURE_COLUMNS)}")
-print(f"\nFirst 5 rows:")
-real_df[FEATURE_COLUMNS].head()
+print(f"\nTeacher label distribution:")
+print(real_df['Teacher Rating'].value_counts().sort_index())
 
 # %%
-# --------------- GENERATE SYNTHETIC DATA (Cholesky) ---------------
+# --------------- GENERATE SYNTHETIC DATA (Cholesky + KNN) ---------------
 np.random.seed(42)
 N_STUDENTS = 2000
 
@@ -148,29 +154,13 @@ synthetic_df = pd.DataFrame(
 for col, (min_val, max_val) in FEATURE_CONSTRAINTS.items():
     synthetic_df[col] = synthetic_df[col].clip(min_val, max_val).round(2)
 
-# --------------- CALCULATE LMS & MASTERY LEVELS ---------------
-S = synthetic_df['score_percentage']
-Hd = synthetic_df['hard_question_accuracy'] / 100
-expected_conf = 1 + (S / 25)
-conf_diff = np.abs(synthetic_df['avg_confidence'] - expected_conf)
-Ccal = np.where(conf_diff <= 1, 1, 0)
-Ks = np.clip(1 - (synthetic_df['answer_changes_rate'] - 0.5) / 1.0, 0, 1)
-Af = np.clip(1 - (synthetic_df['tab_switches_rate'] - 1) / 2.0, 0, 1)
-Hu = synthetic_df['hint_usage_percentage'] / 100
+# --------------- ASSIGN TEACHER LABELS VIA KNN ---------------
+from sklearn.neighbors import KNeighborsClassifier
+knn_labeller = KNeighborsClassifier(n_neighbors=5, weights='distance')
+knn_labeller.fit(real_df[FEATURE_COLUMNS].values, real_df['mastery_level'].values)
+synthetic_df['mastery_level'] = knn_labeller.predict(synthetic_df[FEATURE_COLUMNS].values)
 
-synthetic_df['learning_mastery_score'] = (
-    0.50 * S + 0.15 * (Hd * 100) + 10 * Ccal + 10 * Ks + 10 * Af - 15 * np.power(Hu, 1.5)
-).round(1).clip(0, 100)
-
-def classify_mastery(lms):
-    if lms < 36: return 0   # at_risk
-    elif lms < 56: return 1  # developing
-    elif lms < 76: return 2  # proficient
-    else: return 3           # advanced
-
-synthetic_df['mastery_level'] = synthetic_df['learning_mastery_score'].apply(classify_mastery)
-
-print(f"✅ Generated {N_STUDENTS} synthetic students via Cholesky decomposition\n")
+print(f"✅ Generated {N_STUDENTS} synthetic students via Cholesky + KNN labels\n")
 print("📊 Class Distribution:")
 for i, name in enumerate(CLASS_NAMES):
     count = (synthetic_df['mastery_level'] == i).sum()

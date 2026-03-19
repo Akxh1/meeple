@@ -2,11 +2,11 @@
 X-Scaffold Prediction Script
 ==============================
 Standalone prediction script for testing and command-line usage.
+Predicts student mastery level using teacher-labelled XGBoost model.
 
 Usage:
     python predict.py --features '{"score_percentage": 72.5, ...}'
     python predict.py --csv students.csv --output predictions.csv
-
 
 """
 

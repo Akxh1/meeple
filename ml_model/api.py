@@ -2,13 +2,14 @@
 X-Scaffold Prediction API
 ==========================
 Flask API for serving ML predictions with SHAP explanations.
+Model trained on teacher-labelled target variable (non-circular).
 
 Endpoints:
 - POST /predict - Get mastery level prediction + SHAP values
 - GET /health - Health check
 
 Author: X-Scaffold Research Team
-Date: January 2026
+Date: March 2026 (Updated — teacher-labelled model)
 """
 
 import os
@@ -212,6 +213,7 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'model': 'xscaffold_xgboost_model',
+        'target_source': 'teacher_labelled',
         'features_count': len(FEATURE_NAMES),
         'classes': CLASS_NAMES,
         'shap_available': SHAP_AVAILABLE

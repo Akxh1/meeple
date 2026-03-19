@@ -2,6 +2,9 @@
 # # X-Scaffold ML Stress Testing Suite
 # **Comprehensive validation of XGBoost & Gradient Boosting**
 #
+# **Target Variable:** Teacher-assigned mastery labels (v3.0)
+# **Data:** 81 real teacher-rated records → Cholesky → KNN label propagation
+#
 # 8 Test Sections:
 # 1. Stratified k-Fold Cross-Validation
 # 2. Model Comparison Tournament + Statistical Significance
@@ -13,7 +16,7 @@
 # 8. STRESS: Feature Importance Audit
 #
 # **Usage**: Run cell-by-cell in Google Colab.
-# Upload `student_research_data.csv` and `xscaffold_student_dataset.csv`.
+# Upload `student_research_data_teacher_reviewed.csv`.
 
 # %%
 # =====================================================
@@ -68,8 +71,23 @@ FEATURE_CONSTRAINTS = {
     'performance_trend': (-1, 1)
 }
 
-# --- Helper: LMS Calculation (from generate_dataset.py) ---
+# --- Helper: Assign teacher labels via KNN ---
+TEACHER_LABEL_MAP = {'At Risk': 0, 'Developing': 1, 'Proficient': 2, 'Advanced': 3}
+META_NAMES = {0: 'at_risk', 1: 'developing', 2: 'proficient', 3: 'advanced'}
+
+def assign_teacher_labels(df, real_df):
+    """Assign teacher labels to synthetic data via KNN on real teacher-rated records."""
+    from sklearn.neighbors import KNeighborsClassifier
+    df = df.copy()
+    knn = KNeighborsClassifier(n_neighbors=5, weights='distance')
+    knn.fit(real_df[FEATURE_COLUMNS].values, real_df['mastery_level'].values)
+    df['mastery_level'] = knn.predict(df[FEATURE_COLUMNS].values)
+    df['mastery_level_name'] = df['mastery_level'].map(META_NAMES)
+    return df
+
+# --- Helper: LMS Calculation (FALLBACK ONLY — from generate_dataset.py) ---
 def calculate_lms(df):
+    """FALLBACK: Calculate LMS using formula. Used only for comparison, not as target."""
     df = df.copy()
     S = df['score_percentage']
     Hd = df['hard_question_accuracy'] / 100
@@ -87,13 +105,12 @@ def calculate_lms(df):
         elif lms < 76: return 2
         else: return 3
     df['mastery_level'] = df['learning_mastery_score'].apply(classify)
-    df['mastery_level_name'] = df['mastery_level'].map(
-        {0: 'at_risk', 1: 'developing', 2: 'proficient', 3: 'advanced'}
-    )
+    df['mastery_level_name'] = df['mastery_level'].map(META_NAMES)
     return df
 
-# --- Helper: Synthetic Generation (Cholesky) ---
+# --- Helper: Synthetic Generation (Cholesky + KNN) ---
 def generate_synthetic_from_real(real_df, n_students=2000):
+    """Generate synthetic features via Cholesky, then assign teacher labels via KNN."""
     means = real_df[FEATURE_COLUMNS].mean()
     stds = real_df[FEATURE_COLUMNS].std()
     corr = real_df[FEATURE_COLUMNS].corr().values + np.eye(len(FEATURE_COLUMNS)) * 0.001
@@ -103,7 +120,7 @@ def generate_synthetic_from_real(real_df, n_students=2000):
     for col, (lo, hi) in FEATURE_CONSTRAINTS.items():
         if col in synth.columns:
             synth[col] = synth[col].clip(lo, hi).round(2)
-    return calculate_lms(synth)
+    return assign_teacher_labels(synth, real_df)
 
 print("=" * 70)
 print("  X-SCAFFOLD ML STRESS TESTING SUITE")
@@ -117,7 +134,8 @@ print("=" * 70)
 # from google.colab import files
 # uploaded = files.upload()
 
-real_df = pd.read_csv('student_research_data.csv')
+real_df = pd.read_csv('student_research_data_teacher_reviewed.csv')
+real_df['mastery_level'] = real_df['Teacher Rating'].map(TEACHER_LABEL_MAP)
 synth_df = pd.read_csv('xscaffold_student_dataset.csv')
 
 print(f"✅ Real data:      {len(real_df)} records")

@@ -72,7 +72,7 @@ class HintController extends Controller
         ]);
 
         // Retry up to 3 times with backoff for 429 rate limits
-        $maxTokens = $hintMode === 'generic' ? 100 : ($hintMode === 'personalized' ? 600 : 300);
+        $maxTokens = $hintMode === 'generic' ? 80 : ($hintMode === 'personalized' ? 400 : 200);
 
         $response = null;
         $maxRetries = 3;
@@ -235,13 +235,14 @@ You are a helpful tutor. A student is practising and has NOT completed any diagn
 \"{$question}\"
 
 === INSTRUCTIONS ===
-Provide a SHORT, one-sentence hint that nudges the student toward the right approach WITHOUT revealing the answer.
-- Maximum 1-2 sentences
-- Be encouraging and concise
-- Point toward the key concept needed, not the solution
-- Output as a single <p> tag. No markdown.
+Provide a SHORT hint as exactly 2 bullet points:
+• Bullet 1: A guiding question that nudges the student toward the right approach
+• Bullet 2: The key concept or topic they should revisit
 
-Generate the one-liner hint now:
+Do NOT reveal the answer. Keep it under 30 words total.
+Output as an HTML unordered list (<ul><li>). No markdown.
+
+Generate the hint now:
 ";
     }
 
@@ -258,11 +259,13 @@ You are an expert tutor. This student is taking a DIAGNOSTIC assessment (Level I
 \"{$question}\"
 
 === INSTRUCTIONS ===
-Provide a balanced, moderate hint that helps without giving away the answer:
-- Give ONE key concept or approach to consider
-- Point out a common mistake to avoid
-- Keep it under 100 words
-- Output in HTML (<p>, <strong>, <em> tags). No markdown.
+Provide a balanced hint as a short numbered list (3 steps max):
+1. The key concept or approach to consider
+2. A common mistake to avoid
+3. The first step to get started (without solving it)
+
+Keep each step to ONE sentence. Maximum 60 words total.
+Output as an HTML ordered list (<ol><li>). No markdown.
 
 Generate the hint now:
 ";
@@ -321,32 +324,38 @@ You have access to rich diagnostic data from their Level Indicator Exam.
 
 === ADAPTIVE SCAFFOLDING STRATEGY ===
 
-**For Proficient (L1) Students:**
-- Provide a minimal Socratic prompt (a thought-provoking question)
-- Reference their strength areas positively
-- Avoid direct explanations; trust their ability to reason
-- Keep it under 100 words
+**For Proficient (L1) Students — BULLET FORMAT:**
+Output EXACTLY 2 bullet points:
+• Bullet 1: A Socratic question that makes them think deeper
+• Bullet 2: A brief positive reference to their strength area
+Keep under 30 words. No steps, no explanations. Trust their ability.
+Format: HTML unordered list (<ul><li>).
 
-**For Developing (L2) Students:**
-- Give a structured nudge with ONE key concept reminder
-- Reference specific behavioral patterns (e.g., if high answer changes, suggest being more deliberate)
-- Point out a common misconception to avoid
-- Provide the first step WITHOUT revealing the answer
-- Keep it under 150 words
+**For Developing (L2) Students — NUMBERED STEPS FORMAT:**
+Output EXACTLY 3-5 numbered steps:
+1. Remind them of the key concept needed
+2. Point out a common mistake to avoid
+3. Give the FIRST concrete step to approach this (not the answer)
+4. (Optional) Reference a behavioral pattern to improve
+5. (Optional) Brief encouragement
+Keep each step to ONE sentence. Max 80 words total.
+Format: HTML ordered list (<ol><li>).
 
-**For Struggling (L3) Students:**
-- Acknowledge their effort with genuine empathy
-- Reference their SHAP weaknesses to address specific gaps
-- Provide a clear conceptual breakdown with an analogy
-- Give step-by-step guidance toward the answer
-- If their confidence is low, add encouragement
-- Up to 250 words
+**For Struggling (L3) Students — WORKED EXAMPLE FORMAT:**
+Output a short introduction sentence, then 3-5 numbered steps where each step shows what to do AND why:
+1. Step 1: [what to do] — [brief reason why]
+2. Step 2: [what to do] — [brief reason why]
+... and so on.
+End with ONE sentence of encouragement.
+Use simple language and analogies where possible. Max 120 words.
+Format: HTML: <p> for intro, <ol><li> for steps, <p><em> for encouragement.
 
 === OUTPUT REQUIREMENTS ===
-1. **HTML Format Only**: Use <p>, <ul>, <li>, <strong>, <em> tags. NO markdown (**, \`\`\`, etc.)
-2. **Personalized Tone**: Weave in references to their specific data naturally
-3. **Encouraging Closing**: End with a motivational phrase that acknowledges their learning journey
+1. **HTML Format Only**: Use <p>, <ul>, <ol>, <li>, <strong>, <em> tags. NO markdown (**, \`\`\`, #, etc.)
+2. **Structured Layout**: Use bullet points or numbered lists as specified above — NEVER output a wall of text
+3. **Personalized Tone**: Weave in references to their specific data naturally (e.g., \"Given your strong score...\")
 4. **No Meta-Commentary**: Don't mention \"as an AI\", \"your SHAP values\", or technical model terms
+5. **Concise**: Respect the word limits strictly
 
 Generate the personalized hint now:
 ";
@@ -477,38 +486,64 @@ Generate the personalized hint now:
     {
         $questionLower = strtolower($question);
 
-        $topicHints = [
-            'set' => 'Think about the elements that belong to each set and the operations being performed (union, intersection, difference).',
-            'probability' => 'Consider the total number of outcomes and the favorable outcomes. Remember P(E) = favorable / total.',
-            'function' => 'Check the domain and range. Try substituting a value to trace through the function step by step.',
-            'graph' => 'Visualize the structure. Consider the vertices, edges, and how they connect.',
-            'logic' => 'Break down the statement into smaller propositions. Evaluate each part using truth values.',
-            'relation' => 'Check each property: reflexive (a→a), symmetric (a→b means b→a), transitive (a→b and b→c means a→c).',
-            'matrix' => 'Work through the calculation element by element. Pay attention to the dimensions.',
-            'tree' => 'Consider the root, leaves, and the path between nodes. How many edges are there?',
-            'boolean' => 'Apply the Boolean algebra rules. Try simplifying using De Morgan\'s laws or distribution.',
-            'proof' => 'Identify what you need to show. What assumptions can you start with?',
+        // Topic-specific guidance mapped to structured hints
+        $topicData = [
+            'set' => ['concept' => 'Set Operations', 'question' => 'Which set operation is being asked for — union, intersection, or difference?', 'step1' => 'Identify the elements in each set', 'step2' => 'Apply the relevant set operation', 'step3' => 'Write out the resulting set'],
+            'probability' => ['concept' => 'Probability', 'question' => 'What is the total number of possible outcomes here?', 'step1' => 'Count the total outcomes in the sample space', 'step2' => 'Count the favorable outcomes', 'step3' => 'Apply P(E) = favorable / total'],
+            'function' => ['concept' => 'Functions', 'question' => 'What is the domain and range of this function?', 'step1' => 'Identify the input (domain) and output (range)', 'step2' => 'Substitute a value to trace the function', 'step3' => 'Check if the result matches the expected output'],
+            'graph' => ['concept' => 'Graph Theory', 'question' => 'How many vertices and edges does the graph have?', 'step1' => 'List the vertices and edges', 'step2' => 'Check for the property being asked about', 'step3' => 'Verify with the definition'],
+            'logic' => ['concept' => 'Propositional Logic', 'question' => 'Can you break this into smaller propositions?', 'step1' => 'Identify each proposition', 'step2' => 'Assign truth values', 'step3' => 'Evaluate using the logical connectives'],
+            'relation' => ['concept' => 'Relations', 'question' => 'Which property is being tested — reflexive, symmetric, or transitive?', 'step1' => 'Check reflexive: does a→a hold for all elements?', 'step2' => 'Check symmetric: if a→b, does b→a hold?', 'step3' => 'Check transitive: if a→b and b→c, does a→c hold?'],
+            'matrix' => ['concept' => 'Matrix Operations', 'question' => 'What are the dimensions of the matrices involved?', 'step1' => 'Confirm the dimensions allow the operation', 'step2' => 'Work through element by element', 'step3' => 'Double-check your arithmetic'],
+            'tree' => ['concept' => 'Trees', 'question' => 'What is the height and how many leaf nodes are there?', 'step1' => 'Identify the root node', 'step2' => 'Trace the path to the relevant node', 'step3' => 'Count edges or levels as needed'],
+            'boolean' => ['concept' => 'Boolean Algebra', 'question' => 'Can you apply De Morgan\'s law or distribution here?', 'step1' => 'Write the expression in standard form', 'step2' => 'Apply the relevant Boolean law', 'step3' => 'Simplify step by step'],
+            'proof' => ['concept' => 'Mathematical Proof', 'question' => 'What exactly do you need to show?', 'step1' => 'State your assumptions clearly', 'step2' => 'Identify the proof technique (direct, contradiction, induction)', 'step3' => 'Build the argument step by step'],
         ];
 
-        $matchedHint = 'Re-read the question carefully. Identify the key terms and think about what concept they relate to.';
-        foreach ($topicHints as $keyword => $hint) {
+        // Find matching topic
+        $matched = null;
+        foreach ($topicData as $keyword => $data) {
             if (str_contains($questionLower, $keyword)) {
-                $matchedHint = $hint;
+                $matched = $data;
                 break;
             }
         }
 
-        $prefix = match($hintLevel) {
-            1 => '<p><strong>Quick Nudge:</strong></p>',
-            3 => '<p><strong>Step-by-Step Guidance:</strong></p>',
-            default => '<p><strong>Hint:</strong></p>',
+        // Default fallback
+        if (!$matched) {
+            $matched = [
+                'concept' => 'the core concept',
+                'question' => 'What are the key terms in this question and what concept do they relate to?',
+                'step1' => 'Re-read the question and underline key terms',
+                'step2' => 'Recall the relevant definition or formula',
+                'step3' => 'Apply it to the specific values given',
+            ];
+        }
+
+        // Format based on hint level
+        return match($hintLevel) {
+            // L1 (Proficient): 2 bullet points
+            1 => '<ul>'
+                . '<li>' . $matched['question'] . '</li>'
+                . '<li>Think about <strong>' . $matched['concept'] . '</strong> — you know this well.</li>'
+                . '</ul>',
+
+            // L3 (Struggling): Worked steps with intro + encouragement
+            3 => '<p>Let\'s work through this together:</p>'
+                . '<ol>'
+                . '<li>' . $matched['step1'] . '</li>'
+                . '<li>' . $matched['step2'] . '</li>'
+                . '<li>' . $matched['step3'] . '</li>'
+                . '</ol>'
+                . '<p><em>Take it one step at a time — you\'re making progress!</em></p>',
+
+            // L2 (Developing): 3 numbered steps
+            default => '<ol>'
+                . '<li>Recall the key concept: <strong>' . $matched['concept'] . '</strong></li>'
+                . '<li>' . $matched['step1'] . '</li>'
+                . '<li>' . $matched['step2'] . '</li>'
+                . '</ol>',
         };
-
-        $suffix = $hintLevel === 3
-            ? '<p class="text-xs text-slate-500 mt-2"><em>Try working through a simpler example first, then apply the same method here.</em></p>'
-            : '';
-
-        return $prefix . '<p>' . $matchedHint . '</p>' . $suffix;
     }
 
     /**
@@ -516,9 +551,30 @@ Generate the personalized hint now:
      */
     protected function cleanHintOutput(string $text): string
     {
+        // Strip code fence wrappers
         $text = preg_replace('/^```html\s*|\s*```$/s', '', $text);
+
+        // Convert markdown bold/italic to HTML
         $text = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $text);
         $text = preg_replace('/\*(.*?)\*/', '<em>$1</em>', $text);
+
+        // Convert markdown numbered lists (1. item) to HTML <ol><li>
+        if (preg_match('/^\d+\.\s/m', $text) && !str_contains($text, '<ol>')) {
+            $text = preg_replace('/^\d+\.\s+(.+)$/m', '<li>$1</li>', $text);
+            $text = preg_replace('/(<li>.*<\/li>\s*)+/s', '<ol>$0</ol>', $text);
+        }
+
+        // Convert markdown bullet lists (- item or • item) to HTML <ul><li>
+        if (preg_match('/^[\-•]\s/m', $text) && !str_contains($text, '<ul>')) {
+            $text = preg_replace('/^[\-•]\s+(.+)$/m', '<li>$1</li>', $text);
+            $text = preg_replace('/(<li>.*<\/li>\s*)+/s', '<ul>$0</ul>', $text);
+        }
+
+        // Clean up any double-wrapped lists
+        $text = preg_replace('/<ol>\s*<ol>/', '<ol>', $text);
+        $text = preg_replace('/<\/ol>\s*<\/ol>/', '</ol>', $text);
+        $text = preg_replace('/<ul>\s*<ul>/', '<ul>', $text);
+        $text = preg_replace('/<\/ul>\s*<\/ul>/', '</ul>', $text);
 
         return trim($text);
     }

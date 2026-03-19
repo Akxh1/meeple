@@ -4,6 +4,8 @@
 
 This document provides comprehensive documentation for the X-Scaffold Machine Learning pipeline, including dataset generation, model training, and API deployment.
 
+**Target Variable**: Teacher-assigned mastery labels (81 real student records independently rated by a teacher). The model predicts genuine teacher judgement rather than a formulaic proxy, eliminating the circular target variable problem. The LMS formula is retained as a fallback for deployments without teacher data.
+
 ---
 
 ## 🎯 Model Architecture
@@ -11,10 +13,10 @@ This document provides comprehensive documentation for the X-Scaffold Machine Le
 ### Algorithm: XGBoost Classifier
 
 **Why XGBoost?**
-Based on comprehensive model comparison testing (Feb 2026), XGBoost (Extreme Gradient Boosting) was selected as the production model because:
+Based on comprehensive model comparison testing, XGBoost (Extreme Gradient Boosting) was selected as the production model because:
 
 1. **Superior Accuracy**: Ranked #1 across all metrics (Accuracy, F1, AUC)
-2. **Critical Class Performance**: Achieved 95% F1 on at-risk students (vs 78% for Bagging)
+2. **Critical Class Performance**: Achieved 91.7% F1 on at-risk students (teacher-labelled)
 3. **Robust Regularization**: Built-in L1/L2 regularization prevents overfitting
 4. **SHAP Compatibility**: Native support for TreeExplainer provides fast, exact explanations
 
@@ -55,84 +57,70 @@ Based on comprehensive model comparison testing (Feb 2026), XGBoost (Extreme Gra
 
 ### Target Variable
 
-| Variable | Type | Values | Description |
-|----------|------|--------|-------------|
-| `mastery_level` | Integer | 0, 1, 2, 3 | Classification target |
+| Variable | Type | Values | Source |
+|----------|------|--------|--------|
+| `mastery_level` | Integer | 0, 1, 2, 3 | **Teacher-assigned** (primary) or LMS formula (fallback) |
 | `mastery_level_name` | String | at_risk, developing, proficient, advanced | Human-readable label |
-| `learning_mastery_score` | Float | 0-100 | LMS score (for reference) |
+
+**Teacher Rating Process**: A teacher independently reviewed all 81 real student records (exam scores, behaviour metrics) and assigned one of four mastery classifications. This provides a non-circular, externally validated target variable. Agreement between teacher labels and the formulaic LMS was 59.3% (48/81), confirming the teacher target captures nuances the formula cannot.
 
 ### Mastery Level Classification
 
-| Level | LMS Range | Description | Intervention Priority |
-|-------|-----------|-------------|----------------------|
-| 0 - At Risk | 0-35 | Significant struggle, needs immediate support | 🔴 HIGH |
-| 1 - Developing | 36-55 | Partial understanding, moderate support needed | 🟠 MEDIUM |
-| 2 - Proficient | 56-75 | Good understanding, occasional guidance | 🔵 LOW |
-| 3 - Advanced | 76-100 | Excellent mastery, minimal intervention | 🟢 NONE |
+| Level | Description | Intervention Priority |
+|-------|-------------|----------------------|
+| 0 - At Risk | Significant struggle, needs immediate support | 🔴 HIGH |
+| 1 - Developing | Partial understanding, moderate support needed | 🟠 MEDIUM |
+| 2 - Proficient | Good understanding, occasional guidance | 🔵 LOW |
+| 3 - Advanced | Excellent mastery, minimal intervention | 🟢 NONE |
 
 ---
 
 ## 🔄 Data Generation Process
 
-### Student Archetypes
+### Methodology: Cholesky Decomposition + KNN Label Propagation
 
-The synthetic dataset is generated using 4 student archetypes based on educational research:
+The synthetic dataset is generated in two stages:
 
-#### Archetype 1: At-Risk (15% of dataset)
-- Low scores (μ=35, σ=12)
-- High hint usage (μ=65%, σ=15%)
-- Low confidence (μ=2.0, σ=0.5)
-- Erratic behavior (high answer changes, tab switches)
-- Negative performance trend
+**Stage 1 — Feature Generation (Cholesky)**:
+1. Load 81 real student records with teacher-assigned mastery labels
+2. Extract the 11×11 correlation matrix from real data
+3. Perform Cholesky decomposition (L such that LL^T = R + εI)
+4. Generate 2,000 uncorrelated standard normal samples
+5. Apply Cholesky factor to induce real correlation structure
+6. Scale to original means and standard deviations
+7. Clip features to realistic bounds
 
-#### Archetype 2: Developing (35% of dataset)
-- Moderate scores (μ=55, σ=10)
-- Moderate hint usage (μ=40%, σ=15%)
-- Average confidence (μ=2.8, σ=0.5)
-- Some inconsistency in behavior
-- Slight negative trend
+**Stage 2 — Label Assignment (KNN)**:
+1. Fit a K-Nearest Neighbours classifier (K=5, distance-weighted) on the 81 real records
+2. Each synthetic sample inherits the teacher label of its nearest real neighbours
+3. This preserves teacher judgement rather than reapplying the formulaic LMS
 
-#### Archetype 3: Proficient (35% of dataset)
-- Good scores (μ=72, σ=8)
-- Low hint usage (μ=20%, σ=12%)
-- Good confidence (μ=3.6, σ=0.5)
-- Stable behavior
-- Slight positive trend
+### Real Data Distribution (81 Teacher-Rated Records)
 
-#### Archetype 4: Advanced (15% of dataset)
-- Excellent scores (μ=88, σ=7)
-- Minimal hint usage (μ=8%, σ=8%)
-- High confidence (μ=4.3, σ=0.4)
-- Efficient behavior
-- Strong positive trend
+| Teacher Rating | Count | Avg Score | Score Range |
+|---|---|---|---|
+| At Risk | 24 (29.6%) | 15.8% | 0–30% |
+| Developing | 17 (21.0%) | 47.6% | 40–50% |
+| Proficient | 27 (33.3%) | 71.9% | 60–90% |
+| Advanced | 13 (16.0%) | 94.6% | 90–100% |
 
-### LMS Calculation Formula
+### LMS Formula (Fallback)
 
-The LMS formula was refined through a three-stage process: initial literature-based weights, data-driven correlation analysis on N=56 real students, and a final hybrid formula.
-
-#### Stage 1: Literature-Based Formula (Initial)
-
-```
-LMS = 0.50×S + 0.15×Hd + 10×Ccal + 10×Ks + 10×Af − 15×Hu^1.5
-```
-
-#### Stage 2: Data-Driven Analysis (N=56 Real Students)
-
-Four unsupervised methods (PCA, Entropy Weighting, Factor Analysis, CRITIC) were applied to the 6 core features of 56 real student records to derive empirical weights without a ground-truth target variable. The composite data-driven weights were: Hd (26.6%), S (25.6%), Confidence (16.5%), Tab Switches (15.2%), Hint Usage (11.0%), Answer Changes (5.1%).
-
-#### Stage 3: Refined Hybrid Formula (Production)
+The LMS formula is retained as a fallback for deployments without teacher data:
 
 ```
 LMS = 0.30×S + 0.25×(Hd×100) + 15×Ccal + 15×Af − 10×Hu − 5×Ac
 ```
 
 Where:
-- **S** = score_percentage (0-100) — reduced from 50% to 30% per data analysis
-- **Hd** = hard_question_accuracy / 100 — increased from 15% to 25% (data: #1 differentiator)
-- **Ccal** = Calibration bonus (1 if confidence matches performance, 0 otherwise) — increased to 15
-- **Af** = Attention factor (1 if low tab switches, 0 if high) — increased to 15
-- **Hu** = hint_usage_percentage / 100 — penalty reduced from 15 to 10
-- **Ac** = answer_changes_rate penalty — reduced from 10 to 5 (low variance in data)
+- **S** = score_percentage (0-100)
+- **Hd** = hard_question_accuracy / 100
+- **Ccal** = Calibration bonus (1 if confidence matches performance, 0 otherwise)
+- **Af** = Attention factor (1 if low tab switches, 0 if high)
+- **Hu** = hint_usage_percentage / 100 — penalty
+- **Ac** = answer_changes_rate penalty
+
+> **Note**: When using the LMS fallback, the target variable is formulaic and computed from the same input features. Teacher labels should be used whenever available.
 
 ---
 
@@ -158,16 +146,23 @@ Where:
 8. Save Model Artifacts
 ```
 
-### Expected Performance Metrics
+### Actual Performance Metrics (Teacher-Labelled, March 2026)
 
-Based on the synthetic dataset design, expected metrics are:
+| Metric | Value |
+|--------|-------|
+| Test Accuracy | **85.25%** |
+| F1 Weighted | **0.8503** |
+| F1 Macro | **0.8419** |
+| AUC-ROC (Weighted OVR) | **0.9754** |
+| Cross-Val Mean (5-fold) | **0.8930** |
+| Overfitting Gap | 0.146 |
 
-| Metric | Expected Value |
-|--------|----------------|
-| Test Accuracy | 85-92% |
-| F1 Macro | 0.83-0.90 |
-| Cross-Val Mean | 0.84-0.91 |
-| Overfitting Gap | < 5% |
+| Class | Precision | Recall | F1 |
+|---|---|---|---|
+| At Risk | 0.907 | 0.926 | **0.917** |
+| Developing | 0.785 | 0.697 | 0.738 |
+| Proficient | 0.838 | 0.917 | **0.876** |
+| Advanced | 0.923 | 0.766 | 0.837 |
 
 ### Output Artifacts
 
@@ -234,6 +229,7 @@ Health check endpoint.
 {
   "status": "healthy",
   "model": "xscaffold_xgboost_model",
+  "target_source": "teacher_labelled",
   "features_count": 11,
   "classes": ["at_risk", "developing", "proficient", "advanced"],
   "shap_available": true
@@ -392,6 +388,16 @@ if ($response->successful()) {
 ---
 
 ## 📝 Changelog
+
+### v3.0.0 (March 2026)
+- **Major Update**: Switched from formulaic LMS target to teacher-labelled target variable
+- Teacher independently rated 81 real student records (expanded from 51)
+- Eliminated circular target variable — model now predicts genuine teacher judgement
+- KNN (K=5, distance-weighted) used to propagate teacher labels to synthetic samples
+- LMS formula retained as fallback mode (`use_teacher_labels=False`)
+- Added AUC-ROC metric to training evaluation
+- Results: 85.25% accuracy, 91.7% at-risk F1, 97.54% AUC-ROC
+- Teacher-vs-formula agreement: 59.3% (confirms independent target)
 
 ### v2.1.0 (February 2026)
 - **LMS Formula Refinement**: Hybrid formula derived from literature + data-driven analysis

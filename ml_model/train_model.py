@@ -15,16 +15,20 @@ Features (11):
 
 Target:
 - mastery_level: 0=at_risk, 1=developing, 2=proficient, 3=advanced
+- Source: Teacher-assigned labels (primary) or formulaic LMS (fallback)
+  The target variable is determined by generate_dataset.py.
+  When teacher labels are used, the circular dependency on the LMS
+  formula is eliminated — the model learns genuine teacher judgement.
 
 Research Justification:
 - XGBoost ranked #1 across ALL metrics in model comparison testing
-- Superior at-risk class detection (95.24% F1 vs 78.05% for Bagging)
+- Superior at-risk class detection
 - Built-in L1/L2 regularization prevents overfitting
 - Natively compatible with SHAP TreeExplainer for XAI
 - Industry standard for tabular/structured data classification
 
 Author: X-Scaffold Research Team
-Date: February 2026 (Updated — switched from Bagging to XGBoost)
+Date: March 2026 (Updated — teacher-labelled target variable)
 """
 
 import numpy as np
@@ -172,6 +176,15 @@ def evaluate_model(model, X_test, y_test, X_train, y_train):
           f"R: {recall_score(y_test, y_pred, average='weighted'):.3f}  "
           f"F1: {f1_score(y_test, y_pred, average='weighted'):.3f}")
     
+    # AUC-ROC (One-vs-Rest, weighted)
+    try:
+        from sklearn.preprocessing import label_binarize
+        y_test_bin = label_binarize(y_test, classes=[0, 1, 2, 3])
+        auc_roc = roc_auc_score(y_test_bin, y_pred_proba, multi_class='ovr', average='weighted')
+        print(f"\n  AUC-ROC (Weighted OVR): {auc_roc:.4f}")
+    except Exception:
+        auc_roc = None
+    
     # Confusion Matrix
     print("\n  Confusion Matrix:")
     cm = confusion_matrix(y_test, y_pred)
@@ -192,6 +205,7 @@ def evaluate_model(model, X_test, y_test, X_train, y_train):
     
     # Return metrics for saving
     metrics = {
+        'target_source': 'teacher_labelled',
         'training_accuracy': float(train_acc),
         'test_accuracy': float(test_acc),
         'overfitting_gap': float(train_acc - test_acc),
@@ -199,6 +213,7 @@ def evaluate_model(model, X_test, y_test, X_train, y_train):
         'recall_macro': float(recall.mean()),
         'f1_macro': float(f1.mean()),
         'f1_weighted': float(f1_score(y_test, y_pred, average='weighted')),
+        'auc_roc_weighted': float(auc_roc) if auc_roc is not None else None,
         'cv_mean': float(cv_scores.mean()),
         'cv_std': float(cv_scores.std()),
         'per_class': {

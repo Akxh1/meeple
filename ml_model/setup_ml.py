@@ -2,15 +2,15 @@
 X-Scaffold ML Quick Start Script
 ==================================
 Run this script to set up the complete ML pipeline:
-1. Generate synthetic dataset
-2. Train Bagging Classifier
+1. Generate synthetic dataset (from 81 teacher-labelled real records)
+2. Train XGBoost Classifier (teacher-labelled target variable)
 3. Verify model works
 
 Usage:
     python setup_ml.py
 
 Author: X-Scaffold Research Team
-Date: January 2026
+Date: March 2026 (Updated — teacher-labelled pipeline)
 """
 
 import os
@@ -20,14 +20,14 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(SCRIPT_DIR)
 
 print("=" * 60)
-print("X-SCAFFOLD ML PIPELINE SETUP")
+print("X-SCAFFOLD ML PIPELINE SETUP (Teacher-Labelled)")
 print("=" * 60)
 
 # Step 1: Generate Dataset
-print("\n[STEP 1/3] Generating Dataset...")
+print("\n[STEP 1/3] Generating Dataset (Teacher-Labelled)...")
 print("-" * 40)
 from generate_dataset import generate_dataset
-df = generate_dataset(n_students=2000, output_path="xscaffold_student_dataset.csv")
+df = generate_dataset(n_students=2000, output_path="xscaffold_student_dataset.csv", use_teacher_labels=True)
 
 # Step 2: Train Model
 print("\n[STEP 2/3] Training XGBoost Classifier...")
@@ -67,14 +67,21 @@ print("\n" + "=" * 60)
 print("SETUP COMPLETE!")
 print("=" * 60)
 print("\nFiles created:")
-print("  ✅ xscaffold_student_dataset.csv (2000 students)")
+print("  ✅ xscaffold_student_dataset.csv (2000 students, teacher-labelled)")
 print("  ✅ xscaffold_xgboost_model.pkl")
 print("  ✅ xscaffold_scaler.pkl")
 print("  ✅ feature_names.json")
 print("  ✅ model_metrics.json")
 print("  ✅ feature_importance.json")
 print("  ✅ model_config.json")
+print(f"\nModel Performance:")
+print(f"  Test Accuracy:    {metrics['test_accuracy']:.4f}")
+print(f"  F1 (Weighted):    {metrics['f1_weighted']:.4f}")
+print(f"  CV Accuracy:      {metrics['cv_mean']:.4f}")
+if metrics.get('auc_roc_weighted'):
+    print(f"  AUC-ROC:          {metrics['auc_roc_weighted']:.4f}")
+print(f"  Target Source:    teacher_labelled")
 print("\nNext steps:")
 print("  1. Start API:  python api.py")
-print("  2. Test:       curl http://localhost:5000/health")
+print("  2. Test:       curl http://localhost:5500/health")
 print("=" * 60)
