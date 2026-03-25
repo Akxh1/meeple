@@ -9,7 +9,7 @@ Run this script to set up the complete ML pipeline:
 Usage:
     python setup_ml.py
 
-Date: March 2026 (Updated — teacher-labelled pipeline)
+Date: March 2026 (Updated, teacher-labelled pipeline)
 """
 
 import os
