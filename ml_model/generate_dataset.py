@@ -27,7 +27,6 @@ Features (11 total):
   7. avg_time_per_question, 8. review_percentage, 9. avg_first_action_latency
   10. clicks_per_question, 11. performance_trend
 
-Author: X-Scaffold Research Team
 Date: March 2026 (Updated — switched from formulaic LMS to teacher labels)
 """
 

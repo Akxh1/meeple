@@ -8,8 +8,6 @@ Endpoints:
 - POST /predict - Get mastery level prediction + SHAP values
 - GET /health - Health check
 
-Author: X-Scaffold Research Team
-Date: March 2026 (Updated — teacher-labelled model)
 """
 
 import os

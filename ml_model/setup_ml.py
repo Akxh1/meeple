@@ -9,7 +9,6 @@ Run this script to set up the complete ML pipeline:
 Usage:
     python setup_ml.py
 
-Author: X-Scaffold Research Team
 Date: March 2026 (Updated — teacher-labelled pipeline)
 """
 
