@@ -1,29 +1,22 @@
 <div align="center">
 
-# X-Scaffold
-
-### A Predict-Explain-Act Framework for Intelligent Learning Management
-
-[![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
-[![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
-[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![XGBoost](https://img.shields.io/badge/XGBoost-ML-017CEE?style=for-the-badge&logo=xgboost&logoColor=white)](https://xgboost.readthedocs.io)
-[![Gemini](https://img.shields.io/badge/Gemini-API-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind-CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1a1a2e,50:16213e,100:0f3460&height=220&section=header&text=X-Scaffold&fontSize=72&fontColor=e94560&fontAlignY=35&desc=Predict%20%C2%B7%20Explain%20%C2%B7%20Act&descSize=20&descAlignY=55&descColor=a7c5eb&animation=fadeIn" width="100%" />
 
 <br/>
 
-![Flask](https://img.shields.io/badge/Flask-3.0-000000?style=flat-square&logo=flask&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=flat-square&logo=sqlite&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?style=flat-square&logo=vite&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-20+-339933?style=flat-square&logo=nodedotjs&logoColor=white)
-![SHAP](https://img.shields.io/badge/SHAP-XAI-FF6F00?style=flat-square)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-ML-F7931E?style=flat-square&logo=scikitlearn&logoColor=white)
-![Alpine.js](https://img.shields.io/badge/Alpine.js-3.x-8BC0D0?style=flat-square&logo=alpinedotjs&logoColor=white)
+**A unified framework that synthesises Machine Learning prediction, Explainable AI diagnostics, and LLM-driven adaptive intervention for intelligent learning management.**
 
 <br/>
 
-*A final-year research project exploring how Machine Learning, Explainable AI, and Large Language Models can be synthesised to close the gap between identifying struggling students and actively supporting them.*
+<p>
+<a href="https://skillicons.dev">
+<img src="https://skillicons.dev/icons?i=laravel,php,python,flask,tailwind,alpinejs,sqlite,vite,nodejs&perline=9" />
+</a>
+</p>
+
+[![XGBoost](https://img.shields.io/badge/XGBoost-Classifier-017CEE?style=for-the-badge)](https://xgboost.readthedocs.io)
+[![SHAP](https://img.shields.io/badge/SHAP-Explainability-FF6F00?style=for-the-badge)](https://shap.readthedocs.io)
+[![Gemini](https://img.shields.io/badge/Gemini-LLM_API-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev)
 
 </div>
 
@@ -41,7 +34,6 @@
 - [Project Structure](#project-structure)
 - [ML Pipeline](#ml-pipeline)
 - [Environment Variables](#environment-variables)
-- [Default Accounts](#default-accounts)
 - [API Endpoints](#api-endpoints)
 - [Acknowledgements](#acknowledgements)
 
@@ -55,9 +47,9 @@ X-Scaffold addresses this gap through a unified **Predict-Explain-Act** pipeline
 
 | Stage | Component | What It Does |
 |:-----:|-----------|-------------|
-| 🔮 **Predict** | XGBoost Classifier | Analyses 11 behavioural features captured during exams to classify each student into one of four mastery levels |
-| 🔍 **Explain** | SHAP (XAI Layer) | Generates human-readable factor breakdowns so instructors understand the reasoning behind each prediction |
-| 🎯 **Act** | Gemini LLM | Delivers personalised, level-appropriate hints to students and produces strategic insights for instructors |
+| **Predict** | XGBoost Classifier | Analyses 11 behavioural features captured during exams to classify each student into one of four mastery levels |
+| **Explain** | SHAP (XAI Layer) | Generates human-readable factor breakdowns so instructors understand the reasoning behind each prediction |
+| **Act** | Gemini LLM | Delivers personalised, level-appropriate hints to students and produces strategic insights for instructors |
 
 ---
 
@@ -90,7 +82,7 @@ X-Scaffold addresses this gap through a unified **Predict-Explain-Act** pipeline
 
 ## Key Features
 
-### 🎓 Student Experience
+### Student Experience
 
 | Feature | Description |
 |---------|-------------|
@@ -109,7 +101,7 @@ X-Scaffold addresses this gap through a unified **Predict-Explain-Act** pipeline
 | L3 | Developing | Three numbered steps: recall the concept, avoid a common mistake, take the first action |
 | L4 | At Risk | Full concept explanation with a worked example and the correct answer |
 
-### 👨‍🏫 Instructor Experience
+### Instructor Experience
 
 | Feature | Description |
 |---------|-------------|
@@ -120,7 +112,7 @@ X-Scaffold addresses this gap through a unified **Predict-Explain-Act** pipeline
 | **Data Export** | Export all pipeline data as CSV for offline analysis or ML model retraining |
 | **XAI Explanations** | SHAP-based factor breakdowns that show instructors exactly which behavioural indicators contributed to a student's classification |
 
-### ⚙️ ML and Data Pipeline
+### ML and Data Pipeline
 
 | Capability | Detail |
 |------------|--------|
@@ -134,41 +126,50 @@ X-Scaffold addresses this gap through a unified **Predict-Explain-Act** pipeline
 
 ## Tech Stack
 
+<div align="center">
+
 <table>
 <tr>
 <td align="center" width="33%">
 
-### Backend
+**Backend**
 
-![Laravel](https://img.shields.io/badge/Laravel_12-FF2D20?style=flat-square&logo=laravel&logoColor=white)
-![PHP](https://img.shields.io/badge/PHP_8.2+-777BB4?style=flat-square&logo=php&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white)
-![Python](https://img.shields.io/badge/Python_3.9+-3776AB?style=flat-square&logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask_3.0-000000?style=flat-square&logo=flask&logoColor=white)
+<a href="https://skillicons.dev">
+<img src="https://skillicons.dev/icons?i=laravel,php,python,flask,sqlite&perline=5&theme=dark" />
+</a>
 
-</td>
-<td align="center" width="33%">
-
-### Frontend
-
-![Blade](https://img.shields.io/badge/Blade-FF2D20?style=flat-square&logo=laravel&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
-![Alpine.js](https://img.shields.io/badge/Alpine.js-8BC0D0?style=flat-square&logo=alpinedotjs&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite_6-646CFF?style=flat-square&logo=vite&logoColor=white)
+Laravel 12 · PHP 8.2+
+Python 3.9+ · Flask 3.0
 
 </td>
 <td align="center" width="33%">
 
-### ML and AI
+**Frontend**
 
-![XGBoost](https://img.shields.io/badge/XGBoost-017CEE?style=flat-square)
-![SHAP](https://img.shields.io/badge/SHAP-FF6F00?style=flat-square)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat-square&logo=scikitlearn&logoColor=white)
-![Gemini](https://img.shields.io/badge/Gemini_API-8E75B2?style=flat-square&logo=google&logoColor=white)
+<a href="https://skillicons.dev">
+<img src="https://skillicons.dev/icons?i=tailwind,alpinejs,vite,nodejs&perline=4&theme=dark" />
+</a>
+
+Blade Templates · Tailwind CSS
+Alpine.js · Vite 6
+
+</td>
+<td align="center" width="33%">
+
+**ML and AI**
+
+<a href="https://skillicons.dev">
+<img src="https://skillicons.dev/icons?i=sklearn&perline=3&theme=dark" />
+</a>
+
+XGBoost · SHAP · scikit-learn
+Google Gemini API
 
 </td>
 </tr>
 </table>
+
+</div>
 
 ---
 
@@ -178,12 +179,12 @@ Before setting up the project, ensure the following are installed:
 
 | Requirement | Version | Notes |
 |-------------|---------|-------|
-| ![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat-square&logo=php&logoColor=white) | 8.2+ | SQLite extension must be enabled |
-| ![Composer](https://img.shields.io/badge/Composer-885630?style=flat-square&logo=composer&logoColor=white) | 2.x | PHP dependency manager |
-| ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white) | 20+ | Includes npm |
-| ![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white) | 3.9+ | With pip |
-| **Laravel Herd** | Latest | Recommended local environment (or any alternative) |
-| **Gemini API Key** | Free tier | Obtain from [Google AI Studio](https://aistudio.google.com/apikey) |
+| PHP | 8.2+ | SQLite extension must be enabled |
+| Composer | 2.x | PHP dependency manager |
+| Node.js | 20+ | Includes npm |
+| Python | 3.9+ | With pip |
+| Laravel Herd | Latest | Recommended local environment (or any alternative) |
+| Gemini API Key | Free tier | Obtain from [Google AI Studio](https://aistudio.google.com/apikey) |
 
 ---
 
@@ -334,8 +335,8 @@ X-Scaffold/
 The Learning Mastery Score is a composite metric designed to capture a more holistic view of student understanding than raw exam scores alone. It is computed as follows:
 
 ```
-LMS = 0.50 × Score  +  0.15 × HardQAccuracy  +  10 × ConfidenceCalibration
-    + 10 × AnswerStability  +  10 × AttentionFocus  -  15 × HintDependency^1.5
+LMS = 0.50 x Score  +  0.15 x HardQAccuracy  +  10 x ConfidenceCalibration
+    + 10 x AnswerStability  +  10 x AttentionFocus  -  15 x HintDependency^1.5
 ```
 
 The formula rewards independent performance, well-calibrated confidence, and sustained attention, while applying a non-linear penalty for excessive hint dependency.
@@ -344,10 +345,10 @@ The formula rewards independent performance, well-calibrated confidence, and sus
 
 | Level | LMS Range | Hint Tier | Interpretation |
 |:-----:|:---------:|:---------:|----------------|
-| 🟢 Advanced | 76 to 100 | L1 (Socratic) | Demonstrates independent mastery with minimal scaffolding needed |
-| 🔵 Proficient | 56 to 75 | L2 (Guiding) | Solid foundational understanding with occasional support |
-| 🟠 Developing | 36 to 55 | L3 (Structured) | Requires step-by-step guidance to build confidence |
-| 🔴 At Risk | 0 to 35 | L4 (Full Support) | Needs comprehensive explanation and direct answers |
+| Advanced | 76 to 100 | L1 (Socratic) | Demonstrates independent mastery with minimal scaffolding needed |
+| Proficient | 56 to 75 | L2 (Guiding) | Solid foundational understanding with occasional support |
+| Developing | 36 to 55 | L3 (Structured) | Requires step-by-step guidance to build confidence |
+| At Risk | 0 to 35 | L4 (Full Support) | Needs comprehensive explanation and direct answers |
 
 ### 11 Behavioural Features
 
@@ -384,23 +385,11 @@ This executes the full training pipeline, outputs evaluation metrics, and saves 
 
 | Variable | Required | Description |
 |----------|:--------:|-------------|
-| `APP_NAME` | ✅ | Application display name (default: `X-Scaffold`) |
-| `APP_URL` | ✅ | Base URL for the application |
-| `DB_CONNECTION` | ✅ | Database driver (default: `sqlite`) |
-| `GEMINI_INSIGHTS_API` | ✅ | Google Gemini API key used for hint generation and instructor insights |
-| `IPINFO_TOKEN` | ❌ | Optional IPInfo token for geolocation features |
-
----
-
-## Default Accounts
-
-The following accounts are created when the database seeders are run:
-
-| Role | Email | Password |
-|:----:|-------|----------|
-| 👨‍🏫 Teacher | `teacher@example.com` | `password123` |
-| 👨‍🏫 Teacher | `teacher@test.com` | Same as student account |
-| 🎓 Student | `student@test.com` | Set during seeding |
+| `APP_NAME` | Yes | Application display name (default: `X-Scaffold`) |
+| `APP_URL` | Yes | Base URL for the application |
+| `DB_CONNECTION` | Yes | Database driver (default: `sqlite`) |
+| `GEMINI_INSIGHTS_API` | Yes | Google Gemini API key used for hint generation and instructor insights |
+| `IPINFO_TOKEN` | No | Optional IPInfo token for geolocation features |
 
 ---
 
@@ -451,11 +440,6 @@ This project was developed as part of a final-year dissertation at the Universit
 
 <div align="center">
 
-*Built with*
-![Laravel](https://img.shields.io/badge/-Laravel-FF2D20?style=flat-square&logo=laravel&logoColor=white)
-![Python](https://img.shields.io/badge/-Python-3776AB?style=flat-square&logo=python&logoColor=white)
-![XGBoost](https://img.shields.io/badge/-XGBoost-017CEE?style=flat-square)
-![Gemini](https://img.shields.io/badge/-Gemini-8E75B2?style=flat-square&logo=google&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/-Tailwind-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1a1a2e,50:16213e,100:0f3460&height=120&section=footer" width="100%" />
 
 </div>
