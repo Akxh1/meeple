@@ -1,12 +1,12 @@
 # Code of Conduct
 
-## Our Pledge
+## MY Pledge
 
 I as a contributor and maintainer of X-Scaffold pledge to make participation in our project a harassment-free experience for everyone.
 
-## Our Standards
+## My Standards
 
-Examples of behaviour that contributes to a positive environment:
+Examples of behaviour that contribute to a positive environment:
 
 - Using welcoming and inclusive language
 - Being respectful of differing viewpoints and experiences
@@ -17,8 +17,8 @@ Examples of unacceptable behaviour:
 
 - Trolling, insulting, or derogatory comments
 - Public or private harassment
-- Publishing others' private information without explicit permission
-- Other conduct which could reasonably be considered inappropriate in a professional setting
+- Publishing private information without explicit permission
+- Any other conduct that could reasonably be considered inappropriate in a professional setting
 
 ## Enforcement
 

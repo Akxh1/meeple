@@ -39,14 +39,14 @@ refactor: extract LMS calculation into dedicated service
 test: add unit tests for feature engineering pipeline
 ```
 
-## What We Accept
+## What I Accept
 
 - Bug fixes with clear reproduction steps
 - Documentation improvements
 - Test coverage improvements
 - Performance optimisations with benchmarks
 
-## What We Do Not Accept
+## What I Do Not Accept
 
 - Unsolicited feature additions without prior discussion
 - Changes to the ML model or training pipeline without approval

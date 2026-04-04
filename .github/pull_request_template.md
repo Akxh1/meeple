@@ -27,8 +27,8 @@
 - [ ] Documentation / README
 
 ## Checklist
-- [ ] My branch is created from `develop` (not `main`)
-- [ ] My code follows the project's style guidelines (Pint / ESLint)
-- [ ] I have tested my changes locally
-- [ ] I have not modified files outside the scope of this PR
-- [ ] This PR does not include any hardcoded secrets or API keys
+- [ ] Branch is created from `develop` (not `main`)
+- [ ] Code follows the project's style guidelines (Pint / ESLint)
+- [ ] Changes have been tested locally
+- [ ] No files outside the scope of this PR have been modified
+- [ ] No hardcoded secrets or API keys are included
