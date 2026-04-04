@@ -1,0 +1,22 @@
+Copyright (c) 2026 Akssayan Kalaharan. All Rights Reserved.
+
+This repository and its contents, including but not limited to source code,
+documentation, datasets, trained models, and configuration files, are the
+intellectual property of Akssayan Kalaharan.
+
+This project was developed as part of a final-year dissertation at the
+University of Westminster.
+
+PERMISSIONS:
+  - You MAY view and read the source code on GitHub for reference purposes only.
+
+RESTRICTIONS:
+  - You may NOT copy, clone, download, fork, reproduce, or redistribute
+    this repository or any part of it.
+  - You may NOT modify, adapt, or create derivative works based on this code.
+  - You may NOT use this code, in whole or in part, for commercial, academic,
+    or personal projects without prior written consent from the author.
+  - You may NOT use the trained ML models, datasets, or any generated artefacts
+    contained in this repository.
+
+For permissions beyond the scope of this licence, contact the author directly.
